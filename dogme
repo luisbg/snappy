@@ -1,0 +1,14 @@
+#!/bin/sh
+ 
+######## CONFIGURATION OPTIONS ########
+#OPTIONS="/home/username/.config/dogme/"
+# not being used yet
+#######################################
+ 
+# get the app dir if not already defined
+if [ -z "$PROGRAM_DIR" ]; then
+    PROGRAM_DIR=`dirname "$0"`
+fi
+ 
+#cd ${PROGRAM_DIR}
+exec python -O src/dogme.py "$@"
