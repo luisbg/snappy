@@ -262,6 +262,11 @@ event_cb (ClutterStage *stage,
 											fmt, GST_SEEK_FLAG_FLUSH,
 											pos);
 
+					gfloat progress = (float) pos / ui->engine->video_duration;
+					clutter_actor_set_size (ui->control_seekbar,
+											progress * SEEK_WIDTH,
+											SEEK_HEIGHT);
+
 					handled = TRUE;
 					break;
 				}
