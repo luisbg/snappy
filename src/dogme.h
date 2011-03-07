@@ -1,5 +1,5 @@
 /*
- * Dogme video player.
+ * Dogme media player.
  *
  * Copyright (C) 2011 Collabora Multimedia Ltd.
  * <luis.debethencourt@collabora.co.uk>
@@ -29,9 +29,9 @@ typedef struct UserInterface UserInterface;
 struct GstEngine
 {
 	gchar		*uri, *filepath;
-	guint		video_width, video_height;
+	guint		media_width, media_height;
 	gboolean	playing;
-	gint64		video_duration;
+	gint64		media_duration;
 
 	GstElement	*player;
 	GstElement	*sink;
@@ -56,7 +56,7 @@ struct UserInterface
 	gboolean	controls_showing, fullscreen;
 	guint		controls_timeout;
 
-	guint		video_width, video_height;
+	guint		media_width, media_height;
 	guint		stage_width, stage_height;
 
 	GstEngine   *engine;
@@ -71,7 +71,7 @@ static void toggle_fullscreen (UserInterface *ui);
 static void size_change (ClutterStage *stage, gpointer *data);
 static gboolean event_cb (ClutterStage *stage, ClutterEvent *event,
 							gpointer data);
-static gboolean update_video_duration (GstEngine *engine);
+static gboolean update_media_duration (GstEngine *engine);
 static gboolean progress_update (gpointer data);
 static gboolean bus_call (GstBus *bus, GstMessage *msg, gpointer data);
 static gchar * cut_long_filename (gchar *filename);

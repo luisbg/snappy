@@ -3,7 +3,7 @@
  * or (if your pkg-config has clutter-gst-1.0 instead of clutter-gst-0.10
  * gcc `pkg-config --libs --cflags clutter-1.0 clutter-glx-1.0 gstreamer-0.10 clutter-gst-1.0` dogme.c -o dogme
  *
- * Dogme video player.
+ * Dogme media player.
  *
  * Copyright (C) 2011 Collabora Multimedia Ltd.
  * <luis.debethencourt@collabora.co.uk>
@@ -132,11 +132,11 @@ size_change (ClutterStage *stage,
 
 	gfloat stage_width, stage_height;
 	gfloat new_width, new_height;
-	gfloat video_width, video_height;
+	gfloat media_width, media_height;
 	gfloat center, aratio;
 
-	video_width = ui->engine->video_width;
-	video_height = ui->engine->video_height;
+	media_width = ui->engine->media_width;
+	media_height = ui->engine->media_height;
 
 	stage_width = clutter_actor_get_width (ui->stage);
 	stage_height = clutter_actor_get_height (ui->stage);
@@ -145,14 +145,14 @@ size_change (ClutterStage *stage,
 
 	new_width = stage_width;
 	new_height = stage_height;
-	if (video_height <= video_width)
+	if (media_height <= media_width)
 	{
-		aratio = video_height / video_width;
+		aratio = media_height / media_width;
 		new_height = new_width * aratio;
 		center = (stage_height - new_height) / 2;
 		clutter_actor_set_position (CLUTTER_ACTOR (ui->texture), 0, center);
 	} else {
-		aratio = video_width / video_height;
+		aratio = media_width / media_height;
 		new_width = new_height * aratio;
 		center = (stage_width - new_width) / 2;
 		clutter_actor_set_position (CLUTTER_ACTOR (ui->texture), center, 0);
@@ -267,7 +267,7 @@ event_cb (ClutterStage *stage,
 											fmt, GST_SEEK_FLAG_FLUSH,
 											pos);
 
-					gfloat progress = (float) pos / ui->engine->video_duration;
+					gfloat progress = (float) pos / ui->engine->media_duration;
 					clutter_actor_set_size (ui->control_seekbar,
 											progress * SEEK_WIDTH,
 											SEEK_HEIGHT);
@@ -276,7 +276,7 @@ event_cb (ClutterStage *stage,
 					break;
 				}
 				case CLUTTER_r:
-					// rotate video 90 degrees.
+					// rotate texture 90 degrees.
 					handled = TRUE;
 					break;
 
@@ -308,12 +308,12 @@ event_cb (ClutterStage *stage,
 					dist = bev->x - x;
 					dist = CLAMP (dist, 0, SEEK_WIDTH);
 
-					if (ui->engine->video_duration == -1)
+					if (ui->engine->media_duration == -1)
 					{
-						update_video_duration (ui->engine);
+						update_media_duration (ui->engine);
 					}
 
-					progress = ui->engine->video_duration * (dist / SEEK_WIDTH);
+					progress = ui->engine->media_duration * (dist / SEEK_WIDTH);
 					gst_element_seek_simple (ui->engine->player,
 										GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 										progress);
@@ -337,16 +337,16 @@ event_cb (ClutterStage *stage,
 }
 
 static gboolean
-update_video_duration (GstEngine *engine)
+update_media_duration (GstEngine *engine)
 {
 	gboolean success = FALSE;
 
 	GstFormat fmt = GST_FORMAT_TIME;
 	if (gst_element_query_duration (engine->player, &fmt,
-			&engine->video_duration))
+			&engine->media_duration))
 	{
-		if (engine->video_duration != -1 && fmt == GST_FORMAT_TIME) {
-			g_debug ("Media duration: %ld\n", engine->video_duration);
+		if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {
+			g_debug ("Media duration: %ld\n", engine->media_duration);
 			success = TRUE;
 		} else {
 			g_debug ("Could not get media's duration\n");
@@ -364,15 +364,15 @@ progress_update (gpointer data)
 	GstEngine *engine = ui->engine;
 	gfloat progress = 0.0;
 
-	if (engine->video_duration == -1)
+	if (engine->media_duration == -1)
 	{
-		update_video_duration (engine);
+		update_media_duration (engine);
 	}
 
 	gint64 pos;
 	GstFormat fmt = GST_FORMAT_TIME;
 	gst_element_query_position (engine->player, &fmt, &pos);
-	progress = (float) pos / engine->video_duration;
+	progress = (float) pos / engine->media_duration;
 	g_debug ("playback position progress: %f\n", progress);
 
 	clutter_actor_set_size (ui->control_seekbar, progress * SEEK_WIDTH,
@@ -412,7 +412,7 @@ bus_call (GstBus *bus, GstMessage *msg, gpointer data)
 			gst_message_parse_state_changed (msg, &old, &new, &pending);
 			if (new == GST_STATE_PAUSED)
 			{
-				if (engine->video_width == -1)
+				if (engine->media_width == -1)
 				{
 					GstPad *p = gst_element_get_pad (engine->sink, "sink");
 					GstCaps *c = gst_pad_get_negotiated_caps (p);
@@ -429,8 +429,8 @@ bus_call (GstBus *bus, GstMessage *msg, gpointer data)
 							height = g_value_get_int (heightval);
 							g_debug ("Setting width: %d, height: %d\n", width,
 										height);
-							engine->video_width = width;
-							engine->video_height = height;
+							engine->media_width = width;
+							engine->media_height = height;
 							load_user_interface (engine->ui);
 						}
 					}
@@ -483,10 +483,10 @@ load_user_interface (UserInterface *ui)
 	ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
 	ui->filename = g_path_get_basename (ui->filepath);
 
-	ui->video_width = ui->engine->video_width;
-	ui->video_height = ui->engine->video_height;
-	ui->stage_width = ui->engine->video_width;
-	ui->stage_height = ui->engine->video_height;
+	ui->media_width = ui->engine->media_width;
+	ui->media_height = ui->engine->media_height;
+	ui->stage_width = ui->engine->media_width;
+	ui->stage_height = ui->engine->media_height;
 	ui->stage = clutter_stage_get_default();
 	clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
 	clutter_stage_set_minimum_size (CLUTTER_STAGE (ui->stage),
@@ -610,8 +610,8 @@ int main (int argc, char *argv[])
 	// Gstreamer
 	GstEngine *engine = NULL;
 	engine = g_new0(GstEngine, 1);
-	engine->video_width = -1;
-	engine->video_height = -1;
+	engine->media_width = -1;
+	engine->media_height = -1;
 	engine->ui = ui;
 	ui->engine = engine;
 
@@ -637,7 +637,7 @@ int main (int argc, char *argv[])
 	GstStateChange ret;
 	gst_element_set_state (engine->player, GST_STATE_PAUSED);
 	engine->playing = FALSE;
-	engine->video_duration = -1;
+	engine->media_duration = -1;
 
 	gst_element_set_state (engine->player, GST_STATE_PLAYING);
 	engine->playing = TRUE;
