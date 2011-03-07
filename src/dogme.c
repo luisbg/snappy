@@ -189,6 +189,11 @@ event_cb (ClutterStage *stage,
 					toggle_fullscreen (ui);
 					handled = TRUE;
 					break;
+				case CLUTTER_space:
+					// Spacebar
+					toggle_playing (ui, ui->engine);
+					handled = TRUE;
+					break;
 				case CLUTTER_8:
 				{
 					// Mute button
@@ -635,6 +640,7 @@ int main (int argc, char *argv[])
 	engine->video_duration = -1;
 
 	gst_element_set_state (engine->player, GST_STATE_PLAYING);
+	engine->playing = TRUE;
 	clutter_main ();
 
 	return 0;
