@@ -375,9 +375,6 @@ toggle_playing (UserInterface *ui, GstEngine *engine)
 void
 load_user_interface (UserInterface *ui)
 {
-	char *env;
-	env = getenv("PWD");
-
 	// Stage
 	ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
 	ClutterColor control_color1 = { 73, 74, 77, 0xee };
@@ -402,16 +399,28 @@ load_user_interface (UserInterface *ui)
 	}
 
 	// Controls
-	g_print ("HERE: %s\n", DOGME_DATA_DIR);
-	char *vid_panel_png = malloc (strlen (DOGME_DATA_DIR) +
-									strlen("/vid-panel.png") + 2);
-	sprintf (vid_panel_png, "%s%s", DOGME_DATA_DIR, "/vid-panel.png");
-	char *play_png = malloc (strlen (DOGME_DATA_DIR) +
-								strlen("/media-actions-start.png") + 2);
-	sprintf (play_png, "%s%s", DOGME_DATA_DIR, "/media-actions-start.png");
-	char *pause_png = malloc (strlen (DOGME_DATA_DIR) + 
-								strlen("/media-actions-pause.png") + 2);
-	sprintf (pause_png, "%s%s", DOGME_DATA_DIR, "/media-actions-pause.png");
+	gchar *vid_panel_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
+											"/vid-panel.png");
+	gchar *play_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
+										"/media-actions-start.png");
+	gchar *pause_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
+										"/media-actions-pause.png");
+
+	gchar *icon_files[3];
+	icon_files[0] = vid_panel_png;
+	icon_files[1] = play_png;
+	icon_files[2] = pause_png;
+
+	gint c;
+	for (c = 0; c < 3; c++) {
+		if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS))
+		{
+			g_print ("Icon file doesn't exist, are you sure you have " \
+					" installed dogme correctly?\nThe file needed is: %s\n",
+					icon_files[c]);
+
+		}
+	}
 
 	ui->control = clutter_group_new ();
 	ui->control_bg =
@@ -422,6 +431,9 @@ load_user_interface (UserInterface *ui)
 			clutter_texture_new_from_file (pause_png, NULL);
 
 	g_assert (ui->control_bg && ui->control_play && ui->control_pause);
+	g_free (vid_panel_png);
+	g_free (play_png);
+	g_free (pause_png);
 
 	ui->control_seek1   = clutter_rectangle_new_with_color (&control_color1);
 	ui->control_seek2   = clutter_rectangle_new_with_color (&control_color2);
