@@ -402,15 +402,16 @@ load_user_interface (UserInterface *ui)
 	}
 
 	// Controls
-	char *vid_panel_png = malloc (strlen (env) +
-									strlen("/../img/vid-panel.png") + 2);
-	sprintf (vid_panel_png, "%s%s", env, "/../img/vid-panel.png");
-	char *play_png = malloc (strlen (env) +
-								strlen("/../img/media-actions-start.png") + 2);
-	sprintf (play_png, "%s%s", env, "/../img/media-actions-start.png");
-	char *pause_png = malloc (strlen (env) + 
-								strlen("/../img/media-actions-pause.png") + 2);
-	sprintf (pause_png, "%s%s", env, "/../img/media-actions-pause.png");
+	g_print ("HERE: %s\n", DOGME_DATA_DIR);
+	char *vid_panel_png = malloc (strlen (DOGME_DATA_DIR) +
+									strlen("/vid-panel.png") + 2);
+	sprintf (vid_panel_png, "%s%s", DOGME_DATA_DIR, "/vid-panel.png");
+	char *play_png = malloc (strlen (DOGME_DATA_DIR) +
+								strlen("/media-actions-start.png") + 2);
+	sprintf (play_png, "%s%s", DOGME_DATA_DIR, "/media-actions-start.png");
+	char *pause_png = malloc (strlen (DOGME_DATA_DIR) + 
+								strlen("/media-actions-pause.png") + 2);
+	sprintf (pause_png, "%s%s", DOGME_DATA_DIR, "/media-actions-pause.png");
 
 	ui->control = clutter_group_new ();
 	ui->control_bg =
