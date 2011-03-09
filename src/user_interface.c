@@ -361,22 +361,16 @@ toggle_playing (UserInterface *ui, GstEngine *engine)
 		gst_element_set_state (engine->player, GST_STATE_PAUSED);
 		engine->playing = FALSE;
 
-		gchar *play_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
-										"/media-actions-start.png");
 		clutter_texture_set_from_file (
-					CLUTTER_TEXTURE (ui->control_play_toggle), play_png,
+					CLUTTER_TEXTURE (ui->control_play_toggle), ui->play_png,
 					NULL);
-		g_free (play_png);
 	} else {
 		gst_element_set_state (engine->player, GST_STATE_PLAYING);
 		engine->playing = TRUE;
 
-		gchar *pause_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
-										"/media-actions-pause.png");
 		clutter_texture_set_from_file (
-					CLUTTER_TEXTURE (ui->control_play_toggle), pause_png,
+					CLUTTER_TEXTURE (ui->control_play_toggle), ui->pause_png,
 					NULL);
-		g_free (pause_png);
 	}
 }
 
@@ -411,15 +405,14 @@ load_user_interface (UserInterface *ui)
 	// Check icon files exist
 	gchar *vid_panel_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
 											"/vid-panel.png");
-	gchar *play_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
+	ui->play_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
 										"/media-actions-start.png");
-	gchar *pause_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
+	ui->pause_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
 										"/media-actions-pause.png");
-
 	gchar *icon_files[3];
 	icon_files[0] = vid_panel_png;
-	icon_files[1] = play_png;
-	icon_files[2] = pause_png;
+	icon_files[1] = ui->play_png;
+	icon_files[2] = ui->pause_png;
 
 	gint c;
 	for (c = 0; c < 3; c++) {
@@ -442,9 +435,10 @@ load_user_interface (UserInterface *ui)
 			clutter_texture_new_from_file (vid_panel_png, NULL);
 	clutter_container_add_actor (CLUTTER_CONTAINER (ui->controls),
 									ui->control_bg);
+	g_free (vid_panel_png);
 
 	ui->control_play_toggle =
-			clutter_texture_new_from_file (pause_png, NULL);
+			clutter_texture_new_from_file (ui->pause_png, NULL);
 	clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (controls_layout),
 							ui->control_play_toggle,
 							CLUTTER_BIN_ALIGNMENT_FIXED,
@@ -490,10 +484,6 @@ load_user_interface (UserInterface *ui)
 	clutter_actor_set_position (ui->control_title, 200, 40);
 
 	g_assert (ui->control_bg && ui->control_play_toggle);
-	g_free (vid_panel_png);
-	g_free (play_png);
-	g_free (pause_png);
-
 
 	// Add control UI to stage
 	clutter_container_add (CLUTTER_CONTAINER (ui->stage),

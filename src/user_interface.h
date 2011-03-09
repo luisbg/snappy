@@ -35,6 +35,7 @@ typedef struct _UserInterface UserInterface;
 struct _UserInterface
 {
 	gchar        *filename, *filepath;
+	gchar        *play_png, *pause_png;
 	ClutterActor *stage;
 
 	ClutterColor stage_color, control_color1, control_color2;
@@ -50,6 +51,7 @@ struct _UserInterface
 
 	guint       media_width, media_height;
 	guint       stage_width, stage_height;
+
 
 	GstEngine   *engine;
 };
