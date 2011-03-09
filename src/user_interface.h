@@ -40,10 +40,10 @@ struct _UserInterface
 	ClutterColor stage_color, control_color1, control_color2;
 
 	ClutterActor *texture;
-	ClutterActor *control;
-	ClutterActor *control_bg, *control_label, *control_play,
-	*control_pause, *control_seek1, *control_seek2,
-	*control_seekbar;
+	ClutterActor *controls;
+	ClutterActor *control_bg, *control_title, *control_play_toggle,
+		*control_seek1, *control_seek2,
+		*control_seekbar;
 
 	gboolean    controls_showing, fullscreen;
 	guint       controls_timeout;
