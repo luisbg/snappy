@@ -383,7 +383,7 @@ load_user_interface (UserInterface *ui)
 	ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
 	ClutterColor control_color1 = { 73, 74, 77, 0xee };
 	ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
-	ui->filename = g_path_get_basename (ui->filepath);
+	ui->filename = g_path_get_basename (ui->fileuri);
 
 	ui->media_width = ui->engine->media_width;
 	ui->media_height = ui->engine->media_height;

@@ -34,7 +34,7 @@ typedef struct _UserInterface UserInterface;
 
 struct _UserInterface
 {
-	gchar        *filename, *filepath;
+	gchar        *filename, *fileuri;
 	gchar        *play_png, *pause_png;
 	ClutterActor *stage;
 

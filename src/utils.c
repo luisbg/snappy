@@ -21,10 +21,11 @@
  */
 
 #include <glib.h>
+#include <gio/gio.h>
 
 
 gchar *
-cut_long_filename(gchar *filename)
+cut_long_filename (gchar *filename)
 {
 	gchar *ret;
 	gint c;
@@ -48,4 +49,21 @@ cut_long_filename(gchar *filename)
 
 	if (ret == NULL) g_print ("really?\n");
 	return ret;
+}
+
+gchar *
+clean_uri (gchar *input_arg)
+{
+	GFile *gfile;
+	gchar *filepath;
+
+	gfile = g_file_new_for_commandline_arg (input_arg);
+	if (g_file_has_uri_scheme (gfile, "archive") != FALSE)
+	{
+		g_print ("ERROR: %s isn't a file\n", input_arg);
+	}
+
+	filepath = g_file_get_path (gfile);
+
+	return filepath;
 }

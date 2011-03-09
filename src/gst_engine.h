@@ -29,7 +29,7 @@ typedef struct _GstEngine GstEngine;
 
 struct _GstEngine
 {
-	gchar		*uri, *filepath;
+	gchar		*uri, *fileuri;
 	guint		media_width, media_height;
 	gboolean	playing;
 	gint64		media_duration;

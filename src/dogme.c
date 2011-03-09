@@ -1,12 +1,4 @@
 /*
- * gcc `pkg-config --libs --cflags clutter-1.0 clutter-glx-1.0 gstreamer-0.10
- * clutter-gst-0.10` utils.c user_interface.c gst_engine.c dogme.c -o dogme
- *
- * or (if your pkg-config has clutter-gst-1.0 instead of clutter-gst-0.10
- *
- * gcc `pkg-config --libs --cflags clutter-1.0 clutter-glx-1.0 gstreamer-0.10
- * clutter-gst-1.0` utils.c user_interface.c gst_engine.c dogme.c -o dogme
- *
  * Dogme media player.
  *
  * Copyright (C) 2011 Collabora Multimedia Ltd.
@@ -36,6 +28,7 @@
 
 #include "user_interface.h"
 #include "gst_engine.h"
+#include "utils.h"
 
 
 int main (int argc, char *argv[])
@@ -59,8 +52,8 @@ int main (int argc, char *argv[])
 		}
 	for (index = optind; index < argc; index++)
 	{
-		g_debug ("Adding file: %s\n", argv[index]);
 		file_list[pos] = argv[index];
+		g_debug ("Adding file: %s\n", file_list[pos]);
 		pos++;
 	}
 
@@ -91,12 +84,14 @@ int main (int argc, char *argv[])
 	gst_object_unref (engine->bus);
 	ui->texture = texture;
 
-	gchar *filepath = file_list[0];
+	gchar *fileuri;
+	fileuri = clean_uri (file_list[0]);
+	g_print ("Loading: %s\n", fileuri);
 	engine->uri = NULL;
-	asprintf(&engine->uri, "file://%s", filepath);
+	asprintf(&engine->uri, "file://%s", fileuri);
 	g_object_set (G_OBJECT (engine->player), "uri", engine->uri, NULL);
-	engine->filepath = filepath;
-	ui->filepath = filepath;
+	engine->fileuri = fileuri;
+	ui->fileuri = fileuri;
 	GstStateChange ret;
 	gst_element_set_state (engine->player, GST_STATE_PAUSED);
 	engine->playing = FALSE;
