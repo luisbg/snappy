@@ -495,9 +495,9 @@ load_user_interface (UserInterface *ui)
 	clutter_actor_animate (ui->controls, CLUTTER_EASE_OUT_QUINT, 1000,
 							"opacity", 0, NULL);
 
-	g_signal_connect (CLUTTER_TEXTURE (ui->stage), "fullscreen",
+	g_signal_connect (CLUTTER_STAGE (ui->stage), "fullscreen",
 						G_CALLBACK (size_change), ui);
-	g_signal_connect (CLUTTER_TEXTURE (ui->stage), "unfullscreen",
+	g_signal_connect (CLUTTER_STAGE (ui->stage), "unfullscreen",
 						G_CALLBACK (size_change), ui);
 	g_signal_connect (ui->stage, "event", G_CALLBACK (event_cb), ui);
 
