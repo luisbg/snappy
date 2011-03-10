@@ -2,12 +2,12 @@ AC_PREREQ(2.60)
 dnl initialize autoconf
 dnl when going to/from release please set the nano (fourth number) right !
 dnl releases only do Wall, cvs and prerelease does Werror too
-AC_INIT([dogme],
+AC_INIT([snappy],
     [0.1],
     NULL,
-    dogme)
+    snappy)
 
-AC_CONFIG_SRCDIR([src/dogme.c])
+AC_CONFIG_SRCDIR([src/snappy.c])
 AM_CONFIG_HEADER([config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 
@@ -101,5 +101,5 @@ Configuration
 	Vala bindings              : ${enable_vala}
 	Python bindings:           : ${HAVE_PYTHON_BINDINGS}
 
-dogme configured. Type 'make' to build.
+snappy configured. Type 'make' to build.
 "

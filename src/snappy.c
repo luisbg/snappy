@@ -1,5 +1,5 @@
 /*
- * Dogme media player.
+ * snappy - 0.1 beta
  *
  * Copyright (C) 2011 Collabora Multimedia Ltd.
  * <luis.debethencourt@collabora.co.uk>

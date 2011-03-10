@@ -9,14 +9,14 @@ c_sources = \
 	utils.c \
 	user_interface.c \
 	gst_engine.c \
-	dogme.c
+	snappy.c
 
 CLEANFILES =
 
-bin_PROGRAMS = dogme
+bin_PROGRAMS = snappy
 
-dogme_SOURCES = $(c_sources)
-dogme_CFLAGS = $(CLUTTER_CFLAGS) $(GSTREAMER_0_10_CFLAGS) $(CLUTTER_GST_CFLAGS) -DDOGME_DATA_DIR="\"$(pkgdatadir)\""
-dogme_LDADD = $(CLUTTER_LIBS) $(GSTREAMER_0_10_LIBS) $(CLUTTER_GST_LIBS)
+snappy_SOURCES = $(c_sources)
+snappy_CFLAGS = $(CLUTTER_CFLAGS) $(GSTREAMER_0_10_CFLAGS) $(CLUTTER_GST_CFLAGS) -DSNAPPY_DATA_DIR="\"$(pkgdatadir)\""
+snappy_LDADD = $(CLUTTER_LIBS) $(GSTREAMER_0_10_LIBS) $(CLUTTER_GST_LIBS)
 
 noinst_HEADERS = $(public_headers)

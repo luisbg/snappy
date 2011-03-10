@@ -1,5 +1,5 @@
 /*
- * Dogme media player.
+ * snappy - 0.1 beta
  *
  * Copyright (C) 2011 Collabora Multimedia Ltd.
  * <luis.debethencourt@collabora.co.uk>
@@ -403,11 +403,11 @@ load_user_interface (UserInterface *ui)
 	}
 
 	// Check icon files exist
-	gchar *vid_panel_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
+	gchar *vid_panel_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
 											"/vid-panel.png");
-	ui->play_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
+	ui->play_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
 										"/media-actions-start.png");
-	ui->pause_png = g_strdup_printf ("%s%s", DOGME_DATA_DIR,
+	ui->pause_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
 										"/media-actions-pause.png");
 	gchar *icon_files[3];
 	icon_files[0] = vid_panel_png;
@@ -419,7 +419,7 @@ load_user_interface (UserInterface *ui)
 		if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS))
 		{
 			g_print ("Icon file doesn't exist, are you sure you have " \
-					" installed dogme correctly?\nThe file needed is: %s\n",
+					" installed snappy correctly?\nThis file needed is: %s\n",
 					icon_files[c]);
 
 		}
