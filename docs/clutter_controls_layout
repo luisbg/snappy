@@ -1,0 +1,28 @@
+layout management of snappy's clutter controls
+----------------------------------------------
+
+ui->control_box (fixed alignment bin)
+[
+	ui->control_bg
+	main_box (horizontal alignment box)
+	[
+		ui->control_play_toggle
+		info_box (vertical alignment box)
+		[
+			ui->control_title
+			seek_box (fixed alignment bin)
+			[
+				ui->control_seek1
+				ui->control_seek2
+				ui->control_seekbar
+			]
+		]
+	]
+]
+
+
+
+
+
+for more information read:
+http://docs.clutter-project.org/docs/clutter-cookbook/stable/layouts.html

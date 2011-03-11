@@ -1,0 +1,20 @@
+keyboard controls for snappy
+----------------------------
+
+spacebar   - play/pause
+
+f          - fullscreen/unfullscreen
+
+esc        - close snappy
+q          - close snappy
+
+up         - seek 1 minute foward
+down       - seek 1 minute back
+left       - seek 10 seconds back
+right      - seek 10 seconds foward
+
+8          - mute/unmute
+9          - turn volume up
+0          - turn volume down
+
+r          - rotate video 90 degrees
