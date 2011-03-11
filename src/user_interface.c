@@ -46,15 +46,15 @@ center_controls (UserInterface *ui)
 {
 	gfloat x, y;
 
-	x = (ui->stage_width - clutter_actor_get_width (ui->controls)) / 2;
+	x = (ui->stage_width - clutter_actor_get_width (ui->control_box)) / 2;
 	y = ui->stage_height - (ui->stage_height / 3);
 
 	g_debug ("stage width = %.2d, height = %.2d\n", ui->stage_width,
 		ui->stage_height);
 	g_debug ("setting x = %.2f, y = %.2f, width = %.2f\n",
-		x, y, clutter_actor_get_width (ui->controls));
+		x, y, clutter_actor_get_width (ui->control_box));
 
-	clutter_actor_set_position (ui->controls, x, y);
+	clutter_actor_set_position (ui->control_box, x, y);
 }
 
 static gboolean
@@ -323,7 +323,7 @@ show_controls (UserInterface *ui, gboolean vis)
 		ui->controls_showing = TRUE;
 
 		clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
-		clutter_actor_animate (ui->controls, CLUTTER_EASE_OUT_QUINT, 250,
+		clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, 250,
 			"opacity", 224,
 			NULL);
 
@@ -335,7 +335,7 @@ show_controls (UserInterface *ui, gboolean vis)
 		ui->controls_showing = FALSE;
 
 		clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
-		clutter_actor_animate (ui->controls, CLUTTER_EASE_OUT_QUINT, 250,
+		clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, 250,
 			"opacity", 0,
 			NULL);
 		return;
@@ -427,72 +427,107 @@ load_user_interface (UserInterface *ui)
 
 	// Controls
 	ClutterLayoutManager *controls_layout = clutter_bin_layout_new (
-												CLUTTER_BIN_ALIGNMENT_FILL,
-												CLUTTER_BIN_ALIGNMENT_FILL);
-	ui->controls = clutter_box_new (controls_layout);
+												CLUTTER_BIN_ALIGNMENT_FIXED,
+												CLUTTER_BIN_ALIGNMENT_FIXED);
+	ui->control_box = clutter_box_new (controls_layout);
 
 	ui->control_bg =
 			clutter_texture_new_from_file (vid_panel_png, NULL);
-	clutter_container_add_actor (CLUTTER_CONTAINER (ui->controls),
-									ui->control_bg);
 	g_free (vid_panel_png);
+	clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
+									ui->control_bg);
 
+	ClutterLayoutManager *main_box_layout;
+	main_box_layout = clutter_box_layout_new ();
+	clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (main_box_layout),
+										FALSE);
+	ClutterActor *main_box;
+	main_box = clutter_box_new (main_box_layout);
+	clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (main_box_layout),
+									CTL_SPACING);
 	ui->control_play_toggle =
 			clutter_texture_new_from_file (ui->pause_png, NULL);
-	clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (controls_layout),
-							ui->control_play_toggle,
-							CLUTTER_BIN_ALIGNMENT_FIXED,
-							CLUTTER_BIN_ALIGNMENT_FIXED);
+	clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
+                         ui->control_play_toggle,
+                         FALSE,							/* expand */
+                         FALSE,							/* x-fill */
+                         FALSE,							/* y-fill */
+                         CLUTTER_BOX_ALIGNMENT_START,	/* x-align */
+                         CLUTTER_BOX_ALIGNMENT_CENTER);	/* y-align */
+	clutter_actor_set_position (main_box, CTL_BORDER, CTL_BORDER);
+	clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
+									main_box);
+
+	ClutterLayoutManager *info_box_layout;
+	info_box_layout = clutter_box_layout_new ();
+	clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (info_box_layout),
+										TRUE);
+	ClutterActor *info_box;
+	info_box = clutter_box_new (info_box_layout);
 
 	ui->control_title =
-			clutter_text_new_full ("Sans Bold 24", cut_long_filename (ui->filename),
+			clutter_text_new_full ("Sans Bold 24",
+									cut_long_filename (ui->filename),
 									&control_color1);
-	clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (controls_layout),
-							ui->control_title,
-							CLUTTER_BIN_ALIGNMENT_FIXED,
-							CLUTTER_BIN_ALIGNMENT_FIXED);
+	clutter_box_pack (CLUTTER_BOX (info_box), ui->control_title,
+						"x-fill", TRUE, NULL);
 
-	ui->control_seek1   = clutter_rectangle_new_with_color (&control_color1);
-	clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (controls_layout),
-							ui->control_seek1,
-							CLUTTER_BIN_ALIGNMENT_FIXED,
-							CLUTTER_BIN_ALIGNMENT_FIXED);
+	ClutterLayoutManager *seek_box_layout;
+	seek_box_layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
+												CLUTTER_BIN_ALIGNMENT_FIXED);
+	ClutterActor *seek_box;
+	seek_box = clutter_box_new (seek_box_layout);
 
-	ui->control_seek2   = clutter_rectangle_new_with_color (&control_color2);
-	clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (controls_layout),
-							ui->control_seek2,
-							CLUTTER_BIN_ALIGNMENT_FIXED,
-							CLUTTER_BIN_ALIGNMENT_FIXED);
+	ui->control_seek1  = clutter_rectangle_new_with_color (&control_color1);
+	clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
+									ui->control_seek1);
+
+	ui->control_seek2  = clutter_rectangle_new_with_color (&control_color2);
+	clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
+									ui->control_seek2);
 
 	ui->control_seekbar = clutter_rectangle_new_with_color (&control_color1);
-	clutter_bin_layout_add (CLUTTER_BIN_LAYOUT (controls_layout),
-							ui->control_seekbar,
-							CLUTTER_BIN_ALIGNMENT_FIXED,
-							CLUTTER_BIN_ALIGNMENT_FIXED);
+	clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
+									ui->control_seekbar);
 
-	clutter_actor_set_opacity (ui->controls, 0xee);
+	clutter_box_pack (CLUTTER_BOX (info_box), seek_box,
+						"x-fill", FALSE, "y-fill", TRUE, NULL);
 
-	clutter_actor_set_position (ui->control_play_toggle, 30, 30);
+	clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
+                         info_box,
+                         FALSE,							/* expand */
+                         FALSE,							/* x-fill */
+                         FALSE,							/* y-fill */
+                         CLUTTER_BOX_ALIGNMENT_START,   /* x-align */
+                         CLUTTER_BOX_ALIGNMENT_CENTER);	/* y-align */
 
-	clutter_actor_set_size (ui->control_seek1, SEEK_WIDTH+10, SEEK_HEIGHT+10);
-	clutter_actor_set_position (ui->control_seek1, 200, 100);
+	clutter_actor_set_opacity (ui->control_box, 0xee);
+
+	clutter_actor_set_size (ui->control_seek1, SEEK_WIDTH + (SEEK_BORDER * 2),
+								SEEK_HEIGHT + (SEEK_BORDER * 2));
+	clutter_actor_set_position (ui->control_seek1, 0, 0);
 	clutter_actor_set_size (ui->control_seek2, SEEK_WIDTH, SEEK_HEIGHT);
-	clutter_actor_set_position (ui->control_seek2, 205, 105);
+	clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
 	clutter_actor_set_size (ui->control_seekbar, 0, SEEK_HEIGHT);
-	clutter_actor_set_position (ui->control_seekbar, 205, 105);
+	clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
-	clutter_actor_set_position (ui->control_title, 200, 40);
+	gfloat ctl_width, ctl_height;
+	clutter_actor_get_size (main_box, &ctl_width, &ctl_height);
+	clutter_actor_set_size (ui->control_bg, ctl_width + (CTL_BORDER * 2)
+											+ SHADOW_CORRECT,
+							ctl_height + (CTL_BORDER * 2));
+	clutter_actor_lower_bottom (ui->control_bg);
 
 	g_assert (ui->control_bg && ui->control_play_toggle);
 
 	// Add control UI to stage
 	clutter_container_add (CLUTTER_CONTAINER (ui->stage),
 							ui->texture,
-							ui->controls,
+							ui->control_box,
 							NULL);
 
 	clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
-	clutter_actor_animate (ui->controls, CLUTTER_EASE_OUT_QUINT, 1000,
+	clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, 1000,
 							"opacity", 0, NULL);
 
 	g_signal_connect (CLUTTER_STAGE (ui->stage), "fullscreen",

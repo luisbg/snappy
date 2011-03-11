@@ -25,8 +25,13 @@
 
 #include "gst_engine.h"
 
+#define CTL_BORDER 20
+#define SHADOW_CORRECT 15
+#define CTL_SPACING 10
+
 #define SEEK_HEIGHT 20
 #define SEEK_WIDTH 640
+#define SEEK_BORDER 5
 
 G_BEGIN_DECLS
 
@@ -41,10 +46,9 @@ struct _UserInterface
 	ClutterColor stage_color, control_color1, control_color2;
 
 	ClutterActor *texture;
-	ClutterActor *controls;
-	ClutterActor *control_bg, *control_title, *control_play_toggle,
-		*control_seek1, *control_seek2,
-		*control_seekbar;
+	ClutterActor *control_box;
+	ClutterActor *control_bg, *control_title, *control_play_toggle;
+	ClutterActor *control_seek1, *control_seek2, *control_seekbar;
 
 	gboolean    controls_showing, fullscreen;
 	guint       controls_timeout;
