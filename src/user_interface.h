@@ -50,7 +50,8 @@ struct _UserInterface
 	ClutterActor *control_bg, *control_title, *control_play_toggle;
 	ClutterActor *control_seek1, *control_seek2, *control_seekbar;
 
-	gboolean    controls_showing, fullscreen;
+	gboolean    controls_showing, keep_showing_controls;
+	gboolean    fullscreen;
 	guint       controls_timeout;
 
 	guint       media_width, media_height;

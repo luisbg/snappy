@@ -63,7 +63,11 @@ controls_timeout_cb (gpointer data)
 	UserInterface *ui = data;
 
 	ui->controls_timeout = 0;
-	show_controls (ui, FALSE);
+	clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
+	if (!ui->keep_showing_controls)
+	{
+		show_controls (ui, FALSE);
+	}
 
 	return FALSE;
 }
@@ -185,6 +189,13 @@ event_cb (ClutterStage *stage,
 					handled = TRUE;
 					break;
 
+				case CLUTTER_c:
+					// show or hide controls
+					ui->keep_showing_controls = !ui->controls_showing;
+					show_controls (ui, !ui->controls_showing);
+
+					handled = TRUE;
+					break;
 				default:
 					handled = FALSE;
 					break;
@@ -309,15 +320,17 @@ show_controls (UserInterface *ui, gboolean vis)
 {
 	if (vis == TRUE && ui->controls_showing == TRUE)
 	{
+		// ToDo: add 3 more seconds to the controls hiding delay
+		gboolean cursor;
+		g_object_get (G_OBJECT (ui->stage), "cursor-visible", &cursor, NULL);
+		if (!cursor)
+			clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
 		if (ui->controls_timeout == 0)
 		{
 			ui->controls_timeout =
 				g_timeout_add_seconds (3, controls_timeout_cb, ui);
 		}
-
-		return;
 	}
-
 	if (vis == TRUE && ui->controls_showing == FALSE)
 	{
 		ui->controls_showing = TRUE;
@@ -327,10 +340,13 @@ show_controls (UserInterface *ui, gboolean vis)
 			"opacity", 224,
 			NULL);
 
-		return;
+		if (ui->controls_timeout == 0)
+		{
+			ui->controls_timeout =
+				g_timeout_add_seconds (3, controls_timeout_cb, ui);
+		}
 	}
-
-	if (vis == FALSE && ui->controls_showing == TRUE)
+	else if (vis == FALSE && ui->controls_showing == TRUE)
 	{
 		ui->controls_showing = FALSE;
 
@@ -338,7 +354,6 @@ show_controls (UserInterface *ui, gboolean vis)
 		clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, 250,
 			"opacity", 0,
 			NULL);
-		return;
 	}
 }
 
@@ -390,6 +405,9 @@ load_user_interface (UserInterface *ui)
 	ui->stage_width = ui->engine->media_width;
 	ui->stage_height = ui->engine->media_height;
 	ui->stage = clutter_stage_get_default();
+	ui->controls_showing = FALSE;
+	ui->keep_showing_controls = FALSE;
+	ui->controls_timeout = 0;
 	clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
 	clutter_stage_set_minimum_size (CLUTTER_STAGE (ui->stage),
 									ui->stage_width, ui->stage_height);
