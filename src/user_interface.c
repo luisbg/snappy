@@ -33,6 +33,7 @@ static gboolean controls_timeout_cb (gpointer data);
 static gboolean event_cb (ClutterStage *stage, ClutterEvent *event,
 							gpointer data);
 static gboolean progress_update (gpointer data);
+static void load_controls (UserInterface *ui);
 static void size_change (ClutterStage *stage, gpointer *data);
 static void show_controls (UserInterface *ui, gboolean vis);
 static void toggle_fullscreen (UserInterface *ui);
@@ -278,6 +279,124 @@ progress_update (gpointer data)
 }
 
 static void
+load_controls (UserInterface *ui)
+{
+	// Check icon files exist
+	gchar *vid_panel_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
+											"/vid-panel.png");
+	ui->play_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
+										"/media-actions-start.png");
+	ui->pause_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
+										"/media-actions-pause.png");
+	gchar *icon_files[3];
+	icon_files[0] = vid_panel_png;
+	icon_files[1] = ui->play_png;
+	icon_files[2] = ui->pause_png;
+
+	gint c;
+	for (c = 0; c < 3; c++) {
+		if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS))
+		{
+			g_print ("Icon file doesn't exist, are you sure you have " \
+					" installed snappy correctly?\nThis file needed is: %s\n",
+					icon_files[c]);
+
+		}
+	}
+
+	// Control colors
+	ClutterColor control_color1 = { 73, 74, 77, 0xee };
+	ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
+
+	// Controls layout management
+	ClutterLayoutManager *controls_layout = clutter_bin_layout_new (
+												CLUTTER_BIN_ALIGNMENT_FIXED,
+												CLUTTER_BIN_ALIGNMENT_FIXED);
+	ui->control_box = clutter_box_new (controls_layout);
+
+	// Controls background
+	ui->control_bg =
+			clutter_texture_new_from_file (vid_panel_png, NULL);
+	g_free (vid_panel_png);
+	clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
+									ui->control_bg);
+
+	// Controls play toggle
+	ClutterLayoutManager *main_box_layout;
+	main_box_layout = clutter_box_layout_new ();
+	clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (main_box_layout),
+										FALSE);
+	ui->main_box = clutter_box_new (main_box_layout);
+	clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (main_box_layout),
+									CTL_SPACING);
+	ui->control_play_toggle =
+			clutter_texture_new_from_file (ui->pause_png, NULL);
+	clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
+                         ui->control_play_toggle,
+                         FALSE,							/* expand */
+                         FALSE,							/* x-fill */
+                         FALSE,							/* y-fill */
+                         CLUTTER_BOX_ALIGNMENT_START,	/* x-align */
+                         CLUTTER_BOX_ALIGNMENT_CENTER);	/* y-align */
+	clutter_actor_set_position (ui->main_box, CTL_BORDER, CTL_BORDER);
+	clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
+									ui->main_box);
+	g_assert (ui->control_bg && ui->control_play_toggle);
+
+	// Controls title
+	ClutterLayoutManager *info_box_layout;
+	info_box_layout = clutter_box_layout_new ();
+	clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (info_box_layout),
+										TRUE);
+	ClutterActor *info_box;
+	info_box = clutter_box_new (info_box_layout);
+
+	ui->control_title =
+			clutter_text_new_full ("Sans Bold 32px",
+									cut_long_filename (ui->filename),
+									&control_color1);
+	clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title), 34);
+	clutter_box_pack (CLUTTER_BOX (info_box), ui->control_title,
+						"x-align", CLUTTER_BOX_ALIGNMENT_CENTER, NULL);
+
+	// Controls seek
+	ClutterLayoutManager *seek_box_layout;
+	seek_box_layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
+												CLUTTER_BIN_ALIGNMENT_FIXED);
+	ClutterActor *seek_box;
+	seek_box = clutter_box_new (seek_box_layout);
+
+	ui->control_seek1  = clutter_rectangle_new_with_color (&control_color1);
+	clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
+									ui->control_seek1);
+
+	ui->control_seek2  = clutter_rectangle_new_with_color (&control_color2);
+	clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
+									ui->control_seek2);
+
+	ui->control_seekbar = clutter_rectangle_new_with_color (&control_color1);
+	clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
+									ui->control_seekbar);
+
+	clutter_box_pack (CLUTTER_BOX (info_box), seek_box,
+						"x-fill", FALSE, "y-fill", TRUE, NULL);
+
+	clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
+                         info_box,
+                         FALSE,							/* expand */
+                         FALSE,							/* x-fill */
+                         FALSE,							/* y-fill */
+                         CLUTTER_BOX_ALIGNMENT_START,   /* x-align */
+                         CLUTTER_BOX_ALIGNMENT_CENTER);	/* y-align */
+
+	clutter_actor_set_opacity (ui->control_box, 0xee);
+
+	clutter_actor_lower_bottom (ui->control_bg);
+
+	update_controls_size (ui);
+}
+
+static void
 size_change (ClutterStage *stage,
 				gpointer *data)
 {
@@ -432,8 +551,6 @@ load_user_interface (UserInterface *ui)
 {
 	// Stage
 	ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
-	ClutterColor control_color1 = { 73, 74, 77, 0xee };
-	ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
 	ui->filename = g_path_get_basename (ui->fileuri);
 
 	ui->media_width = ui->engine->media_width;
@@ -459,112 +576,11 @@ load_user_interface (UserInterface *ui)
 								ui->stage_height);
 	}
 
-	// Check icon files exist
-	gchar *vid_panel_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-											"/vid-panel.png");
-	ui->play_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-										"/media-actions-start.png");
-	ui->pause_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-										"/media-actions-pause.png");
-	gchar *icon_files[3];
-	icon_files[0] = vid_panel_png;
-	icon_files[1] = ui->play_png;
-	icon_files[2] = ui->pause_png;
-
-	gint c;
-	for (c = 0; c < 3; c++) {
-		if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS))
-		{
-			g_print ("Icon file doesn't exist, are you sure you have " \
-					" installed snappy correctly?\nThis file needed is: %s\n",
-					icon_files[c]);
-
-		}
-	}
 
 	// Controls
-	ClutterLayoutManager *controls_layout = clutter_bin_layout_new (
-												CLUTTER_BIN_ALIGNMENT_FIXED,
-												CLUTTER_BIN_ALIGNMENT_FIXED);
-	ui->control_box = clutter_box_new (controls_layout);
+	load_controls (ui);
 
-	ui->control_bg =
-			clutter_texture_new_from_file (vid_panel_png, NULL);
-	g_free (vid_panel_png);
-	clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
-									ui->control_bg);
-
-	ClutterLayoutManager *main_box_layout;
-	main_box_layout = clutter_box_layout_new ();
-	clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (main_box_layout),
-										FALSE);
-	ui->main_box = clutter_box_new (main_box_layout);
-	clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (main_box_layout),
-									CTL_SPACING);
-	ui->control_play_toggle =
-			clutter_texture_new_from_file (ui->pause_png, NULL);
-	clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
-                         ui->control_play_toggle,
-                         FALSE,							/* expand */
-                         FALSE,							/* x-fill */
-                         FALSE,							/* y-fill */
-                         CLUTTER_BOX_ALIGNMENT_START,	/* x-align */
-                         CLUTTER_BOX_ALIGNMENT_CENTER);	/* y-align */
-	clutter_actor_set_position (ui->main_box, CTL_BORDER, CTL_BORDER);
-	clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
-									ui->main_box);
-
-	ClutterLayoutManager *info_box_layout;
-	info_box_layout = clutter_box_layout_new ();
-	clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (info_box_layout),
-										TRUE);
-	ClutterActor *info_box;
-	info_box = clutter_box_new (info_box_layout);
-
-	ui->control_title =
-			clutter_text_new_full ("Sans Bold 32px",
-									cut_long_filename (ui->filename),
-									&control_color1);
-	clutter_box_pack (CLUTTER_BOX (info_box), ui->control_title,
-						"x-fill", TRUE, NULL);
-
-	ClutterLayoutManager *seek_box_layout;
-	seek_box_layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
-												CLUTTER_BIN_ALIGNMENT_FIXED);
-	ClutterActor *seek_box;
-	seek_box = clutter_box_new (seek_box_layout);
-
-	ui->control_seek1  = clutter_rectangle_new_with_color (&control_color1);
-	clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
-									ui->control_seek1);
-
-	ui->control_seek2  = clutter_rectangle_new_with_color (&control_color2);
-	clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
-									ui->control_seek2);
-
-	ui->control_seekbar = clutter_rectangle_new_with_color (&control_color1);
-	clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
-									ui->control_seekbar);
-
-	clutter_box_pack (CLUTTER_BOX (info_box), seek_box,
-						"x-fill", FALSE, "y-fill", TRUE, NULL);
-
-	clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
-                         info_box,
-                         FALSE,							/* expand */
-                         FALSE,							/* x-fill */
-                         FALSE,							/* y-fill */
-                         CLUTTER_BOX_ALIGNMENT_START,   /* x-align */
-                         CLUTTER_BOX_ALIGNMENT_CENTER);	/* y-align */
-
-	clutter_actor_set_opacity (ui->control_box, 0xee);
-
-	clutter_actor_lower_bottom (ui->control_bg);
-	g_assert (ui->control_bg && ui->control_play_toggle);
-
-	update_controls_size (ui);
-
-	// Add control UI to stage
+	// Add video texture and control UI to stage
 	clutter_container_add (CLUTTER_CONTAINER (ui->stage),
 							ui->texture,
 							ui->control_box,
