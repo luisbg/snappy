@@ -18,3 +18,5 @@ In no particular order:
 - Key controls configurable through a ~/.config/ file.
 
 - Rotate video texture.
+
+- Move code from snappy.c to gst_engine.c

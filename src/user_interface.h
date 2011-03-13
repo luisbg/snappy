@@ -29,8 +29,8 @@
 #define SHADOW_CORRECT 15
 #define CTL_SPACING 10
 
-#define SEEK_HEIGHT 20
-#define SEEK_WIDTH 640
+#define SEEK_WIDTH_RATIO 2.2
+#define SEEK_HEIGHT_RATIO 45
 #define SEEK_BORDER 5
 
 G_BEGIN_DECLS
@@ -49,6 +49,7 @@ struct _UserInterface
 	ClutterActor *control_box;
 	ClutterActor *control_bg, *control_title, *control_play_toggle;
 	ClutterActor *control_seek1, *control_seek2, *control_seekbar;
+	ClutterActor *main_box;
 
 	gboolean    controls_showing, keep_showing_controls;
 	gboolean    fullscreen;
@@ -56,7 +57,7 @@ struct _UserInterface
 
 	guint       media_width, media_height;
 	guint       stage_width, stage_height;
-
+	gfloat		seek_width, seek_height;
 
 	GstEngine   *engine;
 };

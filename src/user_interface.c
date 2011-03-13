@@ -37,6 +37,7 @@ static void size_change (ClutterStage *stage, gpointer *data);
 static void show_controls (UserInterface *ui, gboolean vis);
 static void toggle_fullscreen (UserInterface *ui);
 static void toggle_playing (UserInterface *ui, GstEngine *engine);
+static void update_controls_size (UserInterface *ui);
 
 
 /* ---------------------- static functions ----------------------- */
@@ -178,8 +179,8 @@ event_cb (ClutterStage *stage,
 
 					gfloat progress = (float) pos / ui->engine->media_duration;
 					clutter_actor_set_size (ui->control_seekbar,
-											progress * SEEK_WIDTH,
-											SEEK_HEIGHT);
+											progress * ui->seek_width,
+											ui->seek_height);
 
 					handled = TRUE;
 					break;
@@ -222,19 +223,19 @@ event_cb (ClutterStage *stage,
 					clutter_actor_get_transformed_position (ui->control_seekbar,
 															&x, &y);
 					dist = bev->x - x;
-					dist = CLAMP (dist, 0, SEEK_WIDTH);
+					dist = CLAMP (dist, 0, ui->seek_width);
 
 					if (ui->engine->media_duration == -1)
 					{
 						update_media_duration (ui->engine);
 					}
 
-					progress = ui->engine->media_duration * (dist / SEEK_WIDTH);
+					progress = ui->engine->media_duration * (dist / ui->seek_width);
 					gst_element_seek_simple (ui->engine->player,
 										GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 										progress);
 					clutter_actor_set_size (ui->control_seekbar,
-							dist, SEEK_HEIGHT);
+							dist, ui->seek_height);
 				}
 			}
 			handled = TRUE;
@@ -270,8 +271,8 @@ progress_update (gpointer data)
 	progress = (float) pos / engine->media_duration;
 	g_debug ("playback position progress: %f\n", progress);
 
-	clutter_actor_set_size (ui->control_seekbar, progress * SEEK_WIDTH,
-	SEEK_HEIGHT);
+	clutter_actor_set_size (ui->control_seekbar, progress * ui->seek_width,
+							ui->seek_height);
 
 	return TRUE;
 }
@@ -312,7 +313,8 @@ size_change (ClutterStage *stage,
 
 	clutter_actor_set_size (CLUTTER_ACTOR (ui->texture),
 							new_width, new_height);
-	center_controls(ui);
+	update_controls_size (ui);
+	center_controls (ui);
 }
 
 static void
@@ -389,6 +391,40 @@ toggle_playing (UserInterface *ui, GstEngine *engine)
 	}
 }
 
+static void
+update_controls_size (UserInterface *ui)
+{
+	clutter_actor_set_size (ui->control_play_toggle, ui->stage_width / 10,
+							ui->stage_width / 10);
+
+	gchar *font_name = g_strdup_printf ("Sans Bold %dpx",
+										(ui->stage_height / 25));
+	clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title),
+								font_name);
+
+	ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
+	ui->seek_height = ui->stage_height / SEEK_HEIGHT_RATIO;
+
+	clutter_actor_set_size (ui->control_seek1,
+							ui->seek_width + (SEEK_BORDER * 2),
+								ui->seek_height + (SEEK_BORDER * 2));
+	clutter_actor_set_position (ui->control_seek1, 0, 0);
+
+	clutter_actor_set_size (ui->control_seek2, ui->seek_width,
+							ui->seek_height);
+	clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
+
+	progress_update (ui);
+	clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
+
+	gfloat ctl_width, ctl_height;
+	clutter_actor_get_size (ui->main_box, &ctl_width, &ctl_height);
+	clutter_actor_set_size (ui->control_bg, ctl_width + (CTL_BORDER * 2)
+											+ SHADOW_CORRECT,
+							ctl_height + (CTL_BORDER * 2));
+}
+
+
 /* -------------------- non-static functions --------------------- */
 
 void
@@ -408,6 +444,9 @@ load_user_interface (UserInterface *ui)
 	ui->controls_showing = FALSE;
 	ui->keep_showing_controls = FALSE;
 	ui->controls_timeout = 0;
+	ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
+	ui->seek_height = ui->stage_height / SEEK_HEIGHT_RATIO;
+
 	clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
 	clutter_stage_set_minimum_size (CLUTTER_STAGE (ui->stage),
 									ui->stage_width, ui->stage_height);
@@ -459,8 +498,7 @@ load_user_interface (UserInterface *ui)
 	main_box_layout = clutter_box_layout_new ();
 	clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (main_box_layout),
 										FALSE);
-	ClutterActor *main_box;
-	main_box = clutter_box_new (main_box_layout);
+	ui->main_box = clutter_box_new (main_box_layout);
 	clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (main_box_layout),
 									CTL_SPACING);
 	ui->control_play_toggle =
@@ -472,9 +510,9 @@ load_user_interface (UserInterface *ui)
                          FALSE,							/* y-fill */
                          CLUTTER_BOX_ALIGNMENT_START,	/* x-align */
                          CLUTTER_BOX_ALIGNMENT_CENTER);	/* y-align */
-	clutter_actor_set_position (main_box, CTL_BORDER, CTL_BORDER);
+	clutter_actor_set_position (ui->main_box, CTL_BORDER, CTL_BORDER);
 	clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
-									main_box);
+									ui->main_box);
 
 	ClutterLayoutManager *info_box_layout;
 	info_box_layout = clutter_box_layout_new ();
@@ -484,7 +522,7 @@ load_user_interface (UserInterface *ui)
 	info_box = clutter_box_new (info_box_layout);
 
 	ui->control_title =
-			clutter_text_new_full ("Sans Bold 24",
+			clutter_text_new_full ("Sans Bold 32px",
 									cut_long_filename (ui->filename),
 									&control_color1);
 	clutter_box_pack (CLUTTER_BOX (info_box), ui->control_title,
@@ -521,22 +559,10 @@ load_user_interface (UserInterface *ui)
 
 	clutter_actor_set_opacity (ui->control_box, 0xee);
 
-	clutter_actor_set_size (ui->control_seek1, SEEK_WIDTH + (SEEK_BORDER * 2),
-								SEEK_HEIGHT + (SEEK_BORDER * 2));
-	clutter_actor_set_position (ui->control_seek1, 0, 0);
-	clutter_actor_set_size (ui->control_seek2, SEEK_WIDTH, SEEK_HEIGHT);
-	clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
-	clutter_actor_set_size (ui->control_seekbar, 0, SEEK_HEIGHT);
-	clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
-
-	gfloat ctl_width, ctl_height;
-	clutter_actor_get_size (main_box, &ctl_width, &ctl_height);
-	clutter_actor_set_size (ui->control_bg, ctl_width + (CTL_BORDER * 2)
-											+ SHADOW_CORRECT,
-							ctl_height + (CTL_BORDER * 2));
 	clutter_actor_lower_bottom (ui->control_bg);
-
 	g_assert (ui->control_bg && ui->control_play_toggle);
+
+	update_controls_size (ui);
 
 	// Add control UI to stage
 	clutter_container_add (CLUTTER_CONTAINER (ui->stage),
