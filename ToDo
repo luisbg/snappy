@@ -20,3 +20,5 @@ In no particular order:
 - Rotate video texture.
 
 - Move code from snappy.c to gst_engine.c
+
+- Deactivate screensaver when playing fullscreen.
