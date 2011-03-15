@@ -20,9 +20,12 @@
  * USA
  */
 
+#define VERSION "0.1 beta"
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <getopt.h>
 #include <clutter/clutter.h>
 #include <clutter-gst/clutter-gst.h>
 
@@ -31,25 +34,50 @@
 #include "utils.h"
 
 
+static void help (const char *argv0)
+{
+	g_print (("%s [options] media_file\n\n"
+				" -h, --help                           Show this help\n"
+				"     --version                        Show this version\n\n"
+				" -f, --fullscreen                     Play video fullscreen\n\n")
+				, argv0);
+}
+
 int main (int argc, char *argv[])
 {
+	int ret = 0;
+
 	// Command line arguments.
 	if (argc < 2)
 	{
 		g_print ("Usage: %s [options] <media_file>\n", argv[0]);
 		return EXIT_FAILURE;
 	}
+
 	gboolean fullscreen = FALSE;
 	guint c, index, pos = 0;
 	gchar *file_list[argc];
-	while ((c = getopt (argc, argv, "f")) != -1)
+	static const struct option long_options[] = {
+		{"fullscreen",	0, NULL, 'f'},
+		{"help",		0, NULL, 'h'},
+		{"version",		0, NULL, 'v'}
+	};
+
+	while ((c = getopt_long (argc, argv, "fh", long_options, NULL)) != -1)
 		switch (c)
 		{
 			case 'f':
 				g_debug ("fullscreen!\n");
 				fullscreen = TRUE;
 				break;
+			case 'h':
+				help (argv[0]);
+				goto quit;
+			case 'v':
+				g_print ("snappy version %s\n", VERSION);
+				goto quit;
 		}
+
 	for (index = optind; index < argc; index++)
 	{
 		file_list[pos] = argv[index];
@@ -74,8 +102,10 @@ int main (int argc, char *argv[])
 	engine->player = gst_element_factory_make ("playbin2", "playbin2");
 	if (engine->player == NULL){
 		g_print ("ERROR: Failed to create playbin element\n");
-		return 1;
+		ret = 1;
+		goto quit;
 	} 
+
 	ClutterActor *texture = clutter_texture_new ();
 	engine->sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (texture));
 	g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
@@ -92,7 +122,6 @@ int main (int argc, char *argv[])
 	g_object_set (G_OBJECT (engine->player), "uri", engine->uri, NULL);
 	engine->fileuri = fileuri;
 	ui->fileuri = fileuri;
-	GstStateChange ret;
 	gst_element_set_state (engine->player, GST_STATE_PAUSED);
 	engine->playing = FALSE;
 	engine->media_duration = -1;
@@ -101,5 +130,6 @@ int main (int argc, char *argv[])
 	engine->playing = TRUE;
 	clutter_main ();
 
-	return 0;
+quit:
+	return ret;
 }
