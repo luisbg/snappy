@@ -27,6 +27,8 @@
 #include "user_interface.h"
 #include "utils.h"
 
+#include <X11/extensions/scrnsaver.h>
+
 // Declaration of static functions
 static void center_controls (UserInterface *ui);
 static gboolean controls_timeout_cb (gpointer data);
@@ -39,6 +41,7 @@ static void show_controls (UserInterface *ui, gboolean vis);
 static void toggle_fullscreen (UserInterface *ui);
 static void toggle_playing (UserInterface *ui, GstEngine *engine);
 static void update_controls_size (UserInterface *ui);
+static void xss_suspend (gboolean suspend);
 
 
 /* ---------------------- static functions ----------------------- */
@@ -483,9 +486,11 @@ toggle_fullscreen (UserInterface *ui)
 {
 	if (ui->fullscreen) {
 		clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), FALSE);
+		xss_suspend (FALSE);
 		ui->fullscreen = FALSE;
 	} else {
 		clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), TRUE);
+		xss_suspend (TRUE);
 		ui->fullscreen = TRUE;
 	}
 }
@@ -543,6 +548,30 @@ update_controls_size (UserInterface *ui)
 							ctl_height + (CTL_BORDER * 2));
 }
 
+static void
+xss_suspend (gboolean suspend)
+{
+	int event, error, major, minor;
+
+	Display *dpy = clutter_x11_get_default_display ();
+	if( !dpy ) {
+		if( getenv( "DISPLAY" ) ) {
+			g_print ("xcommon: Cannot open display '%s'.\n",
+						getenv( "DISPLAY") );
+		} else {
+			g_print ("xcommon: No DISPLAY set, so no output possible!\n");
+		}
+			return;
+	}
+
+	if (XScreenSaverQueryExtension (dpy, &event, &error) != True ||
+		XScreenSaverQueryVersion (dpy, &major, &minor) != True)
+		return;
+	if (major < 1 || (major == 1 && minor < 1))
+		return;
+
+	XScreenSaverSuspend (dpy, suspend);
+}
 
 /* -------------------- non-static functions --------------------- */
 
