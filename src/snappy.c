@@ -47,22 +47,26 @@ help (const char *argv0)
 int
 main (int argc, char *argv[])
 {
+  UserInterface *ui = NULL;
+  GstEngine *engine = NULL;
+  ClutterActor *texture;
+  gchar *fileuri;
   int ret = 0;
-
-  // Command line arguments.
-  if (argc < 2) {
-    g_print ("Usage: %s [options] <media_file>\n", argv[0]);
-    return EXIT_FAILURE;
-  }
-
   gboolean fullscreen = FALSE;
   guint c, index, pos = 0;
   gchar *file_list[argc];
+
   static const struct option long_options[] = {
     {"fullscreen", 0, NULL, 'f'},
     {"help", 0, NULL, 'h'},
     {"version", 0, NULL, 'v'}
   };
+
+  // Command line arguments.
+  if (argc < 2) {
+    g_print ("Usage: %s [options] <media_file>\n", argv[0]);
+    goto quit;
+  }
 
   while ((c = getopt_long (argc, argv, "fh", long_options, NULL)) != -1)
     switch (c) {
@@ -85,14 +89,12 @@ main (int argc, char *argv[])
   }
 
   // User Interface
-  UserInterface *ui = NULL;
   ui = g_new0 (UserInterface, 1);
   ui->fullscreen = fullscreen;
 
   clutter_gst_init (&argc, &argv);
 
   // Gstreamer
-  GstEngine *engine = NULL;
   engine = g_new0 (GstEngine, 1);
   engine->media_width = -1;
   engine->media_height = -1;
@@ -105,7 +107,7 @@ main (int argc, char *argv[])
     goto quit;
   }
 
-  ClutterActor *texture = clutter_texture_new ();
+  texture = clutter_texture_new ();
   engine->sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (texture));
   g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
   engine->bus = gst_pipeline_get_bus (GST_PIPELINE (engine->player));
@@ -113,7 +115,6 @@ main (int argc, char *argv[])
   gst_object_unref (engine->bus);
   ui->texture = texture;
 
-  gchar *fileuri;
   fileuri = clean_uri (file_list[0]);
   g_print ("Loading: %s\n", fileuri);
   engine->uri = NULL;

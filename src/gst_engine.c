@@ -60,15 +60,21 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       gst_message_parse_state_changed (msg, &old, &new, &pending);
       if (new == GST_STATE_PAUSED) {
         if (engine->media_width == -1) {
-          GstPad *p = gst_element_get_pad (engine->sink, "sink");
-          GstCaps *c = gst_pad_get_negotiated_caps (p);
+          GstPad *p;
+          GstCaps *c;
+
+          p = gst_element_get_pad (engine->sink, "sink");
+          c = gst_pad_get_negotiated_caps (p);
           if (c) {
-            GstStructure *s = gst_caps_get_structure (c, 0);
+            GstStructure *s;
             const GValue *widthval, *heightval;
+
+            s = gst_caps_get_structure (c, 0);
             widthval = gst_structure_get_value (s, "width");
             heightval = gst_structure_get_value (s, "height");
             if (G_VALUE_HOLDS (widthval, G_TYPE_INT)) {
               gint width, height;
+
               width = g_value_get_int (widthval);
               height = g_value_get_int (heightval);
               engine->media_width = width;
@@ -92,8 +98,8 @@ gboolean
 update_media_duration (GstEngine * engine)
 {
   gboolean success = FALSE;
-
   GstFormat fmt = GST_FORMAT_TIME;
+
   if (gst_element_query_duration (engine->player, &fmt,
           &engine->media_duration)) {
     if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {

@@ -231,18 +231,29 @@ static void
 load_controls (UserInterface * ui)
 {
   // Check icon files exist
-  gchar *vid_panel_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
+  gchar *vid_panel_png;
+  gchar *icon_files[3];
+  gint c;
+  ClutterColor control_color1 = { 73, 74, 77, 0xee };
+  ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
+  ClutterLayoutManager *controls_layout;
+  ClutterLayoutManager *main_box_layout;
+  ClutterLayoutManager *info_box_layout;
+  ClutterActor *info_box;
+  ClutterLayoutManager *seek_box_layout;
+  ClutterActor *seek_box;
+
+  vid_panel_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
       "/vid-panel.png");
   ui->play_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
       "/media-actions-start.png");
   ui->pause_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
       "/media-actions-pause.png");
-  gchar *icon_files[3];
+
   icon_files[0] = vid_panel_png;
   icon_files[1] = ui->play_png;
   icon_files[2] = ui->pause_png;
 
-  gint c;
   for (c = 0; c < 3; c++) {
     if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS)) {
       g_print ("Icon file doesn't exist, are you sure you have "
@@ -252,13 +263,8 @@ load_controls (UserInterface * ui)
     }
   }
 
-  // Control colors
-  ClutterColor control_color1 = { 73, 74, 77, 0xee };
-  ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
-
   // Controls layout management
-  ClutterLayoutManager *controls_layout =
-      clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
+  controls_layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
       CLUTTER_BIN_ALIGNMENT_FIXED);
   ui->control_box = clutter_box_new (controls_layout);
 
@@ -269,7 +275,6 @@ load_controls (UserInterface * ui)
       ui->control_bg);
 
   // Controls play toggle
-  ClutterLayoutManager *main_box_layout;
   main_box_layout = clutter_box_layout_new ();
   clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (main_box_layout), FALSE);
   ui->main_box = clutter_box_new (main_box_layout);
@@ -288,10 +293,8 @@ load_controls (UserInterface * ui)
   g_assert (ui->control_bg && ui->control_play_toggle);
 
   // Controls title
-  ClutterLayoutManager *info_box_layout;
   info_box_layout = clutter_box_layout_new ();
   clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (info_box_layout), TRUE);
-  ClutterActor *info_box;
   info_box = clutter_box_new (info_box_layout);
 
   ui->control_title = clutter_text_new_full ("Sans Bold 32px",
@@ -301,10 +304,8 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_CENTER, NULL);
 
   // Controls seek
-  ClutterLayoutManager *seek_box_layout;
   seek_box_layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
       CLUTTER_BIN_ALIGNMENT_FIXED);
-  ClutterActor *seek_box;
   seek_box = clutter_box_new (seek_box_layout);
 
   ui->control_seek1 = clutter_rectangle_new_with_color (&control_color1);
@@ -354,13 +355,13 @@ progress_update (gpointer data)
   UserInterface *ui = (UserInterface *) data;
   GstEngine *engine = ui->engine;
   gfloat progress = 0.0;
+  gint64 pos;
+  GstFormat fmt = GST_FORMAT_TIME;
 
   if (engine->media_duration == -1) {
     update_media_duration (engine);
   }
 
-  gint64 pos;
-  GstFormat fmt = GST_FORMAT_TIME;
   gst_element_query_position (engine->player, &fmt, &pos);
   progress = (float) pos / engine->media_duration;
 
@@ -411,9 +412,10 @@ size_change (ClutterStage * stage, gpointer * data)
 static void
 show_controls (UserInterface * ui, gboolean vis)
 {
+  gboolean cursor;
+
   if (vis == TRUE && ui->controls_showing == TRUE) {
     // ToDo: add 3 more seconds to the controls hiding delay
-    gboolean cursor;
     g_object_get (G_OBJECT (ui->stage), "cursor-visible", &cursor, NULL);
     if (!cursor)
       clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
@@ -421,7 +423,8 @@ show_controls (UserInterface * ui, gboolean vis)
       ui->controls_timeout = g_timeout_add_seconds (3, controls_timeout_cb, ui);
     }
   }
-  if (vis == TRUE && ui->controls_showing == FALSE) {
+
+  else if (vis == TRUE && ui->controls_showing == FALSE) {
     ui->controls_showing = TRUE;
 
     clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
@@ -431,7 +434,9 @@ show_controls (UserInterface * ui, gboolean vis)
     if (ui->controls_timeout == 0) {
       ui->controls_timeout = g_timeout_add_seconds (3, controls_timeout_cb, ui);
     }
-  } else if (vis == FALSE && ui->controls_showing == TRUE) {
+  }
+  
+  else if (vis == FALSE && ui->controls_showing == TRUE) {
     ui->controls_showing = FALSE;
 
     clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
@@ -473,10 +478,13 @@ toggle_playing (UserInterface * ui, GstEngine * engine)
 static void
 update_controls_size (UserInterface * ui)
 {
+  gchar *font_name;
+  gfloat ctl_width, ctl_height;
+
   clutter_actor_set_size (ui->control_play_toggle, ui->stage_width / 10,
       ui->stage_width / 10);
 
-  gchar *font_name = g_strdup_printf ("Sans Bold %dpx",
+  font_name = g_strdup_printf ("Sans Bold %dpx",
       (ui->stage_height / 25));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
 
@@ -493,12 +501,9 @@ update_controls_size (UserInterface * ui)
   progress_update (ui);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
-  gfloat ctl_width, ctl_height;
   clutter_actor_get_size (ui->main_box, &ctl_width, &ctl_height);
   clutter_actor_set_size (ui->control_bg, ctl_width + (CTL_BORDER * 2)
       + SHADOW_CORRECT, ctl_height + (CTL_BORDER * 2));
-
-
 }
 
 
@@ -507,10 +512,10 @@ update_controls_size (UserInterface * ui)
 void
 load_user_interface (UserInterface * ui)
 {
-  // Stage
   ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
-  ui->filename = g_path_get_basename (ui->fileuri);
 
+  // Init UserInterface structure variables
+  ui->filename = g_path_get_basename (ui->fileuri);
   ui->media_width = ui->engine->media_width;
   ui->media_height = ui->engine->media_height;
   ui->stage_width = ui->engine->media_width;

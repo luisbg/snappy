@@ -30,12 +30,11 @@ cut_long_filename (gchar * filename)
   gchar *ret;
   gint c;
   gint max_size = 34;
+  gchar short_filename[max_size];
 
   for (c = 0; filename[c] != '\0'; c++);
 
   if (c >= max_size) {
-    gchar short_filename[max_size];
-
     for (c = 0; c < max_size; c++) {
       short_filename[c] = filename[c];
     }
