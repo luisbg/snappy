@@ -75,8 +75,6 @@ bus_call (GstBus *bus, GstMessage *msg, gpointer data)
 							gint width, height;
 							width = g_value_get_int (widthval);
 							height = g_value_get_int (heightval);
-							g_debug ("Setting width: %d, height: %d\n", width,
-										height);
 							engine->media_width = width;
 							engine->media_height = height;
 							load_user_interface (ui);
@@ -104,7 +102,6 @@ update_media_duration (GstEngine *engine)
 			&engine->media_duration))
 	{
 		if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {
-			g_debug ("Media duration: %ld\n", engine->media_duration);
 			success = TRUE;
 		} else {
 			g_debug ("Could not get media's duration\n");

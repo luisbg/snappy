@@ -27,8 +27,6 @@
 #include "user_interface.h"
 #include "utils.h"
 
-#include <X11/extensions/scrnsaver.h>
-
 // Declaration of static functions
 static void center_controls (UserInterface *ui);
 static gboolean controls_timeout_cb (gpointer data);
@@ -41,7 +39,6 @@ static void show_controls (UserInterface *ui, gboolean vis);
 static void toggle_fullscreen (UserInterface *ui);
 static void toggle_playing (UserInterface *ui, GstEngine *engine);
 static void update_controls_size (UserInterface *ui);
-static void xss_suspend (gboolean suspend);
 
 
 /* ---------------------- static functions ----------------------- */
@@ -53,11 +50,6 @@ center_controls (UserInterface *ui)
 
 	x = (ui->stage_width - clutter_actor_get_width (ui->control_box)) / 2;
 	y = ui->stage_height - (ui->stage_height / 3);
-
-	g_debug ("stage width = %.2d, height = %.2d\n", ui->stage_width,
-		ui->stage_height);
-	g_debug ("setting x = %.2f, y = %.2f, width = %.2f\n",
-		x, y, clutter_actor_get_width (ui->control_box));
 
 	clutter_actor_set_position (ui->control_box, x, y);
 }
@@ -116,11 +108,6 @@ event_cb (ClutterStage *stage,
 									&muteval, NULL);
 					g_object_set (G_OBJECT (ui->engine->player), "mute",
 									! muteval, NULL);
-					if (muteval) {
-						g_debug ("Unmute stream\n");
-					} else {
-						g_debug ("Mute stream\n");
-					}
 					handled = TRUE;
 					break;
 				}
@@ -135,13 +122,11 @@ event_cb (ClutterStage *stage,
 					if (keyval == CLUTTER_9 && volume > 0.0) {
 						g_object_set (G_OBJECT (ui->engine->player), "volume",
 										volume -= 0.05, NULL);
-						g_debug ("Volume down: %f", volume);
 
 					// Volume Up
 					} else if (keyval == CLUTTER_0 && volume < 1.0) {
 						g_object_set (G_OBJECT (ui->engine->player), "volume",
 										volume += 0.05, NULL);
-						g_debug ("Volume up: %f", volume);
 					}
 					handled = TRUE;
 					break;
@@ -159,22 +144,18 @@ event_cb (ClutterStage *stage,
 					// Seek 1 minute foward
 					if (keyval == CLUTTER_Up) {
 						pos += 60 * GST_SECOND;
-						g_debug("Skipping 1 minute ahead in the stream\n");
 
 					// Seek 1 minute back
 					} else if (keyval == CLUTTER_Down) {
 						pos -= 60 * GST_SECOND;
-						g_debug("Moving 1 minute back in the stream\n");
 
 					// Seek 10 seconds back
 					} else if (keyval == CLUTTER_Left) {
 						pos -= 10 * GST_SECOND;
-						g_debug("Moving 10 seconds back in the stream\n");
 
 					// Seek 10 seconds foward
 					} else if (keyval == CLUTTER_Right) {
 						pos += 10 * GST_SECOND;
-						g_debug("Skipping 10 seconds ahead in the stream\n");
 					}
 
 					gst_element_seek_simple (ui->engine->player,
@@ -273,7 +254,6 @@ progress_update (gpointer data)
 	GstFormat fmt = GST_FORMAT_TIME;
 	gst_element_query_position (engine->player, &fmt, &pos);
 	progress = (float) pos / engine->media_duration;
-	g_debug ("playback position progress: %f\n", progress);
 
 	clutter_actor_set_size (ui->control_seekbar, progress * ui->seek_width,
 							ui->seek_height);
@@ -486,11 +466,9 @@ toggle_fullscreen (UserInterface *ui)
 {
 	if (ui->fullscreen) {
 		clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), FALSE);
-		xss_suspend (FALSE);
 		ui->fullscreen = FALSE;
 	} else {
 		clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), TRUE);
-		xss_suspend (TRUE);
 		ui->fullscreen = TRUE;
 	}
 }
@@ -548,30 +526,6 @@ update_controls_size (UserInterface *ui)
 							ctl_height + (CTL_BORDER * 2));
 }
 
-static void
-xss_suspend (gboolean suspend)
-{
-	int event, error, major, minor;
-
-	Display *dpy = clutter_x11_get_default_display ();
-	if( !dpy ) {
-		if( getenv( "DISPLAY" ) ) {
-			g_print ("xcommon: Cannot open display '%s'.\n",
-						getenv( "DISPLAY") );
-		} else {
-			g_print ("xcommon: No DISPLAY set, so no output possible!\n");
-		}
-			return;
-	}
-
-	if (XScreenSaverQueryExtension (dpy, &event, &error) != True ||
-		XScreenSaverQueryVersion (dpy, &major, &minor) != True)
-		return;
-	if (major < 1 || (major == 1 && minor < 1))
-		return;
-
-	XScreenSaverSuspend (dpy, suspend);
-}
 
 /* -------------------- non-static functions --------------------- */
 
