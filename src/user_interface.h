@@ -33,38 +33,35 @@
 #define SEEK_HEIGHT_RATIO 45
 #define SEEK_BORDER 5
 
-G_BEGIN_DECLS
-
-typedef struct _UserInterface UserInterface;
+G_BEGIN_DECLS typedef struct _UserInterface UserInterface;
 
 struct _UserInterface
 {
-	gchar        *filename, *fileuri;
-	gchar        *play_png, *pause_png;
-	ClutterActor *stage;
+  gchar *filename, *fileuri;
+  gchar *play_png, *pause_png;
+  ClutterActor *stage;
 
-	ClutterColor stage_color, control_color1, control_color2;
+  ClutterColor stage_color, control_color1, control_color2;
 
-	ClutterActor *texture;
-	ClutterActor *control_box;
-	ClutterActor *control_bg, *control_title, *control_play_toggle;
-	ClutterActor *control_seek1, *control_seek2, *control_seekbar;
-	ClutterActor *main_box;
+  ClutterActor *texture;
+  ClutterActor *control_box;
+  ClutterActor *control_bg, *control_title, *control_play_toggle;
+  ClutterActor *control_seek1, *control_seek2, *control_seekbar;
+  ClutterActor *main_box;
 
-	gboolean    controls_showing, keep_showing_controls;
-	gboolean    fullscreen;
-	guint       controls_timeout, progress_id;
+  gboolean controls_showing, keep_showing_controls;
+  gboolean fullscreen;
+  guint controls_timeout, progress_id;
 
-	guint       media_width, media_height;
-	guint       stage_width, stage_height;
-	gfloat		seek_width, seek_height;
+  guint media_width, media_height;
+  guint stage_width, stage_height;
+  gfloat seek_width, seek_height;
 
-	GstEngine   *engine;
+  GstEngine *engine;
 };
 
 // Declaration of non-static functions
-void load_user_interface (UserInterface *ui);
+void load_user_interface (UserInterface * ui);
 
 G_END_DECLS
-
 #endif /* __USER_INTERFACE_H__ */

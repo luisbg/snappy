@@ -25,45 +25,43 @@
 
 
 gchar *
-cut_long_filename (gchar *filename)
+cut_long_filename (gchar * filename)
 {
-	gchar *ret;
-	gint c;
-	gint max_size = 34;
+  gchar *ret;
+  gint c;
+  gint max_size = 34;
 
-	for (c = 0; filename[c] != '\0'; c++);
+  for (c = 0; filename[c] != '\0'; c++);
 
-	if (c >= max_size)
-	{
-		gchar short_filename[max_size];
+  if (c >= max_size) {
+    gchar short_filename[max_size];
 
-		for (c = 0; c < max_size; c++)
-		{
-			short_filename[c] = filename[c];
-		}
-		short_filename[max_size] = '\0';
-		ret = g_filename_to_utf8 (short_filename, max_size, NULL, NULL, NULL);
-	} else {
-		ret = g_locale_to_utf8 (filename, -1, NULL, NULL, NULL);
-	}
+    for (c = 0; c < max_size; c++) {
+      short_filename[c] = filename[c];
+    }
+    short_filename[max_size] = '\0';
+    ret = g_filename_to_utf8 (short_filename, max_size, NULL, NULL, NULL);
+  } else {
+    ret = g_locale_to_utf8 (filename, -1, NULL, NULL, NULL);
+  }
 
-	if (ret == NULL) g_print ("really?\n");
-	return ret;
+  if (ret == NULL)
+    g_print ("really?\n");
+  return ret;
 }
 
 gchar *
-clean_uri (gchar *input_arg)
+clean_uri (gchar * input_arg)
 {
-	GFile *gfile;
-	gchar *filepath;
+  GFile *gfile;
+  gchar *filepath;
 
-	gfile = g_file_new_for_commandline_arg (input_arg);
-	if (g_file_has_uri_scheme (gfile, "archive") != FALSE)
-	{
-		g_print ("ERROR: %s isn't a file\n", input_arg);
-	}
+  gfile = g_file_new_for_commandline_arg (input_arg);
+  if (g_file_has_uri_scheme (gfile, "archive") != FALSE) {
+    g_print ("ERROR: %s isn't a file\n", input_arg);
+  }
 
-	filepath = g_file_get_path (gfile);
+  filepath = g_file_get_path (gfile);
 
-	return filepath;
+  return filepath;
 }

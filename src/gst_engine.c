@@ -29,85 +29,80 @@
 /* -------------------- non-static functions --------------------- */
 
 gboolean
-bus_call (GstBus *bus, GstMessage *msg, gpointer data)
+bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 {
-	UserInterface *ui = (UserInterface*)data;
-	GstEngine *engine = ui->engine;
+  UserInterface *ui = (UserInterface *) data;
+  GstEngine *engine = ui->engine;
 
-	switch (GST_MESSAGE_TYPE (msg)) {
-		case GST_MESSAGE_EOS:
-			g_debug ("End-of-stream\n");
-			break;
-		case GST_MESSAGE_ERROR: {
-			gchar *debug = NULL;
-			GError *err = NULL;
+  switch (GST_MESSAGE_TYPE (msg)) {
+    case GST_MESSAGE_EOS:
+      g_debug ("End-of-stream\n");
+      break;
+    case GST_MESSAGE_ERROR:{
+      gchar *debug = NULL;
+      GError *err = NULL;
 
-			gst_message_parse_error (msg, &err, &debug);
+      gst_message_parse_error (msg, &err, &debug);
 
-			g_debug ("Error: %s\n", err->message);
-			g_error_free (err);
+      g_debug ("Error: %s\n", err->message);
+      g_error_free (err);
 
-			if (debug) {
-				g_debug ("Debug details: %s\n", debug);
-				g_free (debug);
-			}
+      if (debug) {
+        g_debug ("Debug details: %s\n", debug);
+        g_free (debug);
+      }
 
-			break;
-		}
-		case GST_MESSAGE_STATE_CHANGED:
-		{
-			GstState old, new, pending;
-			gst_message_parse_state_changed (msg, &old, &new, &pending);
-			if (new == GST_STATE_PAUSED)
-			{
-				if (engine->media_width == -1)
-				{
-					GstPad *p = gst_element_get_pad (engine->sink, "sink");
-					GstCaps *c = gst_pad_get_negotiated_caps (p);
-					if (c)
-					{
-						GstStructure *s = gst_caps_get_structure (c, 0);
-						const GValue *widthval, *heightval;
-						widthval = gst_structure_get_value (s, "width");
-						heightval = gst_structure_get_value (s, "height");
-						if (G_VALUE_HOLDS (widthval, G_TYPE_INT))
-						{
-							gint width, height;
-							width = g_value_get_int (widthval);
-							height = g_value_get_int (heightval);
-							engine->media_width = width;
-							engine->media_height = height;
-							load_user_interface (ui);
-						}
-					}
-				}
-			}
+      break;
+    }
+    case GST_MESSAGE_STATE_CHANGED:
+    {
+      GstState old, new, pending;
+      gst_message_parse_state_changed (msg, &old, &new, &pending);
+      if (new == GST_STATE_PAUSED) {
+        if (engine->media_width == -1) {
+          GstPad *p = gst_element_get_pad (engine->sink, "sink");
+          GstCaps *c = gst_pad_get_negotiated_caps (p);
+          if (c) {
+            GstStructure *s = gst_caps_get_structure (c, 0);
+            const GValue *widthval, *heightval;
+            widthval = gst_structure_get_value (s, "width");
+            heightval = gst_structure_get_value (s, "height");
+            if (G_VALUE_HOLDS (widthval, G_TYPE_INT)) {
+              gint width, height;
+              width = g_value_get_int (widthval);
+              height = g_value_get_int (heightval);
+              engine->media_width = width;
+              engine->media_height = height;
+              load_user_interface (ui);
+            }
+          }
+        }
+      }
 
-			break;
-		}
-		default:
-			break;
-	}
+      break;
+    }
+    default:
+      break;
+  }
 
-	return TRUE;
+  return TRUE;
 }
 
 gboolean
-update_media_duration (GstEngine *engine)
+update_media_duration (GstEngine * engine)
 {
-	gboolean success = FALSE;
+  gboolean success = FALSE;
 
-	GstFormat fmt = GST_FORMAT_TIME;
-	if (gst_element_query_duration (engine->player, &fmt,
-			&engine->media_duration))
-	{
-		if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {
-			success = TRUE;
-		} else {
-			g_debug ("Could not get media's duration\n");
-			success = FALSE;
-		}
-	}
+  GstFormat fmt = GST_FORMAT_TIME;
+  if (gst_element_query_duration (engine->player, &fmt,
+          &engine->media_duration)) {
+    if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {
+      success = TRUE;
+    } else {
+      g_debug ("Could not get media's duration\n");
+      success = FALSE;
+    }
+  }
 
-	return success;
+  return success;
 }

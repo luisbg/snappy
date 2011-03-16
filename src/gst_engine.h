@@ -23,27 +23,24 @@
 #ifndef __GST_ENGINE_H__
 #define __GST_ENGINE_H__
 
-G_BEGIN_DECLS
-
-typedef struct _GstEngine GstEngine;
+G_BEGIN_DECLS typedef struct _GstEngine GstEngine;
 
 struct _GstEngine
 {
-	gchar		*uri, *fileuri;
-	guint		media_width, media_height;
-	gboolean	playing;
-	gint64		media_duration;
+  gchar *uri, *fileuri;
+  guint media_width, media_height;
+  gboolean playing;
+  gint64 media_duration;
 
-	GstElement	*player;
-	GstElement	*sink;
+  GstElement *player;
+  GstElement *sink;
 
-	GstBus		*bus;
+  GstBus *bus;
 };
 
 // Declaration of non-static functions
-gboolean bus_call (GstBus *bus, GstMessage *msg, gpointer data);
-gboolean update_media_duration (GstEngine *engine);
+gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
+gboolean update_media_duration (GstEngine * engine);
 
 G_END_DECLS
-
 #endif /* __GST_ENGINE_H__ */
