@@ -158,6 +158,9 @@ event_cb (ClutterStage *stage,
 						pos += 10 * GST_SECOND;
 					}
 
+					/* clamp the timestamp to be within the media */
+					pos = CLAMP (pos, 0, ui->engine->media_duration);
+
 					gst_element_seek_simple (ui->engine->player,
 											fmt, GST_SEEK_FLAG_FLUSH,
 											pos);
