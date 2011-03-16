@@ -53,7 +53,7 @@ struct _UserInterface
 
 	gboolean    controls_showing, keep_showing_controls;
 	gboolean    fullscreen;
-	guint       controls_timeout;
+	guint       controls_timeout, progress_id;
 
 	guint       media_width, media_height;
 	guint       stage_width, stage_height;
