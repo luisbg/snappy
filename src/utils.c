@@ -25,21 +25,20 @@
 
 
 gchar *
-cut_long_filename (gchar * filename)
+cut_long_filename (gchar * filename, gint length)
 {
   gchar *ret;
   gint c;
-  gint max_size = 34;
-  gchar short_filename[max_size];
+  gchar short_filename[length];
 
   for (c = 0; filename[c] != '\0'; c++);
 
-  if (c >= max_size) {
-    for (c = 0; c < max_size; c++) {
+  if (c >= length) {
+    for (c = 0; c < length; c++) {
       short_filename[c] = filename[c];
     }
-    short_filename[max_size] = '\0';
-    ret = g_filename_to_utf8 (short_filename, max_size, NULL, NULL, NULL);
+    short_filename[length] = '\0';
+    ret = g_filename_to_utf8 (short_filename, length, NULL, NULL, NULL);
   } else {
     ret = g_locale_to_utf8 (filename, -1, NULL, NULL, NULL);
   }

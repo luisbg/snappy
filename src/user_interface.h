@@ -33,7 +33,9 @@
 #define SEEK_HEIGHT_RATIO 45
 #define SEEK_BORDER 5
 
-G_BEGIN_DECLS typedef struct _UserInterface UserInterface;
+G_BEGIN_DECLS
+
+typedef struct _UserInterface UserInterface;
 
 struct _UserInterface
 {
@@ -56,6 +58,7 @@ struct _UserInterface
   guint media_width, media_height;
   guint stage_width, stage_height;
   gfloat seek_width, seek_height;
+  gint title_length;
 
   GstEngine *engine;
 };

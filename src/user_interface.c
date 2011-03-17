@@ -297,9 +297,10 @@ load_controls (UserInterface * ui)
   clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (info_box_layout), TRUE);
   info_box = clutter_box_new (info_box_layout);
 
-  ui->control_title = clutter_text_new_full ("Sans Bold 32px",
-      cut_long_filename (ui->filename), &control_color1);
-  clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title), 34);
+  ui->control_title = clutter_text_new_full ("Sans 32px",
+      cut_long_filename (ui->filename, ui->title_length), &control_color1);
+  clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
+      ui->title_length);
   clutter_box_pack (CLUTTER_BOX (info_box), ui->control_title, "x-align",
       CLUTTER_BOX_ALIGNMENT_CENTER, NULL);
 
@@ -484,7 +485,7 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_size (ui->control_play_toggle, ui->stage_width / 10,
       ui->stage_width / 10);
 
-  font_name = g_strdup_printf ("Sans Bold %dpx",
+  font_name = g_strdup_printf ("Sans %dpx",
       (ui->stage_height / 25));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
 
@@ -527,6 +528,7 @@ load_user_interface (UserInterface * ui)
   ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
   ui->seek_height = ui->stage_height / SEEK_HEIGHT_RATIO;
   ui->progress_id = -1;
+  ui->title_length = 40;
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
   clutter_stage_set_minimum_size (CLUTTER_STAGE (ui->stage),

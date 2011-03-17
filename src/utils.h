@@ -23,7 +23,9 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
-G_BEGIN_DECLS gchar * cut_long_filename (gchar * filename);
+G_BEGIN_DECLS
+
+gchar * cut_long_filename (gchar * filename, gint length);
 gchar *clean_uri (gchar * input_arg);
 
 G_END_DECLS

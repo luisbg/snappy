@@ -23,7 +23,9 @@
 #ifndef __GST_ENGINE_H__
 #define __GST_ENGINE_H__
 
-G_BEGIN_DECLS typedef struct _GstEngine GstEngine;
+G_BEGIN_DECLS
+
+typedef struct _GstEngine GstEngine;
 
 struct _GstEngine
 {
