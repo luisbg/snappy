@@ -1,24 +1,40 @@
-In no particular order:
-
-
-- GUPnP media server.
-
-- Media's position/duration display in the clutter controls.
-
-- Volume interactive display in the controls.
+Common
+------
 
 - Port to Windows and Mac OS X.
 
 - Use autotools to build/install the code.
 
-- Handle playlists.
+- Key controls configurable through a ~/.config/ file.
+
+
+UI
+--
+
+- Volume interactive display in the controls.
+
+- Media's position/duration display in the clutter controls.
 
 - Load UI with visualizations when media is a music file.
 
-- Key controls configurable through a ~/.config/ file.
-
 - Rotate video texture.
 
-- Move code from snappy.c to gst_engine.c
-
 - Deactivate screensaver when playing fullscreen.
+
+- Clean up controls
+  - Vertically centre play/pause button
+  - Vertically centre seek bar
+  - Make UI theme borders thinner and sleeker
+  - Make UI fonts thinner but still appropriately large for distance-viewing
+
+- Add a 'timestamp / duration' print out
+
+
+Engine
+------
+
+- GUPnP media server.
+
+- Handle playlists.
+
+- Move code from snappy.c to gst_engine.c
