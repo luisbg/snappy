@@ -79,6 +79,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
               height = g_value_get_int (heightval);
               engine->media_width = width;
               engine->media_height = height;
+              update_media_duration (ui->engine);
               load_user_interface (ui);
             }
           }

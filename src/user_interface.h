@@ -41,6 +41,7 @@ struct _UserInterface
 {
   gchar *filename, *fileuri;
   gchar *play_png, *pause_png;
+  gchar *duration_str;
   ClutterActor *stage;
 
   ClutterColor stage_color, control_color1, control_color2;
@@ -49,6 +50,7 @@ struct _UserInterface
   ClutterActor *control_box;
   ClutterActor *control_bg, *control_title, *control_play_toggle;
   ClutterActor *control_seek1, *control_seek2, *control_seekbar;
+  ClutterActor *control_pos;
   ClutterActor *main_box;
 
   gboolean controls_showing, keep_showing_controls;
