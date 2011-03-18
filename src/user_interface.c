@@ -33,6 +33,7 @@ static gboolean controls_timeout_cb (gpointer data);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
     gpointer data);
 static void load_controls (UserInterface * ui);
+static gchar * position_ns_to_str (gint64 nanoseconds);
 static void progress_timing (UserInterface * ui);
 static gboolean progress_update (gpointer data);
 static void size_change (ClutterStage * stage, gpointer * data);
@@ -343,6 +344,21 @@ load_controls (UserInterface * ui)
   update_controls_size (ui);
 }
 
+static gchar *
+position_ns_to_str (gint64 nanoseconds)
+{
+  gint64 seconds;
+  gint hours, minutes;
+
+  seconds = nanoseconds / 1000000000;
+  hours = seconds / 3600;
+  seconds = seconds - (hours * 3600);
+  minutes = seconds / 60;
+  seconds = seconds - (minutes * 60);
+
+  return g_strdup_printf("%d:%02d:%02ld", hours, minutes, seconds);
+}
+
 static void
 progress_timing (UserInterface * ui)
 {
@@ -365,12 +381,10 @@ progress_update (gpointer data)
 {
   UserInterface *ui = (UserInterface *) data;
   GstEngine *engine = ui->engine;
-  gchar *duration_str, *pos_str;
+  gchar *duration_str;
   gfloat progress = 0.0;
   gint64 pos;
   GstFormat fmt = GST_FORMAT_TIME;
-  gint64 seconds;
-  gint hours, minutes;
 
   if (engine->media_duration == -1) {
     update_media_duration (engine);
@@ -382,14 +396,8 @@ progress_update (gpointer data)
   clutter_actor_set_size (ui->control_seekbar, progress * ui->seek_width,
       ui->seek_height);
 
-  seconds = pos / 1000000000;
-  hours = seconds / 3600;
-  seconds = seconds - (hours * 3600);
-  minutes = seconds / 60;
-  seconds = seconds - (minutes * 60);
-  pos_str = g_strdup_printf("%d:%02d:%02ld", hours, minutes, seconds);
-
-  duration_str = g_strdup_printf ("%s/%s", pos_str, ui->duration_str);
+  duration_str = g_strdup_printf ("%s/%s", position_ns_to_str (pos),
+      ui->duration_str);
   clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
 
   return TRUE;
@@ -539,8 +547,6 @@ void
 load_user_interface (UserInterface * ui)
 {
   ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
-  gint64 seconds;
-  gint hours, minutes;
 
   // Init UserInterface structure variables
   ui->filename = g_path_get_basename (ui->fileuri);
@@ -556,13 +562,7 @@ load_user_interface (UserInterface * ui)
   ui->seek_height = ui->stage_height / SEEK_HEIGHT_RATIO;
   ui->progress_id = -1;
   ui->title_length = 40;
-
-  seconds = ui->engine->media_duration / 1000000000;
-  hours = seconds / 3600;
-  seconds = seconds - (hours * 3600);
-  minutes = seconds / 60;
-  seconds = seconds - (minutes * 60);
-  ui->duration_str = g_strdup_printf("%d:%02d:%02ld", hours, minutes, seconds);
+  ui->duration_str = position_ns_to_str (ui->engine->media_duration);
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
   clutter_stage_set_minimum_size (CLUTTER_STAGE (ui->stage),
