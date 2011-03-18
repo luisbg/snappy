@@ -35,7 +35,8 @@ static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
 static void load_controls (UserInterface * ui);
 static gchar * position_ns_to_str (gint64 nanoseconds);
 static void progress_timing (UserInterface * ui);
-static gboolean progress_update (gpointer data);
+static gboolean progress_update_text (gpointer data);
+static gboolean progress_update_seekbar (gpointer data);
 static void size_change (ClutterStage * stage, gpointer * data);
 static void show_controls (UserInterface * ui, gboolean vis);
 static void toggle_fullscreen (UserInterface * ui);
@@ -162,6 +163,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
           gfloat progress = (float) pos / ui->engine->media_duration;
           clutter_actor_set_size (ui->control_seekbar,
               progress * ui->seek_width, ui->seek_height);
+	  progress_update_text (ui);
 
           handled = TRUE;
           break;
@@ -211,6 +213,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
           gst_element_seek_simple (ui->engine->player, GST_FORMAT_TIME,
               GST_SEEK_FLAG_FLUSH, progress);
           clutter_actor_set_size (ui->control_seekbar, dist, ui->seek_height);
+	  progress_update_text (ui);
         }
       }
       handled = TRUE;
@@ -371,34 +374,50 @@ progress_timing (UserInterface * ui)
   duration_ns = ui->engine->media_duration / 1000000;
   timeout_ms = duration_ns / ui->seek_width;
 
-  if (timeout_ms > 1000)
-    timeout_ms = 1000;
-  ui->progress_id = g_timeout_add (timeout_ms, progress_update, ui);
+  ui->progress_id = g_timeout_add (timeout_ms, progress_update_seekbar, ui);
 }
 
 static gboolean
-progress_update (gpointer data)
+progress_update_text (gpointer data)
 {
   UserInterface *ui = (UserInterface *) data;
-  GstEngine *engine = ui->engine;
-  gchar *duration_str;
-  gfloat progress = 0.0;
-  gint64 pos;
-  GstFormat fmt = GST_FORMAT_TIME;
 
-  if (engine->media_duration == -1) {
-    update_media_duration (engine);
+  if (ui->controls_showing) {
+    GstEngine *engine = ui->engine;
+    gchar *duration_str;
+    gint64 pos;
+    GstFormat fmt = GST_FORMAT_TIME;
+
+    gst_element_query_position (engine->player, &fmt, &pos);
+    duration_str = g_strdup_printf ("%s/%s", position_ns_to_str (pos),
+        ui->duration_str);
+    clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
   }
 
-  gst_element_query_position (engine->player, &fmt, &pos);
-  progress = (float) pos / engine->media_duration;
+  return TRUE;
+}
 
-  clutter_actor_set_size (ui->control_seekbar, progress * ui->seek_width,
-      ui->seek_height);
+static gboolean
+progress_update_seekbar (gpointer data)
+{
+  UserInterface *ui = (UserInterface *) data;
 
-  duration_str = g_strdup_printf ("%s/%s", position_ns_to_str (pos),
-      ui->duration_str);
-  clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
+  if (ui->controls_showing) {
+    GstEngine *engine = ui->engine;
+    gint64 pos;
+    gfloat progress = 0.0;
+    GstFormat fmt = GST_FORMAT_TIME;
+
+    if (engine->media_duration == -1) {
+      update_media_duration (engine);
+    }
+
+    gst_element_query_position (engine->player, &fmt, &pos);
+    progress = (float) pos / engine->media_duration;
+
+    clutter_actor_set_size (ui->control_seekbar, progress * ui->seek_width,
+        ui->seek_height);
+  }
 
   return TRUE;
 }
@@ -459,6 +478,8 @@ show_controls (UserInterface * ui, gboolean vis)
   else if (vis == TRUE && ui->controls_showing == FALSE) {
     ui->controls_showing = TRUE;
 
+    progress_update_seekbar (ui);
+    progress_update_text (ui);
     clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
     clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, 250,
         "opacity", 224, NULL);
@@ -529,7 +550,7 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_size (ui->control_seek2, ui->seek_width, ui->seek_height);
   clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
 
-  progress_update (ui);
+  progress_update_seekbar (ui);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
   clutter_actor_get_size (ui->main_box, &ctl_width, &ctl_height);
@@ -595,5 +616,8 @@ load_user_interface (UserInterface * ui)
 
   center_controls (ui);
   progress_timing (ui);
+
+  ui->progress_id = g_timeout_add (1000, progress_update_text, ui);
+
   clutter_actor_show (ui->stage);
 }
