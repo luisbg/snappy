@@ -387,7 +387,7 @@ progress_update (gpointer data)
   seconds = seconds - (hours * 3600);
   minutes = seconds / 60;
   seconds = seconds - (minutes * 60);
-  pos_str = g_strdup_printf("%1d:%2d:%2ld", hours, minutes, seconds);
+  pos_str = g_strdup_printf("%d:%02d:%02ld", hours, minutes, seconds);
 
   duration_str = g_strdup_printf ("%s/%s", pos_str, ui->duration_str);
   clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
@@ -562,7 +562,7 @@ load_user_interface (UserInterface * ui)
   seconds = seconds - (hours * 3600);
   minutes = seconds / 60;
   seconds = seconds - (minutes * 60);
-  ui->duration_str = g_strdup_printf("%1d:%2d:%2ld", hours, minutes, seconds);
+  ui->duration_str = g_strdup_printf("%d:%02d:%02ld", hours, minutes, seconds);
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
   clutter_stage_set_minimum_size (CLUTTER_STAGE (ui->stage),
