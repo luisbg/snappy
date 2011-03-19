@@ -537,7 +537,7 @@ static void
 update_controls_size (UserInterface * ui)
 {
   gchar *font_name;
-  gfloat ctl_width, ctl_height;
+  gfloat ctl_width, ctl_height, title_width;
 
   clutter_actor_set_size (ui->control_play_toggle, ui->stage_width / 10,
       ui->stage_width / 10);
@@ -546,6 +546,9 @@ update_controls_size (UserInterface * ui)
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
 
   ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
+  title_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_title));
+  if (ui->seek_width < title_width)
+    ui->seek_width = title_width;
   ui->seek_height = ui->stage_height / SEEK_HEIGHT_RATIO;
 
   clutter_actor_set_size (ui->control_seek1, ui->seek_width + (SEEK_BORDER * 2),
