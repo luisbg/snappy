@@ -196,7 +196,8 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
             bev->x, bev->y);
         if (actor == ui->control_play_toggle) {
           toggle_playing (ui, ui->engine);
-        } else if (actor == ui->control_seek1 ||
+        }
+        else if (actor == ui->control_seek1 ||
             actor == ui->control_seek2 || actor == ui->control_seekbar) {
           gfloat x, y, dist;
           gint64 progress;
@@ -214,6 +215,10 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
               GST_SEEK_FLAG_FLUSH, progress);
           clutter_actor_set_size (ui->control_seekbar, dist, ui->seek_height);
 	  progress_update_text (ui);
+        }
+        else if (actor == ui->texture || actor == ui->stage)
+        {
+          ui->keep_showing_controls = !ui->keep_showing_controls;
         }
       }
       handled = TRUE;
