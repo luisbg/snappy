@@ -29,10 +29,12 @@ typedef struct _GstEngine GstEngine;
 
 struct _GstEngine
 {
-  gchar *uri, *fileuri;
-  guint media_width, media_height;
   gboolean playing;
+
+  guint media_width, media_height;
   gint64 media_duration;
+
+  gchar *uri, *fileuri;
 
   GstElement *player;
   GstElement *sink;

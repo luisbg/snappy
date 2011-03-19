@@ -39,28 +39,28 @@ typedef struct _UserInterface UserInterface;
 
 struct _UserInterface
 {
+  gboolean controls_showing, keep_showing_controls;
+  gboolean fullscreen;
+
+  gint title_length;
+  guint controls_timeout, progress_id;
+  guint media_width, media_height;
+  guint stage_width, stage_height;
+  gfloat seek_width, seek_height;
+
   gchar *filename, *fileuri;
   gchar *play_png, *pause_png;
   gchar *duration_str;
-  ClutterActor *stage;
 
   ClutterColor stage_color, control_color1, control_color2;
 
+  ClutterActor *stage;
   ClutterActor *texture;
   ClutterActor *control_box;
   ClutterActor *control_bg, *control_title, *control_play_toggle;
   ClutterActor *control_seek1, *control_seek2, *control_seekbar;
   ClutterActor *control_pos;
   ClutterActor *main_box;
-
-  gboolean controls_showing, keep_showing_controls;
-  gboolean fullscreen;
-  guint controls_timeout, progress_id;
-
-  guint media_width, media_height;
-  guint stage_width, stage_height;
-  gfloat seek_width, seek_height;
-  gint title_length;
 
   GstEngine *engine;
 };
