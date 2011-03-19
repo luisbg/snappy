@@ -216,7 +216,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
           clutter_actor_set_size (ui->control_seekbar, dist, ui->seek_height);
 	  progress_update_text (ui);
         }
-        else if (actor == ui->texture || actor == ui->stage)
+        else if (actor == ui->control_bg)
         {
           ui->keep_showing_controls = !ui->keep_showing_controls;
         }
