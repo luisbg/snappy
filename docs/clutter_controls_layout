@@ -16,6 +16,8 @@ ui->control_box (fixed alignment bin)
 				ui->control_seek2
 				ui->control_seekbar
 			]
+
+                        ui->control_pos
 		]
 	]
 ]
