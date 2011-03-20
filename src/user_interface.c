@@ -244,7 +244,7 @@ load_controls (UserInterface * ui)
   gchar *icon_files[3];
   gchar *duration_str;
   gint c;
-  ClutterColor control_color1 = { 73, 74, 77, 0xee };
+  ClutterColor control_color1 = { 0x12, 0x12, 0x12, 0xff };
   ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
   ClutterLayoutManager *controls_layout;
   ClutterLayoutManager *main_box_layout;
@@ -344,8 +344,6 @@ load_controls (UserInterface * ui)
       &control_color1);
   clutter_box_pack (CLUTTER_BOX (info_box), ui->control_pos, "x-align",
       CLUTTER_BOX_ALIGNMENT_END, NULL);
-
-  clutter_actor_set_opacity (ui->control_box, 0xee);
 
   clutter_actor_lower_bottom (ui->control_bg);
 
@@ -488,7 +486,7 @@ show_controls (UserInterface * ui, gboolean vis)
     progress_update_text (ui);
     clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
     clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT,
-        CTL_FADE_DURATION, "opacity", 224, NULL);
+        CTL_FADE_DURATION, "opacity", 0xa0, NULL);
 
     if (ui->controls_timeout == 0) {
       ui->controls_timeout = g_timeout_add_seconds (3, controls_timeout_cb, ui);
