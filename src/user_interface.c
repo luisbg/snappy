@@ -50,10 +50,18 @@ static void update_controls_size (UserInterface * ui);
 static void
 center_controls (UserInterface * ui)
 {
-  gfloat x, y;
+  gfloat x, y, third_vh, diff;
 
+  third_vh = ui->stage_height / 3;
   x = (ui->stage_width - clutter_actor_get_width (ui->control_box)) / 2;
-  y = ui->stage_height - (ui->stage_height / 3);
+  y = ui->stage_height - third_vh;
+
+  third_vh -= CTL_SPACING;
+  if (clutter_actor_get_height (ui->control_box) > third_vh)
+  {
+    diff = clutter_actor_get_height (ui->control_box) - third_vh;
+    y -= diff;
+  }
 
   clutter_actor_set_position (ui->control_box, x, y);
 }
