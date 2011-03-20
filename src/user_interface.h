@@ -47,6 +47,8 @@
 #define SEC_IN_HOUR 3600
 #define SEC_IN_MIN 60
 
+#define PENALTY_TIME 500
+
 G_BEGIN_DECLS
 
 typedef struct _UserInterface UserInterface;
@@ -54,7 +56,7 @@ typedef struct _UserInterface UserInterface;
 struct _UserInterface
 {
   gboolean controls_showing, keep_showing_controls;
-  gboolean fullscreen;
+  gboolean fullscreen, penalty_box_active;
 
   gint title_length;
   guint controls_timeout, progress_id;

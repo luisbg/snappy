@@ -33,6 +33,7 @@ static gboolean controls_timeout_cb (gpointer data);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
     gpointer data);
 static void load_controls (UserInterface * ui);
+static gboolean penalty_box (gpointer data);
 static gchar * position_ns_to_str (gint64 nanoseconds);
 static void progress_timing (UserInterface * ui);
 static gboolean progress_update_text (gpointer data);
@@ -216,9 +217,23 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
           clutter_actor_set_size (ui->control_seekbar, dist, ui->seek_height);
 	  progress_update_text (ui);
         }
-        else if (actor == ui->control_bg)
+        else if (actor == ui->control_bg || actor == ui->control_title
+            || actor == ui->control_pos)
         {
           ui->keep_showing_controls = !ui->keep_showing_controls;
+
+          if (ui->keep_showing_controls)
+          {
+            clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
+          } else {
+            penalty_box (ui);
+            show_controls (ui, FALSE);
+          }
+        }
+        else if (actor == ui->texture || actor == ui->stage)
+        {
+          penalty_box (ui);
+          show_controls (ui, FALSE);
         }
       }
       handled = TRUE;
@@ -227,7 +242,8 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
 
     case CLUTTER_MOTION:
     {
-      show_controls (ui, TRUE);
+      if (!ui->penalty_box_active)
+        show_controls (ui, TRUE);
       handled = TRUE;
       break;
     }
@@ -348,6 +364,22 @@ load_controls (UserInterface * ui)
   clutter_actor_lower_bottom (ui->control_bg);
 
   update_controls_size (ui);
+}
+
+static gboolean
+penalty_box (gpointer data)
+{
+  UserInterface *ui = (UserInterface *) data;
+
+  if (ui->penalty_box_active)
+  {
+    ui->penalty_box_active = FALSE;
+  } else {
+    g_timeout_add (PENALTY_TIME, penalty_box, ui);
+    ui->penalty_box_active = TRUE;
+  }
+
+  return ui->penalty_box_active;
 }
 
 static gchar *
@@ -587,6 +619,7 @@ load_user_interface (UserInterface * ui)
   ui->stage = clutter_stage_get_default ();
   ui->controls_showing = FALSE;
   ui->keep_showing_controls = FALSE;
+  ui->penalty_box_active = FALSE;
   ui->controls_timeout = 0;
   ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
   ui->seek_height = ui->stage_height / SEEK_HEIGHT_RATIO;
