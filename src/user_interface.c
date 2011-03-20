@@ -63,7 +63,8 @@ controls_timeout_cb (gpointer data)
 {
   UserInterface *ui = data;
 
-  ui->controls_timeout = 0;
+  ui->controls_timeout = -1;
+
   clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
   if (!ui->keep_showing_controls) {
     show_controls (ui, FALSE);
@@ -176,6 +177,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
 
         case CLUTTER_c:
           // show or hide controls
+          penalty_box (ui);
           ui->keep_showing_controls = !ui->controls_showing;
           show_controls (ui, !ui->controls_showing);
 
@@ -232,8 +234,11 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
         }
         else if (actor == ui->texture || actor == ui->stage)
         {
-          penalty_box (ui);
-          show_controls (ui, FALSE);
+          if (!ui->penalty_box_active)
+          {
+            penalty_box (ui);
+            show_controls (ui, FALSE);
+          }
         }
       }
       handled = TRUE;
@@ -505,7 +510,7 @@ show_controls (UserInterface * ui, gboolean vis)
     g_object_get (G_OBJECT (ui->stage), "cursor-visible", &cursor, NULL);
     if (!cursor)
       clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
-    if (ui->controls_timeout == 0) {
+    if (ui->controls_timeout == -1) {
       ui->controls_timeout = g_timeout_add_seconds (CTL_SHOW_SEC,
           controls_timeout_cb, ui);
     }
@@ -520,8 +525,9 @@ show_controls (UserInterface * ui, gboolean vis)
     clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT,
         CTL_FADE_DURATION, "opacity", 0xa0, NULL);
 
-    if (ui->controls_timeout == 0) {
-      ui->controls_timeout = g_timeout_add_seconds (3, controls_timeout_cb, ui);
+    if (ui->controls_timeout == -1) {
+      ui->controls_timeout = g_timeout_add_seconds (CTL_SHOW_SEC,
+          controls_timeout_cb, ui);
     }
   }
   
@@ -620,7 +626,7 @@ load_user_interface (UserInterface * ui)
   ui->controls_showing = FALSE;
   ui->keep_showing_controls = FALSE;
   ui->penalty_box_active = FALSE;
-  ui->controls_timeout = 0;
+  ui->controls_timeout = -1;
   ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
   ui->seek_height = ui->stage_height / SEEK_HEIGHT_RATIO;
   ui->progress_id = -1;
