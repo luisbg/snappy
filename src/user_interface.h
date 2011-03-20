@@ -25,13 +25,27 @@
 
 #include "gst_engine.h"
 
+#define CTL_SHOW_SEC 3
+#define CTL_FADE_DURATION 250
+
 #define CTL_BORDER 20
 #define SHADOW_CORRECT 15
 #define CTL_SPACING 10
 
+#define PLAY_TOGGLE_RATIO 10
+#define TITLE_RATIO 25
 #define SEEK_WIDTH_RATIO 2.2
 #define SEEK_HEIGHT_RATIO 45
 #define SEEK_BORDER 5
+#define POS_RATIO 38
+
+#define TITLE_LENGTH 40
+
+#define SECOND 1000
+#define NANOSEC 1000000000
+#define MILISEC 1000000
+#define SEC_IN_HOUR 3600
+#define SEC_IN_MIN 60
 
 G_BEGIN_DECLS
 

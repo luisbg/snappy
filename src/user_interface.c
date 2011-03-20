@@ -358,11 +358,11 @@ position_ns_to_str (gint64 nanoseconds)
   gint64 seconds;
   gint hours, minutes;
 
-  seconds = nanoseconds / 1000000000;
-  hours = seconds / 3600;
-  seconds = seconds - (hours * 3600);
-  minutes = seconds / 60;
-  seconds = seconds - (minutes * 60);
+  seconds = nanoseconds / NANOSEC;
+  hours = seconds / SEC_IN_HOUR;
+  seconds = seconds - (hours * SEC_IN_HOUR);
+  minutes = seconds / SEC_IN_MIN;
+  seconds = seconds - (minutes * SEC_IN_MIN);
 
   return g_strdup_printf("%d:%02d:%02ld", hours, minutes, seconds);
 }
@@ -376,7 +376,7 @@ progress_timing (UserInterface * ui)
   if (ui->progress_id != -1)
     g_source_remove (ui->progress_id);
 
-  duration_ns = ui->engine->media_duration / 1000000;
+  duration_ns = ui->engine->media_duration / MILISEC;
   timeout_ms = duration_ns / ui->seek_width;
 
   ui->progress_id = g_timeout_add (timeout_ms, progress_update_seekbar, ui);
@@ -476,7 +476,8 @@ show_controls (UserInterface * ui, gboolean vis)
     if (!cursor)
       clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
     if (ui->controls_timeout == 0) {
-      ui->controls_timeout = g_timeout_add_seconds (3, controls_timeout_cb, ui);
+      ui->controls_timeout = g_timeout_add_seconds (CTL_SHOW_SEC,
+          controls_timeout_cb, ui);
     }
   }
 
@@ -486,8 +487,8 @@ show_controls (UserInterface * ui, gboolean vis)
     progress_update_seekbar (ui);
     progress_update_text (ui);
     clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
-    clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, 250,
-        "opacity", 224, NULL);
+    clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT,
+        CTL_FADE_DURATION, "opacity", 224, NULL);
 
     if (ui->controls_timeout == 0) {
       ui->controls_timeout = g_timeout_add_seconds (3, controls_timeout_cb, ui);
@@ -498,8 +499,8 @@ show_controls (UserInterface * ui, gboolean vis)
     ui->controls_showing = FALSE;
 
     clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
-    clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, 250,
-        "opacity", 0, NULL);
+    clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT,
+        CTL_FADE_DURATION, "opacity", 0, NULL);
   }
 }
 
@@ -539,10 +540,11 @@ update_controls_size (UserInterface * ui)
   gchar *font_name;
   gfloat ctl_width, ctl_height, title_width;
 
-  clutter_actor_set_size (ui->control_play_toggle, ui->stage_width / 10,
-      ui->stage_width / 10);
+  clutter_actor_set_size (ui->control_play_toggle,
+      ui->stage_width / PLAY_TOGGLE_RATIO,
+      ui->stage_width / PLAY_TOGGLE_RATIO);
 
-  font_name = g_strdup_printf ("Sans %dpx", (ui->stage_height / 25));
+  font_name = g_strdup_printf ("Sans %dpx", (ui->stage_height / TITLE_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
 
   ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
@@ -565,7 +567,8 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_size (ui->control_bg, ctl_width + (CTL_BORDER * 2)
       + SHADOW_CORRECT, ctl_height + (CTL_BORDER * 2));
 
-  font_name = g_strdup_printf ("Sans %dpx", (ui->stage_height / 38));
+  font_name = g_strdup_printf ("Sans %dpx",
+      (ui->stage_height / POS_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_pos), font_name);
 }
 
@@ -590,7 +593,7 @@ load_user_interface (UserInterface * ui)
   ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
   ui->seek_height = ui->stage_height / SEEK_HEIGHT_RATIO;
   ui->progress_id = -1;
-  ui->title_length = 40;
+  ui->title_length = TITLE_LENGTH;
   ui->duration_str = position_ns_to_str (ui->engine->media_duration);
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
@@ -613,7 +616,7 @@ load_user_interface (UserInterface * ui)
       ui->control_box, NULL);
 
   clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
-  clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, 1000,
+  clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, SECOND,
       "opacity", 0, NULL);
 
   g_signal_connect (CLUTTER_STAGE (ui->stage), "fullscreen",
@@ -625,7 +628,7 @@ load_user_interface (UserInterface * ui)
   center_controls (ui);
   progress_timing (ui);
 
-  g_timeout_add (1000, progress_update_text, ui);
+  g_timeout_add (SECOND, progress_update_text, ui);
 
   clutter_actor_show (ui->stage);
 }
