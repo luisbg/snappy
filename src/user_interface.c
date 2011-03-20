@@ -187,6 +187,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
           handled = FALSE;
           break;
       }
+      break;
     }
 
     case CLUTTER_BUTTON_PRESS:
