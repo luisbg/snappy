@@ -23,6 +23,9 @@ UI
   - Make UI theme borders thinner and sleeker
   - Make UI fonts thinner but still appropriately large for distance-viewing
 
+- Single playback or loop mode button
+
+- Playback In/Out points
 
 Engine
 ------
@@ -36,3 +39,9 @@ Engine
 - Change speed of playback
 
 - Frame stepping
+
+- Single playback or loop mode
+
+- Export video block inside in/out points
+
+- gst-launch-esque pipeline handling
