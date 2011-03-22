@@ -191,6 +191,14 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
 
           handled = TRUE;
           break;
+        case CLUTTER_period:
+	  frame_stepping (ui->engine, TRUE);
+	  handled = TRUE;
+	  break;
+        case CLUTTER_comma:
+	  frame_stepping (ui->engine, FALSE);
+	  handled = TRUE;
+	  break;
         default:
           handled = FALSE;
           break;

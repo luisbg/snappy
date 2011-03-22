@@ -38,7 +38,8 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     case GST_MESSAGE_EOS:
       g_debug ("End-of-stream\n");
       break;
-    case GST_MESSAGE_ERROR:{
+    case GST_MESSAGE_ERROR:
+    {
       gchar *debug = NULL;
       GError *err = NULL;
 
@@ -88,11 +89,61 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
       break;
     }
+    case GST_MESSAGE_STEP_DONE:
+    {
+      engine->prev_done = TRUE;
+    }
     default:
       break;
   }
 
   return TRUE;
+}
+
+gboolean frame_stepping (GstEngine * engine, gboolean foward)
+{
+  GstFormat fmt;
+  gdouble rate;
+  gint64 pos;
+  gboolean ok;
+
+  if (engine->prev_done)
+  {
+    engine->prev_done = FALSE;
+
+    if (foward != engine->direction_foward)
+    {
+      engine->direction_foward = foward;
+
+      fmt = GST_FORMAT_TIME;
+      ok = gst_element_query_position (engine->player, &fmt, &pos);
+      gst_element_get_state (engine->player, NULL, NULL, GST_SECOND);
+
+      if (foward)
+	rate = 1.0;
+      else
+	rate = -1.0;
+
+      if (rate >= 0.0) {
+	ok = gst_element_seek (engine->player, rate, fmt,
+	    GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE,
+	    GST_SEEK_TYPE_SET, pos,
+            GST_SEEK_TYPE_SET, GST_CLOCK_TIME_NONE);
+      } else {
+	ok = gst_element_seek (engine->player, rate, fmt,
+            GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE,
+	    GST_SEEK_TYPE_SET, G_GINT64_CONSTANT (0),
+            GST_SEEK_TYPE_SET, pos);
+      }
+      gst_element_get_state (engine->player, NULL, NULL, GST_SECOND);
+    }
+
+    fmt = GST_FORMAT_BUFFERS;
+    gst_element_send_event (engine->player,
+        gst_event_new_step (fmt, 1, 1.0, TRUE, FALSE));
+  }
+
+  return FALSE;
 }
 
 gboolean

@@ -29,7 +29,7 @@ typedef struct _GstEngine GstEngine;
 
 struct _GstEngine
 {
-  gboolean playing;
+  gboolean playing, direction_foward, prev_done;
 
   guint media_width, media_height;
   gint64 media_duration;
@@ -44,6 +44,7 @@ struct _GstEngine
 
 // Declaration of non-static functions
 gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
+gboolean frame_stepping (GstEngine * engine, gboolean foward);
 gboolean update_media_duration (GstEngine * engine);
 
 G_END_DECLS

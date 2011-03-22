@@ -98,6 +98,8 @@ main (int argc, char *argv[])
   engine = g_new0 (GstEngine, 1);
   engine->media_width = -1;
   engine->media_height = -1;
+  engine->direction_foward = TRUE;
+  engine->prev_done = TRUE;
   ui->engine = engine;
 
   engine->player = gst_element_factory_make ("playbin2", "playbin2");
