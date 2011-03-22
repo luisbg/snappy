@@ -18,3 +18,6 @@ right      - seek 10 seconds foward
 0          - turn volume down
 
 c          - show/hide visual controls
+
+.          - frame step foward
+,          - frame step backwards
