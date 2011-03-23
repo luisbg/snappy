@@ -1,52 +1,30 @@
 // gcc `pkg-config --libs --cflags gio-2.0` mpris.c -o mpris
 
-#include <gio/gio.h>
-#include <stdlib.h>
+/*
+ * snappy - 0.1 beta
+ *
+ * Copyright (C) 2011 Collabora Multimedia Ltd.
+ * <luis.debethencourt@collabora.co.uk>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+ * USA
+ */
+
 #include "mpris.h"
 
-
-/* ---------------------------------------------------------------------------------------------------- */
-
-/* The object we want to export */
-typedef struct _MediaPlayer2Class MediaPlayer2Class;
-typedef struct _MediaPlayer2 MediaPlayer2;
-
-struct _MediaPlayer2Class
-{
-  GObjectClass parent_class;
-};
-
-struct _MediaPlayer2
-{
-  GObject parent_instance;
-
-  gint count;
-  gchar *name;
-
-  GDBusConnection *connection;
-  GDBusNodeInfo *node_info;
-  guint name_own_id;
-  guint root_id;
-  guint player_id;
-  guint playlists_id;
-
-  int playlist_count;
-
-  GHashTable *player_property_changes;
-  GHashTable *playlist_property_changes;
-  guint property_emit_id;
-
-  gint64 last_elapsed;
-};
-
-enum
-{
-  PROP_0,
-  PROP_COUNT,
-  PROP_NAME
-};
-
-G_DEFINE_TYPE (MediaPlayer2, my_object, G_TYPE_OBJECT);
+static GDBusNodeInfo *introspection_data = NULL;
 
 static void
 my_object_finalize (GObject * object)
@@ -134,10 +112,6 @@ my_object_change_count (MediaPlayer2 * myobj, gint change)
   g_object_notify (G_OBJECT (myobj), "count");
 }
 
-/* ---------------------------------------------------------------------------------------------------- */
-
-static GDBusNodeInfo *introspection_data = NULL;
-
 static void
 handle_result (GDBusMethodInvocation * invocation, gboolean ret, GError * error)
 {
@@ -156,7 +130,7 @@ handle_result (GDBusMethodInvocation * invocation, gboolean ret, GError * error)
   }
 }
 
-static void
+void
 handle_method_call (GDBusConnection * connection,
     const gchar * sender,
     const gchar * object_path,
@@ -191,7 +165,7 @@ handle_method_call (GDBusConnection * connection,
   }
 }
 
-static GVariant *
+GVariant *
 handle_get_property (GDBusConnection * connection,
     const gchar * sender,
     const gchar * object_path,
@@ -222,7 +196,7 @@ handle_get_property (GDBusConnection * connection,
   return ret;
 }
 
-static gboolean
+gboolean
 handle_set_property (GDBusConnection * connection,
     const gchar * sender,
     const gchar * object_path,
@@ -243,7 +217,7 @@ handle_set_property (GDBusConnection * connection,
   return TRUE;
 }
 
-static void
+void
 handle_root_method_call (GDBusConnection * connection,
     const char *sender,
     const char *object_path,
@@ -273,7 +247,7 @@ handle_root_method_call (GDBusConnection * connection,
   }
 }
 
-static GVariant *
+GVariant *
 get_root_property (GDBusConnection * connection,
     const char *sender,
     const char *object_path,
@@ -324,19 +298,6 @@ get_root_property (GDBusConnection * connection,
       "Property %s.%s not supported", interface_name, property_name);
   return NULL;
 }
-
-/* for now */
-static const GDBusInterfaceVTable interface_vtable = {
-  (GDBusInterfaceMethodCallFunc) handle_method_call,
-  (GDBusInterfaceGetPropertyFunc) handle_get_property,
-  (GDBusInterfaceSetPropertyFunc) handle_set_property
-};
-
-static const GDBusInterfaceVTable root_vtable = {
-  (GDBusInterfaceMethodCallFunc) handle_root_method_call,
-  (GDBusInterfaceGetPropertyFunc) get_root_property,
-  NULL
-};
 
 static void
 send_property_change (GObject * obj,
