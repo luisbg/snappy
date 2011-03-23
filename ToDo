@@ -3,8 +3,6 @@ Common
 
 - Port to Windows and Mac OS X.
 
-- Use autotools to build/install the code.
-
 - Key controls configurable through a ~/.config/ file.
 
 
@@ -12,8 +10,6 @@ UI
 --
 
 - Volume interactive display in the controls.
-
-- Media's position/duration display in the clutter controls.
 
 - Load UI with visualizations when media is a music file.
 
