@@ -3,12 +3,14 @@ NULL =
 public_headers = \
 		utils.h \
 		user_interface.h \
+		mpris.h
 		gst_engine.h \
 		screensaver.h
 
 c_sources = \
 	utils.c \
 	user_interface.c \
+	mpris.c \
 	gst_engine.c \
 	screensaver.c \
 	snappy.c

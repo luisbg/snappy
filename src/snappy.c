@@ -30,6 +30,7 @@
 
 #include "user_interface.h"
 #include "gst_engine.h"
+#include "mpris.h"
 #include "utils.h"
 
 void
