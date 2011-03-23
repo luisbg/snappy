@@ -33,6 +33,7 @@ struct _GstEngine
 
   guint media_width, media_height;
   gint64 media_duration;
+  gint64 second;
 
   gchar *uri, *fileuri;
 
@@ -45,6 +46,9 @@ struct _GstEngine
 // Declaration of non-static functions
 gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);
+gint64 query_position (GstEngine * engine);
+gboolean seek (GstEngine * engine, gint64 position);
+gboolean change_state (GstEngine * engine, gchar * state);
 gboolean update_media_duration (GstEngine * engine);
 
 G_END_DECLS

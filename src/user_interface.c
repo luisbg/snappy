@@ -41,7 +41,7 @@ static gboolean progress_update_seekbar (gpointer data);
 static void size_change (ClutterStage * stage, gpointer * data);
 static void show_controls (UserInterface * ui, gboolean vis);
 static void toggle_fullscreen (UserInterface * ui);
-static void toggle_playing (UserInterface * ui, GstEngine * engine);
+static void toggle_playing (UserInterface * ui);
 static void update_controls_size (UserInterface * ui);
 
 
@@ -107,7 +107,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
           break;
         case CLUTTER_space:
           // Spacebar
-          toggle_playing (ui, ui->engine);
+          toggle_playing (ui);
           handled = TRUE;
           break;
         case CLUTTER_8:
@@ -144,33 +144,35 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
         case CLUTTER_Left:
         case CLUTTER_Right:
         {
-          gint64 pos;
-          GstFormat fmt = GST_FORMAT_TIME;
-          gst_element_query_position (ui->engine->player, &fmt, &pos);
+          gint64 pos, second;
+          gfloat progress;
+
+          pos = query_position (ui->engine);
+          second = ui->engine->second;
+
           // Seek 1 minute foward
           if (keyval == CLUTTER_Up) {
-            pos += 60 * GST_SECOND;
+            pos += 60 * second;
 
             // Seek 1 minute back
           } else if (keyval == CLUTTER_Down) {
-            pos -= 60 * GST_SECOND;
+            pos -= 60 * second;
 
             // Seek 10 seconds back
           } else if (keyval == CLUTTER_Left) {
-            pos -= 10 * GST_SECOND;
+            pos -= 10 * second;
 
             // Seek 10 seconds foward
           } else if (keyval == CLUTTER_Right) {
-            pos += 10 * GST_SECOND;
+            pos += 10 * second;
           }
 
           /* clamp the timestamp to be within the media */
           pos = CLAMP (pos, 0, ui->engine->media_duration);
 
-          gst_element_seek_simple (ui->engine->player, fmt,
-              GST_SEEK_FLAG_FLUSH, pos);
+          seek (ui->engine, pos);
 
-          gfloat progress = (float) pos / ui->engine->media_duration;
+          progress = (float) pos / ui->engine->media_duration;
           clutter_actor_set_size (ui->control_seekbar,
               progress * ui->seek_width, ui->seek_height);
 	  progress_update_text (ui);
@@ -215,7 +217,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
         actor = clutter_stage_get_actor_at_pos (stage, CLUTTER_PICK_ALL,
             bev->x, bev->y);
         if (actor == ui->control_play_toggle) {
-          toggle_playing (ui, ui->engine);
+          toggle_playing (ui);
         }
         else if (actor == ui->control_seek1 ||
             actor == ui->control_seek2 || actor == ui->control_seekbar) {
@@ -231,8 +233,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
           }
 
           progress = ui->engine->media_duration * (dist / ui->seek_width);
-          gst_element_seek_simple (ui->engine->player, GST_FORMAT_TIME,
-              GST_SEEK_FLAG_FLUSH, progress);
+	  seek (ui->engine, progress);
           clutter_actor_set_size (ui->control_seekbar, dist, ui->seek_height);
 	  progress_update_text (ui);
         }
@@ -440,12 +441,10 @@ progress_update_text (gpointer data)
   UserInterface *ui = (UserInterface *) data;
 
   if (ui->controls_showing) {
-    GstEngine *engine = ui->engine;
     gchar *duration_str;
     gint64 pos;
-    GstFormat fmt = GST_FORMAT_TIME;
 
-    gst_element_query_position (engine->player, &fmt, &pos);
+    pos = query_position (ui->engine);
     duration_str = g_strdup_printf ("%s/%s", position_ns_to_str (pos),
         ui->duration_str);
     clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
@@ -458,18 +457,17 @@ static gboolean
 progress_update_seekbar (gpointer data)
 {
   UserInterface *ui = (UserInterface *) data;
+  GstEngine *engine = ui->engine;
 
   if (ui->controls_showing) {
-    GstEngine *engine = ui->engine;
     gint64 pos;
     gfloat progress = 0.0;
-    GstFormat fmt = GST_FORMAT_TIME;
 
     if (engine->media_duration == -1) {
       update_media_duration (engine);
     }
 
-    gst_element_query_position (engine->player, &fmt, &pos);
+    pos = query_position (engine);
     progress = (float) pos / engine->media_duration;
 
     clutter_actor_set_size (ui->control_seekbar, progress * ui->seek_width,
@@ -570,16 +568,18 @@ toggle_fullscreen (UserInterface * ui)
 }
 
 static void
-toggle_playing (UserInterface * ui, GstEngine * engine)
+toggle_playing (UserInterface * ui)
 {
+  GstEngine *engine = ui->engine;
+
   if (engine->playing) {
-    gst_element_set_state (engine->player, GST_STATE_PAUSED);
+    change_state (engine, "Paused");
     engine->playing = FALSE;
 
     clutter_texture_set_from_file (CLUTTER_TEXTURE (ui->control_play_toggle),
         ui->play_png, NULL);
   } else {
-    gst_element_set_state (engine->player, GST_STATE_PLAYING);
+    change_state (engine, "Playing");
     engine->playing = TRUE;
 
     clutter_texture_set_from_file (CLUTTER_TEXTURE (ui->control_play_toggle),

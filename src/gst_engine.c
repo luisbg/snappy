@@ -102,10 +102,10 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
 gboolean frame_stepping (GstEngine * engine, gboolean foward)
 {
-  GstFormat fmt;
-  gdouble rate;
-  gint64 pos;
   gboolean ok;
+  gint64 pos;
+  gdouble rate;
+  GstFormat fmt;
 
   if (engine->prev_done)
   {
@@ -144,6 +144,38 @@ gboolean frame_stepping (GstEngine * engine, gboolean foward)
   }
 
   return FALSE;
+}
+
+gint64 query_position (GstEngine *engine)
+{
+  gint64 position;
+  GstFormat fmt = GST_FORMAT_TIME;
+
+  gst_element_query_position (engine->player, &fmt, &position);
+  return position;
+}
+
+gboolean seek (GstEngine * engine, gint64 position)
+{
+  GstFormat fmt = GST_FORMAT_TIME;
+
+  gst_element_seek_simple (engine->player, fmt, GST_SEEK_FLAG_FLUSH, position);
+
+  return TRUE;
+}
+
+gboolean change_state (GstEngine * engine, gchar * state)
+{
+  if (state == "Playing")
+    gst_element_set_state (engine->player, GST_STATE_PLAYING);
+  else if (state == "Paused")
+    gst_element_set_state (engine->player, GST_STATE_PAUSED);
+  else if (state == "Ready")
+    gst_element_set_state (engine->player, GST_STATE_READY);
+  else if (state == "Null")
+    gst_element_set_state (engine->player, GST_STATE_NULL);
+
+  return TRUE;
 }
 
 gboolean

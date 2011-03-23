@@ -100,6 +100,7 @@ main (int argc, char *argv[])
   engine->media_height = -1;
   engine->direction_foward = TRUE;
   engine->prev_done = TRUE;
+  engine->second = GST_SECOND;
   ui->engine = engine;
 
   engine->player = gst_element_factory_make ("playbin2", "playbin2");
