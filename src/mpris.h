@@ -66,6 +66,8 @@ struct _MediaPlayer2
   guint property_emit_id;
 
   gint64 last_elapsed;
+
+  gchar *uri;
 };
 
 enum
@@ -74,6 +76,14 @@ enum
   PROP_COUNT,
   PROP_NAME
 };
+
+enum {
+        OPEN_URI,
+        LAST_SIGNAL
+};
+
+static guint
+mediaplayer_signals[LAST_SIGNAL] = { 0 };
 
 // Declaration of non-static functions
 gboolean load_mpris (MediaPlayer2 *mp_obj);

@@ -138,9 +138,16 @@ static const GDBusInterfaceVTable root_vtable = {
   NULL
 };
 
-
 static GDBusNodeInfo *introspection_data = NULL;
+
 G_DEFINE_TYPE (MediaPlayer2, my_object, G_TYPE_OBJECT);
+
+static void
+my_object_init (MediaPlayer2 * object)
+{
+  object->count = 0;
+  object->name = NULL;
+}
 
 static void
 my_object_finalize (GObject * object)
@@ -150,13 +157,6 @@ my_object_finalize (GObject * object)
   g_free (myobj->name);
 
   G_OBJECT_CLASS (my_object_parent_class)->finalize (object);
-}
-
-static void
-my_object_init (MediaPlayer2 * object)
-{
-  object->count = 0;
-  object->name = NULL;
 }
 
 static void
@@ -217,6 +217,18 @@ my_object_class_init (MediaPlayer2Class * class)
   g_object_class_install_property (gobject_class,
       PROP_NAME,
       g_param_spec_string ("name", "Name", "Name", NULL, G_PARAM_READWRITE));
+
+  mediaplayer_signals[OPEN_URI] =
+    g_signal_newv ("open-uri",
+		   G_TYPE_FROM_CLASS (class),
+		   G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+		   NULL,
+		   NULL,
+		   NULL,
+		   g_cclosure_marshal_VOID__VOID,
+		   G_TYPE_NONE,
+		   0,
+		   NULL);
 }
 
 /* A method that we want to export */
@@ -226,6 +238,17 @@ my_object_change_count (MediaPlayer2 * myobj, gint change)
   myobj->count = 2 * myobj->count + change;
 
   g_object_notify (G_OBJECT (myobj), "count");
+}
+
+void
+my_object_change_uri (MediaPlayer2 * myobj, gchar * uri)
+{
+  myobj->uri = uri;
+
+  g_print ("changing uri: %s\n", uri);
+  g_object_notify (G_OBJECT (myobj), "uri");
+  g_signal_emit (myobj, mediaplayer_signals[OPEN_URI], 0);
+  g_object_set (G_OBJECT (myobj), "uri", uri, NULL);
 }
 
 static void
@@ -259,12 +282,12 @@ handle_method_call (GDBusConnection * connection,
   gboolean ret = TRUE;
   GError *error = NULL;
 
-  g_print ("handle_method_call\n");
+  g_print ("handle_method_call: %s\n", method_name);
 
   if (g_strcmp0 (method_name, "ChangeCount") == 0) {
     gint change;
-    g_variant_get (parameters, "(i)", &change);
 
+    g_variant_get (parameters, "(i)", &change);
     my_object_change_count (myobj, change);
 
     g_dbus_method_invocation_return_value (invocation, NULL);
@@ -273,12 +296,20 @@ handle_method_call (GDBusConnection * connection,
     /// ToDo: next track call
     handle_result (invocation, ret, error);
   } else if (g_strcmp0 (method_name, "OpenUri") == 0) {
-    const gchar *uri;
+    gchar *uri;
 
-    g_variant_get (parameters, "(&s)", &uri);
-    g_print ("set uri: %s\n", uri);
+    g_variant_get (parameters, "(s)", &uri);
+    my_object_change_uri (myobj, uri);
+
+    g_dbus_method_invocation_return_value (invocation, NULL);
+  } else if (g_strcmp0 (method_name, "Play") == 0) {
+    // send play signal
+    handle_result (invocation, ret, error);
+  } else if (g_strcmp0 (method_name, "Stop") == 0) {
+    // send stop signal
     handle_result (invocation, ret, error);
   }
+
 }
 
 GVariant *
@@ -308,7 +339,23 @@ handle_get_property (GDBusConnection * connection,
     ret = g_variant_new_strv (strv, -1);
   } else if (g_strcmp0 (property_name, "Position") == 0) {
     ret = g_variant_new_double (0);
+  } else if (g_strcmp0 (property_name, "Identity") == 0) {
+    return g_variant_new_string ("snappy");
+  } else if (g_strcmp0 (property_name, "SupportedUriSchemes") == 0) {
+    /* not planning to support this seriously */
+    const char *fake_supported_schemes[] = {
+      "file", "http", "cdda", "smb", "sftp", NULL
+    };
+    return g_variant_new_strv (fake_supported_schemes, -1);
+  } else if (g_strcmp0 (property_name, "SupportedMimeTypes") == 0) {
+    /* nor this */
+    const char *fake_supported_mimetypes[] = {
+      "application/ogg", "audio/x-vorbis+ogg", "audio/x-flac", "audio/mpeg",
+          NULL
+    };
+    return g_variant_new_strv (fake_supported_mimetypes, -1);
   }
+
   return ret;
 }
 
@@ -433,6 +480,8 @@ send_property_change (GObject * obj,
     g_variant_builder_add (builder,
         "{sv}", "Name", g_variant_new_string (myobj->name ? myobj->name : ""));
 
+  g_print ("some property changed %s\n", pspec->name);
+
   g_dbus_connection_emit_signal (connection,
       NULL,
       "org/mpris/MediaPlayer2",
@@ -448,14 +497,18 @@ on_bus_acquired (GDBusConnection * connection,
 {
   MediaPlayer2 *myobj = user_data;
   guint registration_id;
+  GError *error = NULL;
 
   g_print ("on bus acquired\n");
 
   g_signal_connect (myobj, "notify",
       G_CALLBACK (send_property_change), connection);
-  registration_id = g_dbus_connection_register_object (connection, "/org/mpris/MediaPlayer2", introspection_data->interfaces[0], &interface_vtable, myobj, NULL,        /* user_data_free_func */
-      NULL);                    /* GError** */
-  // g_assert (registration_id > 0);
+  registration_id = g_dbus_connection_register_object (connection,
+      "/org/mpris/MediaPlayer2", introspection_data->interfaces[0],
+      &interface_vtable, myobj,
+      NULL,                     /* user_data_free_func */
+      &error);
+  g_assert (registration_id > 0);
 }
 
 static void
@@ -481,6 +534,7 @@ load_mpris (MediaPlayer2 *mp)
 
   g_type_init ();
 
+
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
 
   /* Build the introspection data structures from the XML */
@@ -488,30 +542,33 @@ load_mpris (MediaPlayer2 *mp)
       g_dbus_node_info_new_for_xml (mpris_introspection_xml, NULL);
   g_assert (introspection_data != NULL);
 
-  /* register root interface */
-  ifaceinfo =
-      g_dbus_node_info_lookup_interface (introspection_data,
-      MPRIS_ROOT_INTERFACE);
-  mp->root_id =
-      g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
-      ifaceinfo, &root_vtable, NULL, NULL, &error);
-  if (error != NULL) {
-    g_warning ("unable to register MPRIS root interface: %s", error->message);
-    g_error_free (error);
-  }
-
   /* register player interface */
   ifaceinfo =
       g_dbus_node_info_lookup_interface (introspection_data,
       MPRIS_PLAYER_INTERFACE);
   mp->player_id =
-      g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
-      ifaceinfo, &interface_vtable, NULL, NULL, &error);
+    g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
+        ifaceinfo, &interface_vtable, mp, NULL, &error);
+
+  /* register root interface */
+  //      ifaceinfo =
+  //        g_dbus_node_info_lookup_interface (introspection_data,
+  //       MPRIS_ROOT_INTERFACE);
+  //    mp->root_id =
+  //       g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
+  //       ifaceinfo, &root_vtable, NULL, NULL, &error);
+  //   if (error != NULL) {
+  //      g_warning ("unable to register MPRIS root interface: %s", error->message);
+  //     g_error_free (error);
+  //    }
+
+
 
   mp->owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
       "org.mpris.MediaPlayer2.snappy",
       G_BUS_NAME_OWNER_FLAGS_NONE,
       on_bus_acquired, on_name_acquired, on_name_lost, mp, NULL);
+  g_assert (mp->owner_id > 0);
 
   return TRUE;
 }
