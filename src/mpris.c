@@ -140,19 +140,20 @@ static const GDBusInterfaceVTable root_vtable = {
 
 static GDBusNodeInfo *introspection_data = NULL;
 
-G_DEFINE_TYPE (MediaPlayer2, my_object, G_TYPE_OBJECT);
+G_DEFINE_TYPE (SnappyMP, my_object, G_TYPE_OBJECT);
 
 static void
-my_object_init (MediaPlayer2 * object)
+my_object_init (SnappyMP * object)
 {
-  object->count = 0;
-  object->name = NULL;
+  g_print ("my_object_init\n");
+
+  object->name = "snappy";
 }
 
 static void
 my_object_finalize (GObject * object)
 {
-  MediaPlayer2 *myobj = (MediaPlayer2 *) object;
+  SnappyMP *myobj = (SnappyMP *) object;
 
   g_free (myobj->name);
 
@@ -161,15 +162,15 @@ my_object_finalize (GObject * object)
 
 static void
 my_object_get_property (GObject * object,
-    guint prop_id, GValue * value, GParamSpec * pspec)
+    guint prop_id,
+    GValue * value,
+    GParamSpec * pspec)
 {
-  MediaPlayer2 *myobj = (MediaPlayer2 *) object;
+  SnappyMP *myobj = (SnappyMP *) object;
+
+  g_print ("my_object_get_property\n");
 
   switch (prop_id) {
-    case PROP_COUNT:
-      g_value_set_int (value, myobj->count);
-      break;
-
     case PROP_NAME:
       g_value_set_string (value, myobj->name);
       break;
@@ -181,15 +182,15 @@ my_object_get_property (GObject * object,
 
 static void
 my_object_set_property (GObject * object,
-    guint prop_id, const GValue * value, GParamSpec * pspec)
+    guint prop_id,
+    const GValue * value,
+    GParamSpec * pspec)
 {
-  MediaPlayer2 *myobj = (MediaPlayer2 *) object;
+  SnappyMP *myobj = (SnappyMP *) object;
+
+  g_print ("my_object_set_property\n");
 
   switch (prop_id) {
-    case PROP_COUNT:
-      myobj->count = g_value_get_int (value);
-      break;
-
     case PROP_NAME:
       g_free (myobj->name);
       myobj->name = g_value_dup_string (value);
@@ -201,18 +202,15 @@ my_object_set_property (GObject * object,
 }
 
 static void
-my_object_class_init (MediaPlayer2Class * class)
+my_object_class_init (SnappyMPClass * class)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (class);
+
+  g_print ("my_object_class_init\n");
 
   gobject_class->finalize = my_object_finalize;
   gobject_class->set_property = my_object_set_property;
   gobject_class->get_property = my_object_get_property;
-
-  g_object_class_install_property (gobject_class,
-      PROP_COUNT,
-      g_param_spec_int ("count",
-          "Count", "Count", 0, 99999, 0, G_PARAM_READWRITE));
 
   g_object_class_install_property (gobject_class,
       PROP_NAME,
@@ -231,18 +229,12 @@ my_object_class_init (MediaPlayer2Class * class)
 		   NULL);
 }
 
-/* A method that we want to export */
 void
-my_object_change_count (MediaPlayer2 * myobj, gint change)
+my_object_change_uri (SnappyMP * myobj, gchar * uri)
 {
-  myobj->count = 2 * myobj->count + change;
-
-  g_object_notify (G_OBJECT (myobj), "count");
-}
-
-void
-my_object_change_uri (MediaPlayer2 * myobj, gchar * uri)
-{
+  g_print ("my_object_change_uri\n");
+  if (myobj == NULL)
+    g_print ("object is NULL\n");
   myobj->uri = uri;
 
   g_print ("changing uri: %s\n", uri);
@@ -252,7 +244,9 @@ my_object_change_uri (MediaPlayer2 * myobj, gchar * uri)
 }
 
 static void
-handle_result (GDBusMethodInvocation * invocation, gboolean ret, GError * error)
+handle_result (GDBusMethodInvocation * invocation,
+    gboolean ret,
+    GError * error)
 {
   if (ret) {
     g_dbus_method_invocation_return_value (invocation, NULL);
@@ -276,37 +270,53 @@ handle_method_call (GDBusConnection * connection,
     const gchar * interface_name,
     const gchar * method_name,
     GVariant * parameters,
-    GDBusMethodInvocation * invocation, gpointer user_data)
+    GDBusMethodInvocation * invocation,
+    SnappyMP * myobj)
 {
-  MediaPlayer2 *myobj = user_data;
   gboolean ret = TRUE;
   GError *error = NULL;
 
   g_print ("handle_method_call: %s\n", method_name);
 
-  if (g_strcmp0 (method_name, "ChangeCount") == 0) {
-    gint change;
+  if (g_strcmp0 (object_path, MPRIS_OBJECT_NAME) != 0 ||
+      g_strcmp0 (interface_name, MPRIS_PLAYER_INTERFACE) != 0) {
+    g_dbus_method_invocation_return_error (invocation,
+        G_DBUS_ERROR,
+	G_DBUS_ERROR_NOT_SUPPORTED,
+	"Method %s.%s not supported",
+	interface_name,
+	method_name);
+    return;
+  }
 
-    g_variant_get (parameters, "(i)", &change);
-    my_object_change_count (myobj, change);
-
-    g_dbus_method_invocation_return_value (invocation, NULL);
-  } else if (g_strcmp0 (method_name, "Next") == 0) {
-    g_print ("next\n");
-    /// ToDo: next track call
-    handle_result (invocation, ret, error);
-  } else if (g_strcmp0 (method_name, "OpenUri") == 0) {
+  if (g_strcmp0 (method_name, "OpenUri") == 0) {
     gchar *uri;
+
+    g_print ("name: %s\n", myobj->name);
 
     g_variant_get (parameters, "(s)", &uri);
     my_object_change_uri (myobj, uri);
 
     g_dbus_method_invocation_return_value (invocation, NULL);
+
+  } else if (g_strcmp0 (method_name, "Next") == 0) {
+    g_print ("next\n");
+    /// ToDo: next track call
+
+    g_print ("name: %s\n", myobj->name);
+
+    handle_result (invocation, ret, error);
   } else if (g_strcmp0 (method_name, "Play") == 0) {
     // send play signal
+
+    g_print ("name: %s\n", myobj->name);
+
     handle_result (invocation, ret, error);
   } else if (g_strcmp0 (method_name, "Stop") == 0) {
     // send stop signal
+
+    g_print ("name: %s\n", myobj->name);
+
     handle_result (invocation, ret, error);
   }
 
@@ -320,25 +330,47 @@ handle_get_property (GDBusConnection * connection,
     const gchar * property_name, GError ** error, gpointer user_data)
 {
   GVariant *ret;
-  MediaPlayer2 *myobj = user_data;
+  SnappyMP *myobj = user_data;
 
   g_print ("handle_get_property: %s\n", property_name);
 
   ret = NULL;
-  if (g_strcmp0 (property_name, "Count") == 0) {
-    ret = g_variant_new_int32 (myobj->count);
-  } else if (g_strcmp0 (property_name, "Name") == 0) {
+  if (g_strcmp0 (property_name, "Name") == 0) {
     //ret = g_variant_new_string (myobj->name ? myobj->name : "");
     ret = g_variant_new_string ("snappy");
-  } else if (g_strcmp0 (property_name, "Volume") == 0) {
-    ret = g_variant_new_double (0);
+
   } else if (g_strcmp0 (property_name, "PlaybackStatus") == 0) {
     ret = g_variant_new_string ("Paused");
+  } else if (g_strcmp0 (property_name, "LoopStatus") == 0) {
+    ret = g_variant_new_string ("Paused");
+  } else if (g_strcmp0 (property_name, "Rate") == 0) {
+    ret = g_variant_new_double (0);
+  } else if (g_strcmp0 (property_name, "Shuffle") == 0) {
+    ret = g_variant_new_boolean (FALSE);
   } else if (g_strcmp0 (property_name, "Metadata") == 0) {
     const char *strv[] = { "", NULL };
     ret = g_variant_new_strv (strv, -1);
+  } else if (g_strcmp0 (property_name, "Volume") == 0) {
+    ret = g_variant_new_double (0);
   } else if (g_strcmp0 (property_name, "Position") == 0) {
     ret = g_variant_new_double (0);
+  } else if (g_strcmp0 (property_name, "MinimumRate") == 0) {
+    ret = g_variant_new_double (0);
+  } else if (g_strcmp0 (property_name, "MaximumRate") == 0) {
+    ret = g_variant_new_double (0);
+  } else if (g_strcmp0 (property_name, "CanGoNext") == 0) {
+    ret = g_variant_new_boolean (FALSE);
+  } else if (g_strcmp0 (property_name, "CanGoPrevious") == 0) {
+    ret = g_variant_new_boolean (FALSE);
+  } else if (g_strcmp0 (property_name, "CanPlay") == 0) {
+    ret = g_variant_new_boolean (FALSE);
+  } else if (g_strcmp0 (property_name, "CanPause") == 0) {
+    ret = g_variant_new_boolean (FALSE);
+  } else if (g_strcmp0 (property_name, "CanSeek") == 0) {
+    ret = g_variant_new_boolean (FALSE);
+  } else if (g_strcmp0 (property_name, "CanControl") == 0) {
+    ret = g_variant_new_boolean (FALSE);
+
   } else if (g_strcmp0 (property_name, "Identity") == 0) {
     return g_variant_new_string ("snappy");
   } else if (g_strcmp0 (property_name, "SupportedUriSchemes") == 0) {
@@ -367,13 +399,11 @@ handle_set_property (GDBusConnection * connection,
     const gchar * property_name,
     GVariant * value, GError ** error, gpointer user_data)
 {
-  MediaPlayer2 *myobj = user_data;
+  SnappyMP *myobj = user_data;
 
   g_print ("handle_set_property\n");
 
-  if (g_strcmp0 (property_name, "Count") == 0) {
-    g_object_set (myobj, "count", g_variant_get_int32 (value), NULL);
-  } else if (g_strcmp0 (property_name, "Name") == 0) {
+  if (g_strcmp0 (property_name, "Name") == 0) {
     g_object_set (myobj, "name", g_variant_get_string (value, NULL), NULL);
   }
 
@@ -387,7 +417,7 @@ handle_root_method_call (GDBusConnection * connection,
     const char *interface_name,
     const char *method_name,
     GVariant * parameters,
-    GDBusMethodInvocation * invocation, MediaPlayer2 * mp)
+    GDBusMethodInvocation * invocation, SnappyMP * mp)
 {
   if (g_strcmp0 (object_path, MPRIS_OBJECT_NAME) != 0 ||
       g_strcmp0 (interface_name, MPRIS_ROOT_INTERFACE) != 0) {
@@ -415,7 +445,7 @@ get_root_property (GDBusConnection * connection,
     const char *sender,
     const char *object_path,
     const char *interface_name,
-    const char *property_name, GError ** error, MediaPlayer2 * mp)
+    const char *property_name, GError ** error, SnappyMP * mp)
 {
   g_print ("get_root_property: %s\n", property_name);
 
@@ -464,19 +494,19 @@ get_root_property (GDBusConnection * connection,
 
 static void
 send_property_change (GObject * obj,
-    GParamSpec * pspec, GDBusConnection * connection)
+    GParamSpec * pspec,
+    GDBusConnection * connection)
 {
+  g_print ("send_property_change\n");
+
   GVariantBuilder *builder;
   GVariantBuilder *invalidated_builder;
-  MediaPlayer2 *myobj = (MediaPlayer2 *) obj;
+  SnappyMP *myobj = (SnappyMP *) obj;
 
   builder = g_variant_builder_new (G_VARIANT_TYPE_ARRAY);
   invalidated_builder = g_variant_builder_new (G_VARIANT_TYPE ("as"));
 
-  if (g_strcmp0 (pspec->name, "count") == 0)
-    g_variant_builder_add (builder,
-        "{sv}", "Count", g_variant_new_int32 (myobj->count));
-  else if (g_strcmp0 (pspec->name, "name") == 0)
+  if (g_strcmp0 (pspec->name, "name") == 0)
     g_variant_builder_add (builder,
         "{sv}", "Name", g_variant_new_string (myobj->name ? myobj->name : ""));
 
@@ -492,40 +522,23 @@ send_property_change (GObject * obj,
 }
 
 static void
-on_bus_acquired (GDBusConnection * connection,
-    const gchar * name, gpointer user_data)
-{
-  MediaPlayer2 *myobj = user_data;
-  guint registration_id;
-  GError *error = NULL;
-
-  g_print ("on bus acquired\n");
-
-  g_signal_connect (myobj, "notify",
-      G_CALLBACK (send_property_change), connection);
-  registration_id = g_dbus_connection_register_object (connection,
-      "/org/mpris/MediaPlayer2", introspection_data->interfaces[0],
-      &interface_vtable, myobj,
-      NULL,                     /* user_data_free_func */
-      &error);
-  g_assert (registration_id > 0);
-}
-
-static void
 on_name_acquired (GDBusConnection * connection,
-    const gchar * name, gpointer user_data)
+    const gchar * name,
+    gpointer user_data)
 {
+  g_print ("on_name_acquired\n");
 }
 
 static void
 on_name_lost (GDBusConnection * connection,
-    const gchar * name, gpointer user_data)
+    const gchar * name,
+    gpointer user_data)
 {
   exit (1);
 }
 
 gboolean
-load_mpris (MediaPlayer2 *mp)
+load_mpris (SnappyMP *mp)
 {
   guint owner_id, player_id, root_id;
   GError *error = NULL;
@@ -534,7 +547,6 @@ load_mpris (MediaPlayer2 *mp)
 
   g_type_init ();
 
-
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
 
   /* Build the introspection data structures from the XML */
@@ -542,39 +554,41 @@ load_mpris (MediaPlayer2 *mp)
       g_dbus_node_info_new_for_xml (mpris_introspection_xml, NULL);
   g_assert (introspection_data != NULL);
 
-  /* register player interface */
+  /* register media player interface */
   ifaceinfo =
-      g_dbus_node_info_lookup_interface (introspection_data,
-      MPRIS_PLAYER_INTERFACE);
+    g_dbus_node_info_lookup_interface (introspection_data,
+        MPRIS_PLAYER_INTERFACE);
   mp->player_id =
     g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
         ifaceinfo, &interface_vtable, mp, NULL, &error);
 
   /* register root interface */
-  //      ifaceinfo =
-  //        g_dbus_node_info_lookup_interface (introspection_data,
-  //       MPRIS_ROOT_INTERFACE);
-  //    mp->root_id =
-  //       g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
-  //       ifaceinfo, &root_vtable, NULL, NULL, &error);
-  //   if (error != NULL) {
-  //      g_warning ("unable to register MPRIS root interface: %s", error->message);
-  //     g_error_free (error);
-  //    }
-
-
+  ifaceinfo =
+    g_dbus_node_info_lookup_interface (introspection_data,
+        MPRIS_ROOT_INTERFACE);
+  mp->root_id =
+    g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
+        ifaceinfo, &root_vtable, NULL, NULL, &error);
+  if (error != NULL) {
+    g_warning ("unable to register MPRIS root interface: %s", error->message);
+    g_error_free (error);
+  }
 
   mp->owner_id = g_bus_own_name (G_BUS_TYPE_SESSION,
       "org.mpris.MediaPlayer2.snappy",
       G_BUS_NAME_OWNER_FLAGS_NONE,
-      on_bus_acquired, on_name_acquired, on_name_lost, mp, NULL);
+      NULL,
+      (GBusNameAcquiredCallback) on_name_acquired,
+      (GBusNameLostCallback) on_name_lost,
+      g_object_ref (mp),
+      g_object_unref);
   g_assert (mp->owner_id > 0);
 
   return TRUE;
 }
 
 gboolean
-close_mpris (MediaPlayer2 *mp)
+close_mpris (SnappyMP *mp)
 {
   g_bus_unown_name (mp->owner_id);
 

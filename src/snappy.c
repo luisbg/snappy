@@ -49,8 +49,7 @@ close_down (UserInterface * ui, GstEngine * engine)
   gst_object_unref (G_OBJECT (engine->player));
 }
 
-void
-open_uri_callback (MediaPlayer2 *self, gpointer user_data)
+void open_uri_callback (SnappyMP *self, gpointer user_data)
 {
   g_print ("received the open-uri signal!\n");
 }
@@ -193,7 +192,7 @@ main (int argc, char *argv[])
   change_state (engine, "Paused");
   change_state (engine, "Playing");
 
-  mp_obj = g_new (MediaPlayer2, 1);
+  mp_obj = g_new0 (SnappyMP, 1);
   load_mpris (mp_obj);
   g_signal_connect (mp_obj, "open-uri",
       G_CALLBACK (open_uri_callback), engine);
