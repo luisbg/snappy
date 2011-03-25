@@ -6,6 +6,7 @@ AC_INIT([snappy],
     [0.1],
     NULL,
     snappy)
+AM_MAINTAINER_MODE
 
 AC_CONFIG_SRCDIR([src/snappy.c])
 AM_CONFIG_HEADER([config.h])
@@ -22,6 +23,7 @@ m4_define([_LT_AC_TAGCONFIG],[])
 
 dnl find a compiler
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_STDC_HEADERS
 AM_PROG_LIBTOOL
 
@@ -103,8 +105,6 @@ Configuration
 	Source code location       : ${srcdir}
 	Prefix                     : ${prefix}
 	Compiler                   : ${CC}
-	Vala bindings              : ${enable_vala}
-	Python bindings:           : ${HAVE_PYTHON_BINDINGS}
 
 snappy configured. Type 'make' to build.
 "
