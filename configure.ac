@@ -72,6 +72,12 @@ PKG_CHECK_MODULES(CLUTTER_X11, clutter-x11-1.0,
     [AC_DEFINE(HAVE_X11, 1, [Define if Clutter X11 is available.])],
     [])
 
+PKG_CHECK_MODULES(XTEST, xtst,
+    [AC_DEFINE(HAVE_XTEST, 1, [Define if XTest is available.])],
+    [])
+AC_SUBST(XTEST_CFLAGS)
+AC_SUBST(XTEST_LIBS)
+
 AC_ARG_ENABLE([dbus],
     AS_HELP_STRING([--enable-dbus], [enable DBus support to disable the screensaver (default=no)]),
       [],

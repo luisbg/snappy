@@ -33,6 +33,9 @@
 
 #ifdef HAVE_X11
 #include <clutter/x11/clutter-x11.h>
+#ifdef HAVE_XTEST
+#include <X11/extensions/XTest.h>
+#endif
 #else
 /* The DBus screensaver stuff needs X11 */
 #ifdef ENABLE_DBUS
@@ -55,6 +58,18 @@ struct _ScreenSaver
   gboolean have_session_dbus;
   guint32 cookie;
 #endif
+
+#ifdef HAVE_X11
+  gint timeout;
+  gint interval;
+  gint prefer_blanking;
+  gint allow_exposures;
+#ifdef HAVE_XTEST
+  gint keycode1, keycode2;
+  gint *keycode;
+  gboolean have_xtest;
+#endif
+#endif
 };
 
 #ifdef ENABLE_DBUS
@@ -65,6 +80,10 @@ struct _ScreenSaver
 /* From org.gnome.SessionManager.xml */
 #define GS_NO_IDLE_FLAG 8
 #define REASON "Playing a movie"
+
+#ifdef HAVE_X11
+#define XSCREENSAVER_MIN_TIMEOUT 60
+#endif
 
 static void
 on_inhibit_cb (GObject * source_object, GAsyncResult * res, gpointer user_data)
@@ -186,6 +205,114 @@ screensaver_free_dbus (ScreenSaver * screensaver)
 
 #endif
 
+#ifdef HAVE_X11
+static void
+screensaver_enable_x11 (ScreenSaver * screensaver)
+{
+
+#ifdef HAVE_XTEST
+  if (screensaver->have_xtest) {
+    g_source_remove_by_user_data (screensaver);
+    return;
+  }
+#endif
+
+  XLockDisplay (screensaver->display);
+  XSetScreenSaver (screensaver->display,
+      screensaver->timeout,
+      screensaver->interval,
+      screensaver->prefer_blanking, screensaver->allow_exposures);
+  XUnlockDisplay (screensaver->display);
+}
+
+#ifdef HAVE_XTEST
+static gboolean
+fake_event (ScreenSaver * screensaver)
+{
+  if (screensaver->disabled) {
+    XLockDisplay (screensaver->display);
+    XTestFakeKeyEvent (screensaver->display, *screensaver->keycode,
+        True, CurrentTime);
+    XTestFakeKeyEvent (screensaver->display, *screensaver->keycode,
+        False, CurrentTime);
+    XUnlockDisplay (screensaver->display);
+    /* Swap the keycode */
+    if (screensaver->keycode == &screensaver->keycode1)
+      screensaver->keycode = &screensaver->keycode2;
+    else
+      screensaver->keycode = &screensaver->keycode1;
+  }
+
+  return TRUE;
+}
+#endif
+
+static void
+screensaver_disable_x11 (ScreenSaver * screensaver)
+{
+#ifdef HAVE_XTEST
+  if (screensaver->have_xtest) {
+    XLockDisplay (screensaver->display);
+    XGetScreenSaver (screensaver->display, &screensaver->timeout,
+        &screensaver->interval,
+        &screensaver->prefer_blanking, &screensaver->allow_exposures);
+    XUnlockDisplay (screensaver->display);
+
+    if (screensaver->timeout != 0) {
+      g_timeout_add_seconds (screensaver->timeout / 2,
+          (GSourceFunc) fake_event, screensaver);
+    } else {
+      g_timeout_add_seconds (XSCREENSAVER_MIN_TIMEOUT / 2,
+          (GSourceFunc) fake_event, screensaver);
+    }
+
+    return;
+  }
+#endif
+
+  XLockDisplay (screensaver->display);
+  XGetScreenSaver (screensaver->display, &screensaver->timeout,
+      &screensaver->interval,
+      &screensaver->prefer_blanking, &screensaver->allow_exposures);
+  XSetScreenSaver (screensaver->display, 0, 0,
+      DontPreferBlanking, DontAllowExposures);
+  XUnlockDisplay (screensaver->display);
+}
+
+static void
+screensaver_init_x11 (ScreenSaver * screensaver)
+{
+#ifdef HAVE_XTEST
+  int a, b, c, d;
+
+  XLockDisplay (screensaver->display);
+  screensaver->have_xtest =
+      (XTestQueryExtension (screensaver->display, &a, &b, &c, &d) == True);
+  if (screensaver->have_xtest) {
+    screensaver->keycode1 = XKeysymToKeycode (screensaver->display, XK_Alt_L);
+    if (screensaver->keycode1 == 0) {
+      g_warning ("keycode1 not existant");
+    }
+    screensaver->keycode2 = XKeysymToKeycode (screensaver->display, XK_Alt_R);
+    if (screensaver->keycode2 == 0) {
+      screensaver->keycode2 = XKeysymToKeycode (screensaver->display, XK_Alt_L);
+      if (screensaver->keycode2 == 0) {
+        g_warning ("keycode2 not existant");
+      }
+    }
+    screensaver->keycode = &screensaver->keycode1;
+  }
+  XUnlockDisplay (screensaver->display);
+#endif
+}
+
+static void
+screensaver_free_x11 (ScreenSaver * screensaver)
+{
+  g_source_remove_by_user_data (screensaver);
+}
+#endif
+
 void
 screensaver_enable (ScreenSaver * screensaver, gboolean enable)
 {
@@ -196,6 +323,13 @@ screensaver_enable (ScreenSaver * screensaver, gboolean enable)
     screensaver_enable_dbus (screensaver);
   else
     screensaver_disable_dbus (screensaver);
+#endif
+
+#ifdef HAVE_X11
+  if (screensaver->disabled)
+    screensaver_enable_x11 (screensaver);
+  else
+    screensaver_disable_x11 (screensaver);
 #endif
 }
 
@@ -212,6 +346,8 @@ screensaver_new (ClutterStage * stage)
 #if HAVE_X11
   screensaver->display = clutter_x11_get_default_display ();
   screensaver->window = clutter_x11_get_stage_window (stage);
+
+  screensaver_init_x11 (screensaver);
 #endif
 
 #ifdef ENABLE_DBUS
@@ -226,6 +362,10 @@ screensaver_free (ScreenSaver * screensaver)
 {
 #ifdef ENABLE_DBUS
   screensaver_free_dbus (screensaver);
+#endif
+
+#ifdef HAVE_X11
+  screensaver_free_x11 (screensaver);
 #endif
 
   g_free (screensaver);
