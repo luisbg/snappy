@@ -129,6 +129,9 @@ main (int argc, char *argv[])
   engine->playing = TRUE;
   clutter_main ();
 
+  gst_element_set_state (engine->player, GST_STATE_NULL);
+  gst_object_unref (engine->player);
+
 quit:
   g_option_context_free (context);
 
