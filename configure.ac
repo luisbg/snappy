@@ -68,6 +68,21 @@ PKG_CHECK_MODULES(GIO, gio-2.0 >= $GIO_REQUIRED)
 AC_SUBST(GIO_CFLAGS)
 AC_SUBST(GIO_LIBS)
 
+PKG_CHECK_MODULES(CLUTTER_X11, clutter-x11-1.0,
+    [AC_DEFINE(HAVE_X11, 1, [Define if Clutter X11 is available.])],
+    [])
+
+AC_ARG_ENABLE([dbus],
+    AS_HELP_STRING([--enable-dbus], [enable DBus support to disable the screensaver (default=no)]),
+      [],
+      [enable_dbus=no])
+
+if test "x$enable_dbus" = "xyes"; then
+  PKG_CHECK_MODULES(GIO_2_26, gio-2.0 >= 2.26,
+      [AC_DEFINE(ENABLE_DBUS, 1, [Define if DBus support is enabled.])],
+      [AC_MSG_ERROR([GIO >= 2.26 not found, which is required for DBus support])])
+fi
+
 dnl our libraries and install dirs use major.minor as a version
 GST_MAJORMINOR=$PACKAGE_VERSION_MAJOR.$PACKAGE_VERSION_MINOR
 dnl we override it here if we need to for the release candidate of new series

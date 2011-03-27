@@ -682,6 +682,9 @@ load_user_interface (UserInterface * ui)
   center_controls (ui);
   progress_timing (ui);
 
+  ui->screensaver = screensaver_new (CLUTTER_STAGE (ui->stage));
+  screensaver_enable (ui->screensaver, FALSE);
+
   g_timeout_add (SECOND, progress_update_text, ui);
 
   clutter_actor_show (ui->stage);
