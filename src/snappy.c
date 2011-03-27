@@ -132,6 +132,9 @@ main (int argc, char *argv[])
   gst_element_set_state (engine->player, GST_STATE_NULL);
   gst_object_unref (engine->player);
 
+  screensaver_enable (ui->screensaver, TRUE);
+  screensaver_free (ui->screensaver);
+
 quit:
   g_option_context_free (context);
 

@@ -24,6 +24,7 @@
 #define __USER_INTERFACE_H__
 
 #include "gst_engine.h"
+#include "screensaver.h"
 
 #define CTL_SHOW_SEC 3
 #define CTL_FADE_DURATION 250
@@ -78,6 +79,7 @@ struct _UserInterface
   ClutterActor *main_box;
 
   GstEngine *engine;
+  ScreenSaver *screensaver;
 };
 
 // Declaration of non-static functions
