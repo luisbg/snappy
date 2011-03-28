@@ -628,6 +628,12 @@ update_controls_size (UserInterface * ui)
 
 /* -------------------- non-static functions --------------------- */
 
+gboolean
+interface_load_uri (UserInterface * ui, gchar * uri)
+{
+  ui->fileuri = uri;
+}
+
 void
 load_user_interface (UserInterface * ui)
 {

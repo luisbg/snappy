@@ -35,7 +35,7 @@ struct _GstEngine
   gint64 media_duration;
   gint64 second;
 
-  gchar *uri, *fileuri;
+  gchar *uri;
 
   GstElement *player;
   GstElement *sink;
@@ -45,6 +45,8 @@ struct _GstEngine
 
 // Declaration of non-static functions
 gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
+gboolean engine_load (GstEngine * engine, GstElement * sink);
+gboolean engine_load_uri (GstEngine * engine, gchar * uri);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);
 gint64 query_position (GstEngine * engine);
 gboolean seek (GstEngine * engine, gint64 position);

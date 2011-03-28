@@ -100,6 +100,30 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
   return TRUE;
 }
 
+gboolean engine_load (GstEngine * engine, GstElement * sink)
+{
+  engine->player = gst_element_factory_make ("playbin2", "playbin2");
+  if (engine->player == NULL) {
+    g_print ("ERROR: Failed to create playbin element\n");
+    return FALSE;
+  }
+
+  engine->sink = sink;
+  g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
+  engine->bus = gst_pipeline_get_bus (GST_PIPELINE (engine->player));
+
+  return TRUE;
+}
+
+gboolean engine_load_uri (GstEngine * engine, gchar * uri)
+{
+  engine->uri = uri;
+  g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
+  g_print ("Loading: %s\n", uri);
+
+  return TRUE;
+}
+
 gboolean frame_stepping (GstEngine * engine, gboolean foward)
 {
   gboolean ok;
@@ -166,14 +190,25 @@ gboolean seek (GstEngine * engine, gint64 position)
 
 gboolean change_state (GstEngine * engine, gchar * state)
 {
-  if (state == "Playing")
+  if (state == "Playing") {
     gst_element_set_state (engine->player, GST_STATE_PLAYING);
-  else if (state == "Paused")
+    engine->playing = TRUE;
+  }
+  else if (state == "Paused") {
     gst_element_set_state (engine->player, GST_STATE_PAUSED);
-  else if (state == "Ready")
+    engine->playing = FALSE;
+    engine->media_duration = -1;
+  }
+  else if (state == "Ready") {
     gst_element_set_state (engine->player, GST_STATE_READY);
-  else if (state == "Null")
+    engine->playing = FALSE;
+    engine->media_duration = -1;
+  }
+  else if (state == "Null") {
     gst_element_set_state (engine->player, GST_STATE_NULL);
+    engine->playing = FALSE;
+    engine->media_duration = -1;
+  }
 
   return TRUE;
 }

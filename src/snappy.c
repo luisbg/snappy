@@ -37,11 +37,14 @@ main (int argc, char *argv[])
 {
   UserInterface *ui = NULL;
   GstEngine *engine = NULL;
-  ClutterActor *texture;
-  gchar *fileuri;
-  int ret = 0;
+  ClutterActor *video_texture;
+  GstElement *sink;
+
   gboolean fullscreen = FALSE, version = FALSE;
+  gboolean ok;
+  gint ret = 0;
   guint c, index, pos = 0;
+  gchar *fileuri, *uri;
   gchar *file_list[argc];
   GOptionEntry entries[] = {
     {"fullscreen", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &fullscreen,
@@ -87,6 +90,7 @@ main (int argc, char *argv[])
   // User Interface
   ui = g_new0 (UserInterface, 1);
   ui->fullscreen = fullscreen;
+  video_texture = clutter_texture_new ();
 
   clutter_gst_init (&argc, &argv);
 
@@ -98,38 +102,27 @@ main (int argc, char *argv[])
   engine->prev_done = TRUE;
   engine->second = GST_SECOND;
   ui->engine = engine;
+  sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (video_texture));
 
-  engine->player = gst_element_factory_make ("playbin2", "playbin2");
-  if (engine->player == NULL) {
-    g_print ("ERROR: Failed to create playbin element\n");
-    ret = 1;
+  ok = engine_load (engine, sink);
+  if (!ok)
     goto quit;
-  }
-
-  texture = clutter_texture_new ();
-  engine->sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (texture));
-  g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
-  engine->bus = gst_pipeline_get_bus (GST_PIPELINE (engine->player));
+  ui->texture = video_texture;
   gst_bus_add_watch (engine->bus, bus_call, ui);
   gst_object_unref (engine->bus);
-  ui->texture = texture;
 
   fileuri = clean_uri (file_list[0]);
-  g_print ("Loading: %s\n", fileuri);
-  engine->uri = NULL;
-  asprintf (&engine->uri, "file://%s", fileuri);
-  g_object_set (G_OBJECT (engine->player), "uri", engine->uri, NULL);
-  engine->fileuri = fileuri;
-  ui->fileuri = fileuri;
-  gst_element_set_state (engine->player, GST_STATE_PAUSED);
-  engine->playing = FALSE;
-  engine->media_duration = -1;
+  asprintf (&uri, "file://%s", fileuri);
+  g_print ("Loading: %s\n", uri);
+  engine_load_uri (engine, uri);
+  interface_load_uri (ui, uri);
 
-  gst_element_set_state (engine->player, GST_STATE_PLAYING);
-  engine->playing = TRUE;
+  change_state (engine, "Paused");
+  change_state (engine, "Playing");
+
   clutter_main ();
 
-  gst_element_set_state (engine->player, GST_STATE_NULL);
+  change_state (engine, "Null");
   gst_object_unref (engine->player);
 
   screensaver_enable (ui->screensaver, TRUE);
