@@ -43,6 +43,10 @@
 #endif
 #endif
 
+#ifdef ENABLE_DBUS
+#include <gio/gio.h>
+#endif
+
 struct _ScreenSaver
 {
   ClutterStage *stage;
@@ -77,7 +81,6 @@ struct _ScreenSaver
 #endif
 
 #ifdef ENABLE_DBUS
-#include <gio/gio.h>
 #define GS_SERVICE   "org.gnome.SessionManager"
 #define GS_PATH      "/org/gnome/SessionManager"
 #define GS_INTERFACE "org.gnome.SessionManager"
