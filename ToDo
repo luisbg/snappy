@@ -15,8 +15,6 @@ UI
 
 - Rotate video texture.
 
-- Deactivate screensaver when playing fullscreen.
-
 - Clean up controls
   - Vertically centre play/pause button
   - Vertically centre seek bar

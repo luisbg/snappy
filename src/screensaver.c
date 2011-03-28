@@ -72,6 +72,10 @@ struct _ScreenSaver
 #endif
 };
 
+#ifdef HAVE_X11
+#define XSCREENSAVER_MIN_TIMEOUT 60
+#endif
+
 #ifdef ENABLE_DBUS
 #include <gio/gio.h>
 #define GS_SERVICE   "org.gnome.SessionManager"
@@ -80,10 +84,6 @@ struct _ScreenSaver
 /* From org.gnome.SessionManager.xml */
 #define GS_NO_IDLE_FLAG 8
 #define REASON "Playing a movie"
-
-#ifdef HAVE_X11
-#define XSCREENSAVER_MIN_TIMEOUT 60
-#endif
 
 static void
 on_inhibit_cb (GObject * source_object, GAsyncResult * res, gpointer user_data)
