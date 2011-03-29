@@ -112,7 +112,7 @@ main (int argc, char *argv[])
   gst_object_unref (engine->bus);
 
   fileuri = clean_uri (file_list[0]);
-  asprintf (&uri, "file://%s", fileuri);
+  uri = g_strdup_printf ("file://%s", fileuri);
   engine_load_uri (engine, uri);
   interface_load_uri (ui, uri);
 

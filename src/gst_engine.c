@@ -43,11 +43,11 @@ uri_is_unfinished_playback (GstEngine * engine, gchar * uri)
   keyfile = g_key_file_new ();
   flags = G_KEY_FILE_KEEP_COMMENTS;
   hash_key = g_str_hash (uri);
-  asprintf (&key, "%d", hash_key);
+  key = g_strdup_printf ("%d", hash_key);
 
   // config file path
   config_dir = g_get_user_config_dir ();
-  asprintf (&path, "%s/snappy/config", config_dir);
+  path = g_strdup_printf ("%s/snappy/config", config_dir);
 
   if (g_key_file_load_from_file (keyfile, path, flags, NULL))
     if (g_key_file_has_group (keyfile, "unfinished"))
@@ -83,11 +83,11 @@ add_uri_unfinished_playback (GstEngine * engine, gchar * uri, gint64 position)
   keyfile = g_key_file_new ();
   flags = G_KEY_FILE_KEEP_COMMENTS;
   hash_key = g_str_hash (uri);
-  asprintf (&key, "%d", hash_key);
+  key = g_strdup_printf ("%d", hash_key);
 
   // config file path
   config_dir = g_get_user_config_dir ();
-  asprintf (&path, "%s/snappy/config", config_dir);
+  path = g_strdup_printf ("%s/snappy/config", config_dir);
 
   g_key_file_load_from_file (keyfile, path, flags, NULL);
   // if file doesn't exist it uses the newly created one
@@ -118,11 +118,11 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   keyfile = g_key_file_new ();
   flags = G_KEY_FILE_KEEP_COMMENTS;
   hash_key = g_str_hash (uri);
-  asprintf (&key, "%d", hash_key);
+  key = g_strdup_printf ("%d", hash_key);
 
   // config file path
   config_dir = g_get_user_config_dir ();
-  asprintf (&path, "%s/snappy/config", config_dir);
+  path = g_strdup_printf ("%s/snappy/config", config_dir);
 
   // remove key if gkeyfile exists
   if (g_key_file_load_from_file (keyfile, path, flags, NULL))
