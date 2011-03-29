@@ -49,6 +49,24 @@ close_down (UserInterface * ui, GstEngine * engine)
 }
 
 gboolean
+config_load ()
+{
+  const gchar *config_dir;
+  gchar *path;
+
+  config_dir = g_get_user_config_dir ();
+  path = g_strdup_printf ("%s/snappy/", config_dir);
+  g_print ("%s\n", path);
+  if (!g_file_test(path, G_FILE_TEST_IS_DIR))
+  {
+    g_print ("doesn't exist\n");
+    g_mkdir_with_parents (path, 0700);
+  }
+
+  return TRUE;
+}
+
+gboolean
 process_args (int argc, char *argv[],
     gchar * file_list[], gboolean * fullscreen, GOptionContext * context)
 {
@@ -119,6 +137,7 @@ main (int argc, char *argv[])
   ok = process_args (argc, argv, file_list, &fullscreen, context);
   if (!ok)
     goto quit;
+  config_load();
 
   // User Interface
   ui = g_new0 (UserInterface, 1);
