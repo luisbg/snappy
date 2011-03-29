@@ -23,9 +23,7 @@
 #ifndef __GST_ENGINE_H__
 #define __GST_ENGINE_H__
 
-G_BEGIN_DECLS
-
-typedef struct _GstEngine GstEngine;
+G_BEGIN_DECLS typedef struct _GstEngine GstEngine;
 
 struct _GstEngine
 {
@@ -44,10 +42,13 @@ struct _GstEngine
 };
 
 // Declaration of non-static functions
+gboolean add_uri_unfinished (GstEngine * engine);
+gboolean at_the_eos (GstEngine * engine);
 gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
 gboolean engine_load (GstEngine * engine, GstElement * sink);
 gboolean engine_load_uri (GstEngine * engine, gchar * uri);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);
+GstState get_state (GstEngine * engine);
 gint64 query_position (GstEngine * engine);
 gboolean seek (GstEngine * engine, gint64 position);
 gboolean change_state (GstEngine * engine, gchar * state);

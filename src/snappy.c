@@ -113,7 +113,6 @@ main (int argc, char *argv[])
 
   fileuri = clean_uri (file_list[0]);
   asprintf (&uri, "file://%s", fileuri);
-  g_print ("Loading: %s\n", uri);
   engine_load_uri (engine, uri);
   interface_load_uri (ui, uri);
 
@@ -121,6 +120,11 @@ main (int argc, char *argv[])
   change_state (engine, "Playing");
 
   clutter_main ();
+
+  g_print ("closing snappy\n");
+
+  // save position if file isn't finished playing
+  add_uri_unfinished (engine);
 
   change_state (engine, "Null");
   gst_object_unref (engine->player);
