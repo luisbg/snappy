@@ -32,34 +32,37 @@
 #include "gst_engine.h"
 #include "utils.h"
 
-int
-main (int argc, char *argv[])
+void
+close_down (UserInterface * ui, GstEngine * engine)
 {
-  UserInterface *ui = NULL;
-  GstEngine *engine = NULL;
-  ClutterActor *video_texture;
-  GstElement *sink;
+  g_print ("closing snappy\n");
 
-  gboolean fullscreen = FALSE, version = FALSE;
-  gboolean ok;
-  gint ret = 0;
+  // save position if file isn't finished playing
+  add_uri_unfinished (engine);
+
+  change_state (engine, "Null");
+
+  screensaver_enable (ui->screensaver, TRUE);
+  screensaver_free (ui->screensaver);
+
+  gst_object_unref (G_OBJECT (engine->player));
+}
+
+gboolean
+process_args (int argc, char *argv[],
+    gchar * file_list[], gboolean * fullscreen, GOptionContext * context)
+{
+  gboolean version = FALSE;
   guint c, index, pos = 0;
-  gchar *fileuri, *uri;
-  gchar *file_list[argc];
   GOptionEntry entries[] = {
-    {"fullscreen", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &fullscreen,
+    {"fullscreen", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, fullscreen,
         "Fullscreen mode", NULL},
     {"version", 'v', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &version,
         "Print version", NULL},
     {NULL}
   };
-  GOptionContext *context;
   GError *err = NULL;
 
-  if (!g_thread_supported ())
-    g_thread_init (NULL);
-
-  context = g_option_context_new ("<media file> - Play movie files");
   g_option_context_add_main_entries (context, entries, NULL);
   g_option_context_add_group (context, gst_init_get_option_group ());
   g_option_context_add_group (context, clutter_get_option_group ());
@@ -87,6 +90,36 @@ main (int argc, char *argv[])
     pos++;
   }
 
+  return TRUE;
+
+quit:
+  return FALSE;
+}
+
+int
+main (int argc, char *argv[])
+{
+  UserInterface *ui = NULL;
+  GstEngine *engine = NULL;
+  ClutterActor *video_texture;
+  GstElement *sink;
+
+  gboolean ok, fullscreen = FALSE;
+  gint ret = 0;
+  guint c, index, pos = 0;
+  gchar *fileuri, *uri;
+  gchar *file_list[argc];
+  GOptionContext *context;
+
+  if (!g_thread_supported ())
+    g_thread_init (NULL);
+
+  context = g_option_context_new ("<media file> - Play movie files");
+
+  ok = process_args (argc, argv, file_list, &fullscreen, context);
+  if (!ok)
+    goto quit;
+
   // User Interface
   ui = g_new0 (UserInterface, 1);
   ui->fullscreen = fullscreen;
@@ -96,15 +129,10 @@ main (int argc, char *argv[])
 
   // Gstreamer
   engine = g_new0 (GstEngine, 1);
-  engine->media_width = -1;
-  engine->media_height = -1;
-  engine->direction_foward = TRUE;
-  engine->prev_done = TRUE;
-  engine->second = GST_SECOND;
   ui->engine = engine;
   sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (video_texture));
 
-  ok = engine_load (engine, sink);
+  ok = engine_init (engine, sink);
   if (!ok)
     goto quit;
   ui->texture = video_texture;
@@ -121,16 +149,7 @@ main (int argc, char *argv[])
 
   clutter_main ();
 
-  g_print ("closing snappy\n");
-
-  // save position if file isn't finished playing
-  add_uri_unfinished (engine);
-
-  change_state (engine, "Null");
-  gst_object_unref (engine->player);
-
-  screensaver_enable (ui->screensaver, TRUE);
-  screensaver_free (ui->screensaver);
+  close_down (ui, engine);
 
 quit:
   g_option_context_free (context);

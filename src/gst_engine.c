@@ -245,8 +245,14 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 }
 
 gboolean
-engine_load (GstEngine * engine, GstElement * sink)
+engine_init (GstEngine * engine, GstElement * sink)
 {
+  engine->media_width = -1;
+  engine->media_height = -1;
+  engine->direction_foward = TRUE;
+  engine->prev_done = TRUE;
+  engine->second = GST_SECOND;
+
   engine->player = gst_element_factory_make ("playbin2", "playbin2");
   if (engine->player == NULL) {
     g_print ("ERROR: Failed to create playbin element\n");

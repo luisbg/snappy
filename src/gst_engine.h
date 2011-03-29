@@ -45,7 +45,7 @@ struct _GstEngine
 gboolean add_uri_unfinished (GstEngine * engine);
 gboolean at_the_eos (GstEngine * engine);
 gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
-gboolean engine_load (GstEngine * engine, GstElement * sink);
+gboolean engine_init (GstEngine * engine, GstElement * sink);
 gboolean engine_load_uri (GstEngine * engine, gchar * uri);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);
 GstState get_state (GstEngine * engine);
