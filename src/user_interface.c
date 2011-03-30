@@ -38,6 +38,7 @@ static gchar * position_ns_to_str (gint64 nanoseconds);
 static void progress_timing (UserInterface * ui);
 static gboolean progress_update_text (gpointer data);
 static gboolean progress_update_seekbar (gpointer data);
+gboolean rotate_video (UserInterface * ui);
 static void size_change (ClutterStage * stage, gpointer * data);
 static void show_controls (UserInterface * ui, gboolean vis);
 static void toggle_fullscreen (UserInterface * ui);
@@ -182,6 +183,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
         }
         case CLUTTER_r:
           // rotate texture 90 degrees.
+	  rotate_video (ui);
           handled = TRUE;
           break;
 
@@ -477,6 +479,39 @@ progress_update_seekbar (gpointer data)
   return TRUE;
 }
 
+gboolean rotate_video (UserInterface * ui)
+{
+  gfloat *x = 0, *y = 0, *z = 0;
+  gfloat vid_width, vid_height;
+  gfloat x_center, y_center;
+  gdouble angle;
+
+  angle = clutter_actor_get_rotation (ui->texture, CLUTTER_Z_AXIS, x, y, z);
+  angle += 90;
+  if (angle == 360)
+    angle = 0;
+  clutter_actor_set_z_rotation_from_gravity (ui->texture,
+      angle, CLUTTER_GRAVITY_CENTER);
+
+  if (angle == 90 || angle == 270) {
+    ui->rotated = TRUE;
+
+    if (!ui->fullscreen) {    
+	clutter_actor_set_width (ui->stage, ui->media_height);
+	clutter_actor_set_height (ui->stage, ui->media_width);
+    }
+  } else {
+    ui->rotated = FALSE;
+
+    if (!ui->fullscreen) {
+        clutter_actor_set_width (ui->stage, ui->media_width);
+        clutter_actor_set_height (ui->stage, ui->media_height);
+    }
+  }
+
+  size_change (CLUTTER_STAGE (ui->stage), ui);
+}
+
 static void
 size_change (ClutterStage * stage, gpointer * data)
 {
@@ -487,16 +522,24 @@ size_change (ClutterStage * stage, gpointer * data)
   gfloat media_width, media_height;
   gfloat center, aratio;
 
-  media_width = ui->engine->media_width;
-  media_height = ui->engine->media_height;
+  media_width = clutter_actor_get_width (ui->texture);
+  media_height = clutter_actor_get_height (ui->texture);
+
+  g_print ("%f, %f\n", media_width, media_height);
 
   stage_width = clutter_actor_get_width (ui->stage);
   stage_height = clutter_actor_get_height (ui->stage);
   ui->stage_width = stage_width;
   ui->stage_height = stage_height;
 
-  new_width = stage_width;
-  new_height = stage_height;
+  if (!ui->rotated) {
+    new_width = stage_width;
+    new_height = stage_height;
+  } else {
+    new_width = stage_height;
+    new_height = stage_width;
+  }
+
   if (media_height <= media_width) {
     aratio = media_height / media_width;
     new_height = new_width * aratio;
@@ -655,6 +698,7 @@ load_user_interface (UserInterface * ui)
   ui->progress_id = -1;
   ui->title_length = TITLE_LENGTH;
   ui->duration_str = position_ns_to_str (ui->engine->media_duration);
+  ui->rotated = FALSE;
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
   clutter_stage_set_minimum_size (CLUTTER_STAGE (ui->stage),

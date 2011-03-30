@@ -13,8 +13,6 @@ UI
 
 - Load UI with visualizations when media is a music file.
 
-- Rotate video texture.
-
 - Clean up controls
   - Vertically centre play/pause button
   - Vertically centre seek bar
@@ -41,3 +39,4 @@ Engine
 - Export video block inside in/out points
 
 - gst-launch-esque pipeline handling
+

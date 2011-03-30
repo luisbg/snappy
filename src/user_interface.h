@@ -58,6 +58,7 @@ struct _UserInterface
 {
   gboolean controls_showing, keep_showing_controls;
   gboolean fullscreen, penalty_box_active;
+  gboolean rotated;
 
   gint title_length, controls_timeout, progress_id;
   guint media_width, media_height;
