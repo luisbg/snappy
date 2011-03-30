@@ -490,13 +490,12 @@ gboolean rotate_video (UserInterface * ui)
   angle += 90;
   if (angle == 360)
     angle = 0;
-  clutter_actor_set_z_rotation_from_gravity (ui->texture,
-      angle, CLUTTER_GRAVITY_CENTER);
+  clutter_actor_set_rotation (ui->texture, CLUTTER_Z_AXIS, angle, 0, 0, 0);
 
   if (angle == 90 || angle == 270) {
     ui->rotated = TRUE;
 
-    if (!ui->fullscreen) {    
+    if (!ui->fullscreen) {
 	clutter_actor_set_width (ui->stage, ui->media_height);
 	clutter_actor_set_height (ui->stage, ui->media_width);
     }
@@ -520,12 +519,10 @@ size_change (ClutterStage * stage, gpointer * data)
   gfloat stage_width, stage_height;
   gfloat new_width, new_height;
   gfloat media_width, media_height;
-  gfloat center, aratio;
+  gfloat aratio;
 
   media_width = clutter_actor_get_width (ui->texture);
   media_height = clutter_actor_get_height (ui->texture);
-
-  g_print ("%f, %f\n", media_width, media_height);
 
   stage_width = clutter_actor_get_width (ui->stage);
   stage_height = clutter_actor_get_height (ui->stage);
@@ -543,16 +540,15 @@ size_change (ClutterStage * stage, gpointer * data)
   if (media_height <= media_width) {
     aratio = media_height / media_width;
     new_height = new_width * aratio;
-    center = (stage_height - new_height) / 2;
-    clutter_actor_set_position (CLUTTER_ACTOR (ui->texture), 0, center);
   } else {
     aratio = media_width / media_height;
     new_width = new_height * aratio;
-    center = (stage_width - new_width) / 2;
-    clutter_actor_set_position (CLUTTER_ACTOR (ui->texture), center, 0);
   }
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), new_width, new_height);
+  clutter_actor_set_position (CLUTTER_ACTOR (ui->texture), stage_width / 2,
+      stage_height / 2);
+
   update_controls_size (ui);
   center_controls (ui);
   progress_timing (ui);
@@ -728,6 +724,11 @@ load_user_interface (UserInterface * ui)
   g_signal_connect (CLUTTER_STAGE (ui->stage), "unfullscreen",
       G_CALLBACK (size_change), ui);
   g_signal_connect (ui->stage, "event", G_CALLBACK (event_cb), ui);
+
+  clutter_actor_set_anchor_point_from_gravity (CLUTTER_ACTOR (ui->texture),
+      CLUTTER_GRAVITY_CENTER);
+  clutter_actor_set_position (CLUTTER_ACTOR (ui->texture), ui->stage_width / 2,
+      ui->stage_height / 2);
 
   center_controls (ui);
   progress_timing (ui);
