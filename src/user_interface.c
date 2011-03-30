@@ -293,6 +293,7 @@ load_controls (UserInterface * ui)
   ClutterActor *info_box;
   ClutterLayoutManager *seek_box_layout;
   ClutterActor *seek_box;
+  GError *error = NULL;
 
   vid_panel_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
       "/vid-panel.png");
@@ -320,7 +321,9 @@ load_controls (UserInterface * ui)
   ui->control_box = clutter_box_new (controls_layout);
 
   // Controls background
-  ui->control_bg = clutter_texture_new_from_file (vid_panel_png, NULL);
+  ui->control_bg = clutter_texture_new_from_file (vid_panel_png, &error);
+  if (!ui->control_bg && error)
+    g_debug ("Clutter error: %s\n", error->message);
   g_free (vid_panel_png);
   clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
       ui->control_bg);
@@ -331,7 +334,9 @@ load_controls (UserInterface * ui)
   ui->main_box = clutter_box_new (main_box_layout);
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (main_box_layout),
       CTL_SPACING);
-  ui->control_play_toggle = clutter_texture_new_from_file (ui->pause_png, NULL);
+  ui->control_play_toggle = clutter_texture_new_from_file (ui->pause_png, &error);
+  if (!ui->control_play_toggle && error)
+    g_debug ("Clutter error: %s\n", error->message);
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
       ui->control_play_toggle, FALSE,        /* expand */
       FALSE,                                 /* x-fill */
