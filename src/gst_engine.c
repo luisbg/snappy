@@ -353,18 +353,18 @@ seek (GstEngine * engine, gint64 position)
 gboolean
 change_state (GstEngine * engine, gchar * state)
 {
-  if (state == "Playing") {
+  if (!g_strcmp0(state, "Playing")) {
     gst_element_set_state (engine->player, GST_STATE_PLAYING);
     engine->playing = TRUE;
-  } else if (state == "Paused") {
+  } else if (!g_strcmp0(state, "Paused")) {
     gst_element_set_state (engine->player, GST_STATE_PAUSED);
     engine->playing = FALSE;
     engine->media_duration = -1;
-  } else if (state == "Ready") {
+  } else if (!g_strcmp0 (state, "Ready")) {
     gst_element_set_state (engine->player, GST_STATE_READY);
     engine->playing = FALSE;
     engine->media_duration = -1;
-  } else if (state == "Null") {
+  } else if (!g_strcmp0(state, "Null")) {
     gst_element_set_state (engine->player, GST_STATE_NULL);
     engine->playing = FALSE;
     engine->media_duration = -1;
