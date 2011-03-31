@@ -39,7 +39,7 @@ static void progress_timing (UserInterface * ui);
 static gboolean progress_update_text (gpointer data);
 static gboolean progress_update_seekbar (gpointer data);
 gboolean rotate_video (UserInterface * ui);
-static void size_change (ClutterStage * stage, gpointer * data);
+static void size_change (ClutterStage * stage, gpointer data);
 static void show_controls (UserInterface * ui, gboolean vis);
 static void toggle_fullscreen (UserInterface * ui);
 static void toggle_playing (UserInterface * ui);
@@ -524,7 +524,7 @@ gboolean rotate_video (UserInterface * ui)
 }
 
 static void
-size_change (ClutterStage * stage, gpointer * data)
+size_change (ClutterStage * stage, gpointer data)
 {
   UserInterface *ui = (UserInterface *) data;
 
