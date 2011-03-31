@@ -19,5 +19,7 @@ right      - seek 10 seconds foward
 
 c          - show/hide visual controls
 
+r          - rotate video
+
 .          - frame step foward
 ,          - frame step backwards
