@@ -162,6 +162,7 @@ main (int argc, char *argv[])
   uri = g_strdup_printf ("file://%s", fileuri);
   engine_load_uri (engine, uri);
   interface_load_uri (ui, uri);
+  load_user_interface (ui);
 
   change_state (engine, "Paused");
   change_state (engine, "Playing");

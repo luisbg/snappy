@@ -752,3 +752,10 @@ load_user_interface (UserInterface * ui)
 
   clutter_actor_show (ui->stage);
 }
+
+gboolean
+update_controls (UserInterface * ui)
+{
+  progress_update_text (ui);
+  progress_update_seekbar (ui);
+}

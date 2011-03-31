@@ -28,6 +28,8 @@ G_BEGIN_DECLS typedef struct _GstEngine GstEngine;
 struct _GstEngine
 {
   gboolean playing, direction_foward, prev_done;
+  gboolean has_started;
+  gboolean has_video, has_audio;
 
   guint media_width, media_height;
   gint64 media_duration;

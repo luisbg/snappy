@@ -86,6 +86,7 @@ struct _UserInterface
 // Declaration of non-static functions
 gboolean interface_load_uri (UserInterface * ui, gchar * uri);
 void load_user_interface (UserInterface * ui);
+gboolean update_controls (UserInterface * ui);
 
 G_END_DECLS
 #endif /* __USER_INTERFACE_H__ */

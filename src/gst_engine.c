@@ -21,6 +21,7 @@
  */
 
 #include <clutter-gst/clutter-gst.h>
+#include <gst/pbutils/pbutils.h>
 
 #include "user_interface.h"
 #include "gst_engine.h"
@@ -73,6 +74,46 @@ add_uri_unfinished_playback (GstEngine * engine, gchar * uri, gint64 position)
   g_free (path);
 
   return TRUE;
+}
+
+gboolean
+discover (GstEngine * engine, gchar * uri)
+{
+  gint timeout = 10;
+  GstDiscoverer *dc;
+  GstDiscovererInfo *info;
+  GstDiscovererStreamInfo *s_info;
+  GstDiscovererVideoInfo *v_info;
+  GError *error = NULL;
+  GList *list;
+
+  dc = gst_discoverer_new (timeout * GST_SECOND, &error);
+  if (G_UNLIKELY (dc == NULL)) {
+    g_print ("Error in GST Discoverer initializing: %s\n", error->message);
+    return FALSE;
+  }
+
+  info = gst_discoverer_discover_uri (dc, uri, &error);
+  list = gst_discoverer_info_get_video_streams (info);
+  engine->has_video = (g_list_length (list) > 0);
+  gst_discoverer_stream_info_list_free (list);
+
+  list = gst_discoverer_info_get_audio_streams (info);
+  engine->has_audio = (g_list_length (list) > 0);
+  gst_discoverer_stream_info_list_free (list);
+
+  if (engine->has_video || engine->has_audio)
+    engine->media_duration = gst_discoverer_info_get_duration (info);
+
+  if (engine->has_video) {
+    list = gst_discoverer_info_get_video_streams (info);
+    v_info = (GstDiscovererVideoInfo *) list->data;
+    engine->media_width = gst_discoverer_video_info_get_width (v_info);
+    engine->media_height = gst_discoverer_video_info_get_height (v_info);
+  }
+
+  gst_discoverer_info_unref (info);
+  g_error_free (error);
 }
 
 gboolean
@@ -198,37 +239,18 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     {
       GstState old, new, pending;
       gst_message_parse_state_changed (msg, &old, &new, &pending);
-      if (new == GST_STATE_PAUSED) {
-        if (engine->media_width == -1) {
-          GstPad *p;
-          GstCaps *c;
+      if (new == GST_STATE_PLAYING) {
+	if (!engine->has_started) {
+	  gint64 position;
 
-          p = gst_element_get_pad (engine->sink, "sink");
-          c = gst_pad_get_negotiated_caps (p);
-          if (c) {
-            GstStructure *s;
-            const GValue *widthval, *heightval;
+	  position = uri_is_unfinished_playback (engine, engine->uri);
+	  if (position != -1) {
+	    seek (engine, position);
+	  }
 
-            s = gst_caps_get_structure (c, 0);
-            widthval = gst_structure_get_value (s, "width");
-            heightval = gst_structure_get_value (s, "height");
-            if (G_VALUE_HOLDS (widthval, G_TYPE_INT)) {
-              gint width, height;
-              gint64 position;
-
-              width = g_value_get_int (widthval);
-              height = g_value_get_int (heightval);
-              engine->media_width = width;
-              engine->media_height = height;
-              update_media_duration (ui->engine);
-              load_user_interface (ui);
-
-              position = uri_is_unfinished_playback (engine, engine->uri);
-              if (position != -1)
-                seek (engine, position);
-            }
-          }
-        }
+	  update_controls (ui);
+	  engine->has_started = TRUE;
+	}
       }
 
       break;
@@ -249,9 +271,13 @@ engine_init (GstEngine * engine, GstElement * sink)
 {
   engine->media_width = -1;
   engine->media_height = -1;
+  engine->media_duration = -1;
   engine->direction_foward = TRUE;
   engine->prev_done = TRUE;
   engine->second = GST_SECOND;
+  engine->has_video = FALSE;
+  engine->has_audio = FALSE;
+  engine->has_started = FALSE;
 
   engine->player = gst_element_factory_make ("playbin2", "playbin2");
   if (engine->player == NULL) {
@@ -269,11 +295,11 @@ engine_init (GstEngine * engine, GstElement * sink)
 gboolean
 engine_load_uri (GstEngine * engine, gchar * uri)
 {
-  gint64 position;
-
   engine->uri = uri;
   g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
   g_print ("Loading: %s\n", uri);
+
+  discover (engine, uri);
 
   return TRUE;
 }
@@ -359,7 +385,6 @@ change_state (GstEngine * engine, gchar * state)
   } else if (!g_strcmp0(state, "Paused")) {
     gst_element_set_state (engine->player, GST_STATE_PAUSED);
     engine->playing = FALSE;
-    engine->media_duration = -1;
   } else if (!g_strcmp0 (state, "Ready")) {
     gst_element_set_state (engine->player, GST_STATE_READY);
     engine->playing = FALSE;
