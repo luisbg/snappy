@@ -324,8 +324,10 @@ load_controls (UserInterface * ui)
   ui->control_bg = clutter_texture_new_from_file (vid_panel_png, &error);
   if (!ui->control_bg && error)
     g_debug ("Clutter error: %s\n", error->message);
-  g_error_free (error);
-  error = NULL;
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
 
   g_free (vid_panel_png);
   clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
@@ -341,8 +343,10 @@ load_controls (UserInterface * ui)
   ui->control_play_toggle = clutter_texture_new_from_file (ui->pause_png, &error);
   if (!ui->control_play_toggle && error)
     g_debug ("Clutter error: %s\n", error->message);
-  g_error_free (error);
-  error = NULL;
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
       ui->control_play_toggle, FALSE,        /* expand */
