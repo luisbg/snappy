@@ -31,7 +31,7 @@
 static void center_controls (UserInterface * ui);
 static gboolean controls_timeout_cb (gpointer data);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
-    gpointer data);
+    UserInterface * ui);
 static void load_controls (UserInterface * ui);
 static gboolean penalty_box (gpointer data);
 static gchar * position_ns_to_str (gint64 nanoseconds);
@@ -39,7 +39,7 @@ static void progress_timing (UserInterface * ui);
 static gboolean progress_update_text (gpointer data);
 static gboolean progress_update_seekbar (gpointer data);
 gboolean rotate_video (UserInterface * ui);
-static void size_change (ClutterStage * stage, gpointer data);
+static void size_change (ClutterStage * stage, UserInterface * ui);
 static void show_controls (UserInterface * ui, gboolean vis);
 static void toggle_fullscreen (UserInterface * ui);
 static void toggle_playing (UserInterface * ui);
@@ -83,9 +83,8 @@ controls_timeout_cb (gpointer data)
 }
 
 static gboolean
-event_cb (ClutterStage * stage, ClutterEvent * event, gpointer data)
+event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 {
-  UserInterface *ui = (UserInterface *) data;
   gboolean handled = FALSE;
 
   switch (event->type) {
@@ -528,14 +527,12 @@ gboolean rotate_video (UserInterface * ui)
 }
 
 static void
-size_change (ClutterStage * stage, gpointer data)
+size_change (ClutterStage * stage, UserInterface * ui)
 {
-  UserInterface *ui = (UserInterface *) data;
-
   gfloat stage_width, stage_height;
   gfloat new_width, new_height;
   gfloat media_width, media_height;
-  gfloat aratio;
+  gfloat stage_ar, media_ar;
 
   media_width = clutter_actor_get_width (ui->texture);
   media_height = clutter_actor_get_height (ui->texture);
@@ -545,20 +542,25 @@ size_change (ClutterStage * stage, gpointer data)
   ui->stage_width = stage_width;
   ui->stage_height = stage_height;
 
-  if (!ui->rotated) {
-    new_width = stage_width;
-    new_height = stage_height;
+  stage_ar = stage_width / stage_height;
+
+  /* if we're rotated, the media_width and media_height are swapped */
+  if (ui->rotated) {
+    media_ar = media_height / media_width;
   } else {
-    new_width = stage_height;
-    new_height = stage_width;
+    media_ar = media_width / media_height;
   }
 
-  if (media_height <= media_width) {
-    aratio = media_height / media_width;
-    new_height = new_width * aratio;
+  /* calculate new width and height
+   * note: when we're done, new_width/new_height should equal media_ar */
+  if (media_ar > stage_ar) {
+    /* media has wider aspect than stage so use new width as stage width and
+     * scale down height */
+    new_width = stage_width;
+    new_height = stage_width / media_ar;
   } else {
-    aratio = media_width / media_height;
-    new_width = new_height * aratio;
+    new_height = stage_height;
+    new_width = stage_height * media_ar;
   }
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), new_width, new_height);
