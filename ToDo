@@ -23,8 +23,6 @@ UI
 
 - Playback In/Out points
 
-- Support for audio files
-
 Engine
 ------
 
@@ -40,3 +38,4 @@ Engine
 
 - gst-launch-esque pipeline handling
 
+- support for picture files
