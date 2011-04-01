@@ -88,12 +88,18 @@ discover (GstEngine * engine, gchar * uri)
   GList *list;
 
   dc = gst_discoverer_new (timeout * GST_SECOND, &error);
-  if (G_UNLIKELY (dc == NULL)) {
-    g_print ("Error in GST Discoverer initializing: %s\n", error->message);
+  if (G_UNLIKELY (error)) {
+    g_error ("Error in GST Discoverer initializing: %s\n", error->message);
+    g_error_free (error);
     return FALSE;
   }
 
   info = gst_discoverer_discover_uri (dc, uri, &error);
+  if (G_UNLIKELY (error)) {
+    g_error ("Error discovering URI: %s\n", error->message);
+    g_error_free (error);
+    return FALSE;
+  }
   list = gst_discoverer_info_get_video_streams (info);
   engine->has_video = (g_list_length (list) > 0);
   gst_discoverer_stream_info_list_free (list);
@@ -113,7 +119,8 @@ discover (GstEngine * engine, gchar * uri)
   }
 
   gst_discoverer_info_unref (info);
-  g_error_free (error);
+
+  return TRUE;
 }
 
 gboolean
@@ -297,6 +304,10 @@ engine_load_uri (GstEngine * engine, gchar * uri)
 {
   engine->uri = uri;
   g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
+
+  /* loading a new URI means we haven't started playing this URI yet */
+  engine->has_started = FALSE;
+
   g_print ("Loading: %s\n", uri);
 
   discover (engine, uri);
