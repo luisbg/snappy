@@ -9,7 +9,7 @@ Common
 UI
 --
 
-- Volume interactive display in the controls.
+- Fix the positions of the bottom part of the controls (volume & stream position).
 
 - Load UI with visualizations when media is a music file.
 
