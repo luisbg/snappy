@@ -130,13 +130,19 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           g_object_get (G_OBJECT (ui->engine->player), "volume", &volume, NULL);
           // Volume Down
           if (keyval == CLUTTER_9 && volume > 0.0) {
+            volume -= 0.05;
+            if (volume < 0.01)
+              volume = 0;
             g_object_set (G_OBJECT (ui->engine->player), "volume",
-                volume -= 0.05, NULL);
+                volume, NULL);
 
             // Volume Up
           } else if (keyval == CLUTTER_0 && volume < 1.0) {
+            volume += 0.05;
+            if (volume > 1)
+              volume = 1;
             g_object_set (G_OBJECT (ui->engine->player), "volume",
-                volume += 0.05, NULL);
+                volume, NULL);
           }
 
           update_volume (ui, volume);
@@ -224,6 +230,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
             bev->x, bev->y);
         if (actor == ui->control_play_toggle) {
           toggle_playing (ui);
+
         } else if (actor == ui->control_seek1 ||
             actor == ui->control_seek2 || actor == ui->control_seekbar) {
           gfloat x, y, dist;
@@ -241,6 +248,19 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           seek (ui->engine, progress);
           clutter_actor_set_size (ui->control_seekbar, dist, ui->seek_height);
           progress_update_text (ui);
+
+        } else if (actor == ui->vol_int || actor == ui->vol_int_bg) {
+          gfloat x, y, dist;
+          gdouble volume;
+
+          clutter_actor_get_transformed_position (ui->vol_int_bg, &x, &y);
+          dist = bev->x - x;
+          dist = CLAMP (dist, 0, ui->volume_width);
+
+          volume = dist / ui->volume_width;
+          g_object_set (G_OBJECT (ui->engine->player), "volume", volume, NULL);
+          clutter_actor_set_size (ui->vol_int, dist, ui->volume_height);
+
         } else if (actor == ui->control_bg || actor == ui->control_title
             || actor == ui->control_pos) {
           ui->keep_showing_controls = !ui->keep_showing_controls;
