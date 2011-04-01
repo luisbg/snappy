@@ -32,16 +32,17 @@
 // GstPlayFlags flags from playbin2. It is the policy of GStreamer to
 // not publicly expose element-specific enums. That's why this
 // GstPlayFlags enum has been copied here.
-typedef enum {
-    GST_PLAY_FLAG_VIDEO         = 0x00000001,
-    GST_PLAY_FLAG_AUDIO         = 0x00000002,
-    GST_PLAY_FLAG_TEXT          = 0x00000004,
-    GST_PLAY_FLAG_VIS           = 0x00000008,
-    GST_PLAY_FLAG_SOFT_VOLUME   = 0x00000010,
-    GST_PLAY_FLAG_NATIVE_AUDIO  = 0x00000020,
-    GST_PLAY_FLAG_NATIVE_VIDEO  = 0x00000040,
-    GST_PLAY_FLAG_DOWNLOAD      = 0x00000080,
-    GST_PLAY_FLAG_BUFFERING     = 0x000000100
+typedef enum
+{
+  GST_PLAY_FLAG_VIDEO = 0x00000001,
+  GST_PLAY_FLAG_AUDIO = 0x00000002,
+  GST_PLAY_FLAG_TEXT = 0x00000004,
+  GST_PLAY_FLAG_VIS = 0x00000008,
+  GST_PLAY_FLAG_SOFT_VOLUME = 0x00000010,
+  GST_PLAY_FLAG_NATIVE_AUDIO = 0x00000020,
+  GST_PLAY_FLAG_NATIVE_VIDEO = 0x00000040,
+  GST_PLAY_FLAG_DOWNLOAD = 0x00000080,
+  GST_PLAY_FLAG_BUFFERING = 0x000000100
 } GstPlayFlags;
 
 /* -------------------- static functions --------------------- */
@@ -269,17 +270,17 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       GstState old, new, pending;
       gst_message_parse_state_changed (msg, &old, &new, &pending);
       if (new == GST_STATE_PLAYING) {
-	if (!engine->has_started) {
-	  gint64 position;
+        if (!engine->has_started) {
+          gint64 position;
 
-	  position = uri_is_unfinished_playback (engine, engine->uri);
-	  if (position != -1) {
-	    seek (engine, position);
-	  }
+          position = uri_is_unfinished_playback (engine, engine->uri);
+          if (position != -1) {
+            seek (engine, position);
+          }
 
-	  update_controls (ui);
-	  engine->has_started = TRUE;
-	}
+          update_controls (ui);
+          engine->has_started = TRUE;
+        }
       }
 
       break;
@@ -414,17 +415,17 @@ seek (GstEngine * engine, gint64 position)
 gboolean
 change_state (GstEngine * engine, gchar * state)
 {
-  if (!g_strcmp0(state, "Playing")) {
+  if (!g_strcmp0 (state, "Playing")) {
     gst_element_set_state (engine->player, GST_STATE_PLAYING);
     engine->playing = TRUE;
-  } else if (!g_strcmp0(state, "Paused")) {
+  } else if (!g_strcmp0 (state, "Paused")) {
     gst_element_set_state (engine->player, GST_STATE_PAUSED);
     engine->playing = FALSE;
   } else if (!g_strcmp0 (state, "Ready")) {
     gst_element_set_state (engine->player, GST_STATE_READY);
     engine->playing = FALSE;
     engine->media_duration = -1;
-  } else if (!g_strcmp0(state, "Null")) {
+  } else if (!g_strcmp0 (state, "Null")) {
     gst_element_set_state (engine->player, GST_STATE_NULL);
     engine->playing = FALSE;
     engine->media_duration = -1;

@@ -53,9 +53,7 @@
 
 #define PENALTY_TIME 500
 
-G_BEGIN_DECLS
-
-typedef struct _UserInterface UserInterface;
+G_BEGIN_DECLS typedef struct _UserInterface UserInterface;
 
 struct _UserInterface
 {
