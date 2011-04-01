@@ -39,6 +39,7 @@ struct _GstEngine
 
   GstElement *player;
   GstElement *sink;
+  GstElement *vis;
 
   GstBus *bus;
 };

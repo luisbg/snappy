@@ -29,6 +29,21 @@
 #define SAVE_POSITION_MIN_DURATION 300 * 1000   // don't save >5 minute files
 #define SAVE_POSITION_THRESHOLD 0.05    // percentage threshold
 
+// GstPlayFlags flags from playbin2. It is the policy of GStreamer to
+// not publicly expose element-specific enums. That's why this
+// GstPlayFlags enum has been copied here.
+typedef enum {
+    GST_PLAY_FLAG_VIDEO         = 0x00000001,
+    GST_PLAY_FLAG_AUDIO         = 0x00000002,
+    GST_PLAY_FLAG_TEXT          = 0x00000004,
+    GST_PLAY_FLAG_VIS           = 0x00000008,
+    GST_PLAY_FLAG_SOFT_VOLUME   = 0x00000010,
+    GST_PLAY_FLAG_NATIVE_AUDIO  = 0x00000020,
+    GST_PLAY_FLAG_NATIVE_VIDEO  = 0x00000040,
+    GST_PLAY_FLAG_DOWNLOAD      = 0x00000080,
+    GST_PLAY_FLAG_BUFFERING     = 0x000000100
+} GstPlayFlags;
+
 /* -------------------- static functions --------------------- */
 
 gboolean
@@ -86,6 +101,7 @@ discover (GstEngine * engine, gchar * uri)
   GstDiscovererVideoInfo *v_info;
   GError *error = NULL;
   GList *list;
+  GstPlayFlags flags;
 
   dc = gst_discoverer_new (timeout * GST_SECOND, &error);
   if (G_UNLIKELY (error)) {
@@ -116,6 +132,12 @@ discover (GstEngine * engine, gchar * uri)
     v_info = (GstDiscovererVideoInfo *) list->data;
     engine->media_width = gst_discoverer_video_info_get_width (v_info);
     engine->media_height = gst_discoverer_video_info_get_height (v_info);
+  } else {
+    engine->vis = gst_element_factory_make ("goom2k1", "goom2k1");
+
+    g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
+    g_object_set (G_OBJECT (engine->player), "flags",
+        flags | GST_PLAY_FLAG_VIS, NULL);
   }
 
   gst_discoverer_info_unref (info);
@@ -276,8 +298,8 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 gboolean
 engine_init (GstEngine * engine, GstElement * sink)
 {
-  engine->media_width = -1;
-  engine->media_height = -1;
+  engine->media_width = 600;
+  engine->media_height = 400;
   engine->media_duration = -1;
   engine->direction_foward = TRUE;
   engine->prev_done = TRUE;
@@ -295,6 +317,8 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->sink = sink;
   g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
   engine->bus = gst_pipeline_get_bus (GST_PIPELINE (engine->player));
+
+  engine->vis = NULL;
 
   return TRUE;
 }
