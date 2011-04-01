@@ -39,6 +39,9 @@
 #define SEEK_HEIGHT_RATIO 45
 #define SEEK_BORDER 5
 #define POS_RATIO 38
+#define VOLUME_ICON_RATIO 30
+#define VOLUME_WIDTH_RATIO 5
+#define VOLUME_HEIGHT_RATIO 60
 
 #define TITLE_LENGTH 40
 
@@ -64,9 +67,11 @@ struct _UserInterface
   guint media_width, media_height;
   guint stage_width, stage_height;
   gfloat seek_width, seek_height;
+  gfloat volume_width, volume_height;
 
   gchar *filename, *fileuri;
   gchar *play_png, *pause_png;
+  gchar *volume_low_png, *volume_high_png;
   gchar *duration_str;
 
   ClutterColor stage_color, control_color1, control_color2;
@@ -77,6 +82,9 @@ struct _UserInterface
   ClutterActor *control_bg, *control_title, *control_play_toggle;
   ClutterActor *control_seek1, *control_seek2, *control_seekbar;
   ClutterActor *control_pos;
+  ClutterActor *volume_box;
+  ClutterActor *volume_low, *volume_high;
+  ClutterActor *vol_int, *vol_int_bg, *volume_point;
   ClutterActor *main_box;
 
   GstEngine *engine;

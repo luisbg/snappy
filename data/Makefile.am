@@ -1,7 +1,9 @@
 icons_DATA = \
     media-actions-pause.png \
-	media-actions-start.png \
-	vid-panel.png
+    media-actions-start.png \
+    audio-volume-low.png \
+    audio-volume-high.png \
+    vid-panel.png
 iconsdir = $(datadir)/snappy
 
 EXTRA_DIST = \

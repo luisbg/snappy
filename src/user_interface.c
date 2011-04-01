@@ -44,7 +44,7 @@ static void show_controls (UserInterface * ui, gboolean vis);
 static void toggle_fullscreen (UserInterface * ui);
 static void toggle_playing (UserInterface * ui);
 static void update_controls_size (UserInterface * ui);
-
+static gboolean update_volume (UserInterface * ui, gdouble volume);
 
 /* ---------------------- static functions ----------------------- */
 
@@ -113,10 +113,14 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_8:
         {
           // Mute button
+          gdouble volume;
           gboolean muteval;
+
           g_object_get (G_OBJECT (ui->engine->player), "mute", &muteval, NULL);
           g_object_set (G_OBJECT (ui->engine->player), "mute", !muteval, NULL);
           handled = TRUE;
+	  update_volume (ui, volume);
+
           break;
         }
 
@@ -135,6 +139,8 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
             g_object_set (G_OBJECT (ui->engine->player), "volume",
                 volume += 0.05, NULL);
           }
+
+	  update_volume (ui, volume);
           handled = TRUE;
           break;
         }
@@ -281,7 +287,7 @@ load_controls (UserInterface * ui)
 {
   // Check icon files exist
   gchar *vid_panel_png;
-  gchar *icon_files[3];
+  gchar *icon_files[5];
   gchar *duration_str;
   gint c;
   ClutterColor control_color1 = { 0x12, 0x12, 0x12, 0xff };
@@ -289,9 +295,14 @@ load_controls (UserInterface * ui)
   ClutterLayoutManager *controls_layout;
   ClutterLayoutManager *main_box_layout;
   ClutterLayoutManager *info_box_layout;
+  ClutterLayoutManager *bottom_box_layout;
+  ClutterLayoutManager *volume_box_layout;
   ClutterActor *info_box;
   ClutterLayoutManager *seek_box_layout;
+  ClutterLayoutManager *vol_int_box_layout;
   ClutterActor *seek_box;
+  ClutterActor *bottom_box;
+  ClutterActor *vol_int_box;
   GError *error = NULL;
 
   vid_panel_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
@@ -300,17 +311,22 @@ load_controls (UserInterface * ui)
       "/media-actions-start.png");
   ui->pause_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
       "/media-actions-pause.png");
+  ui->volume_low_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
+      "/audio-volume-low.png");
+  ui->volume_high_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
+      "/audio-volume-high.png");
 
   icon_files[0] = vid_panel_png;
   icon_files[1] = ui->play_png;
   icon_files[2] = ui->pause_png;
+  icon_files[3] = ui->volume_low_png;
+  icon_files[4] = ui->volume_high_png;
 
-  for (c = 0; c < 3; c++) {
+  for (c = 0; c < 5; c++) {
     if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS)) {
       g_print ("Icon file doesn't exist, are you sure you have "
           " installed snappy correctly?\nThis file needed is: %s\n",
           icon_files[c]);
-
     }
   }
 
@@ -394,11 +410,67 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
+  // Controls bottom box
+  bottom_box_layout = clutter_box_layout_new ();
+  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (bottom_box_layout), FALSE);
+  bottom_box = clutter_box_new (bottom_box_layout);
+  clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (bottom_box_layout), 10);
+
+  clutter_box_pack (CLUTTER_BOX (info_box), bottom_box, "x-fill", TRUE, NULL);
+
+  // Controls volume box
+  volume_box_layout = clutter_box_layout_new ();
+  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (bottom_box_layout), FALSE);
+  ui->volume_box = clutter_box_new (volume_box_layout);
+  clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (volume_box_layout), 10);
+
+  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->volume_box, "y-align",
+      CLUTTER_BOX_ALIGNMENT_CENTER, NULL);   
+
+  // Controls volume low
+  ui->volume_low = clutter_texture_new_from_file (ui->volume_low_png, &error);
+  if (!ui->volume_low && error)
+    g_debug ("Clutter error: %s\n", error->message);
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
+  clutter_box_pack (CLUTTER_BOX (ui->volume_box), ui->volume_low, "x-align",
+      CLUTTER_BOX_ALIGNMENT_START, NULL);  
+
+  // Controls volume intensity
+  vol_int_box_layout = 
+      clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
+      CLUTTER_BIN_ALIGNMENT_FIXED);
+  vol_int_box = clutter_box_new (vol_int_box_layout);
+
+  ui->vol_int_bg = clutter_rectangle_new_with_color (&control_color1);
+  clutter_container_add_actor (CLUTTER_CONTAINER (vol_int_box),
+      ui->vol_int_bg);
+
+  ui->vol_int = clutter_rectangle_new_with_color (&control_color1);
+  clutter_container_add_actor (CLUTTER_CONTAINER (vol_int_box),
+      ui->vol_int);
+
+  clutter_box_pack (CLUTTER_BOX (ui->volume_box), vol_int_box, "x-fill",
+      FALSE, "y-fill", FALSE, "y-align", CLUTTER_BOX_ALIGNMENT_CENTER, NULL);
+
+  // Controls volume high
+  ui->volume_high = clutter_texture_new_from_file (ui->volume_high_png, &error);
+  if (!ui->volume_high && error)
+    g_debug ("Clutter error: %s\n", error->message);
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
+  clutter_box_pack (CLUTTER_BOX (ui->volume_box), ui->volume_high, "x-align",
+      CLUTTER_BOX_ALIGNMENT_END, NULL);
+
   // Controls position text
   duration_str = g_strdup_printf ("0:00:00/%s", ui->duration_str);
   ui->control_pos = clutter_text_new_full ("Sans 22px", duration_str,
       &control_color1);
-  clutter_box_pack (CLUTTER_BOX (info_box), ui->control_pos, "x-align",
+  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->control_pos, "x-align",
       CLUTTER_BOX_ALIGNMENT_END, NULL);
 
   clutter_actor_lower_bottom (ui->control_bg);
@@ -649,6 +721,7 @@ update_controls_size (UserInterface * ui)
 {
   gchar *font_name;
   gfloat ctl_width, ctl_height, title_width;
+  gfloat vol_icon_size;
 
   clutter_actor_set_size (ui->control_play_toggle,
       ui->stage_width / PLAY_TOGGLE_RATIO,
@@ -677,11 +750,33 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_size (ui->control_bg, ctl_width + (CTL_BORDER * 2)
       + SHADOW_CORRECT, ctl_height + (CTL_BORDER * 2));
 
+  vol_icon_size = ui->stage_width / VOLUME_ICON_RATIO;
+  clutter_actor_set_size (ui->volume_low, vol_icon_size, vol_icon_size);
+  clutter_actor_set_size (ui->volume_high, vol_icon_size, vol_icon_size);
+
+  ui->volume_width = ui->stage_width / VOLUME_WIDTH_RATIO;
+  ui->volume_height = ui->stage_height / VOLUME_HEIGHT_RATIO;
+  clutter_actor_set_size (ui->vol_int_bg, ui->volume_width, ui->volume_height);
+  clutter_actor_set_position (ui->vol_int_bg, 0, 0);
+
+  update_volume (ui, -1);
+ 
   font_name = g_strdup_printf ("Sans %dpx",
       (ui->stage_height / POS_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_pos), font_name);
 }
 
+static gboolean
+update_volume (UserInterface * ui, gdouble volume)
+{
+  if (volume == -1)
+    g_object_get (G_OBJECT (ui->engine->player), "volume", &volume, NULL);
+
+  clutter_actor_set_size (ui->vol_int, volume * ui->volume_width,
+			  ui->volume_height);
+  
+return TRUE;
+}
 
 /* -------------------- non-static functions --------------------- */
 
@@ -764,4 +859,5 @@ update_controls (UserInterface * ui)
 {
   progress_update_text (ui);
   progress_update_seekbar (ui);
+  update_volume (ui, -1);
 }
