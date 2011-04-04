@@ -134,8 +134,6 @@ discover (GstEngine * engine, gchar * uri)
     engine->media_width = gst_discoverer_video_info_get_width (v_info);
     engine->media_height = gst_discoverer_video_info_get_height (v_info);
   } else {
-    engine->vis = gst_element_factory_make ("goom2k1", "goom2k1");
-
     g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
     g_object_set (G_OBJECT (engine->player), "flags",
         flags | GST_PLAY_FLAG_VIS, NULL);
@@ -318,8 +316,6 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->sink = sink;
   g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
   engine->bus = gst_pipeline_get_bus (GST_PIPELINE (engine->player));
-
-  engine->vis = NULL;
 
   return TRUE;
 }
