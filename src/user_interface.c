@@ -443,6 +443,7 @@ load_controls (UserInterface * ui)
 
   clutter_box_pack (CLUTTER_BOX (bottom_box), ui->volume_box,
       "x-align", CLUTTER_BOX_ALIGNMENT_START,
+      "expand", TRUE,
       NULL);
 
   // Controls volume low
@@ -491,6 +492,7 @@ load_controls (UserInterface * ui)
       &control_color1);
   clutter_box_pack (CLUTTER_BOX (bottom_box), ui->control_pos,
       "x-align", CLUTTER_BOX_ALIGNMENT_END,
+      "expand", TRUE,
       NULL);
 
   clutter_actor_lower_bottom (ui->control_bg);
