@@ -157,8 +157,13 @@ main (int argc, char *argv[])
   gst_bus_add_watch (engine->bus, bus_call, ui);
   gst_object_unref (engine->bus);
 
-  fileuri = clean_uri (file_list[0]);
-  uri = g_strdup_printf ("file://%s", fileuri);
+  if (gst_uri_is_valid (file_list[0]))
+    uri = g_strdup (file_list[0]);
+  else {
+    fileuri = clean_uri (file_list[0]);
+    uri = g_strdup_printf ("file://%s", fileuri);
+  }
+
   engine_load_uri (engine, uri);
   interface_load_uri (ui, uri);
   load_user_interface (ui);
