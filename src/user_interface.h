@@ -31,7 +31,7 @@
 
 #define CTL_BORDER 20
 #define SHADOW_CORRECT 15
-#define CTL_SPACING 10
+#define CTL_SPACING 5
 
 #define PLAY_TOGGLE_RATIO 10
 #define TITLE_RATIO 25
