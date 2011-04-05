@@ -768,7 +768,6 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
   clutter_actor_get_size (ui->main_box, &ctl_width, &ctl_height);
-  g_print ("%f, %f \n", ctl_width, ctl_height);
   clutter_actor_set_size (ui->control_bg, ctl_width + (CTL_BORDER * 2)
       + SHADOW_CORRECT, ctl_height + (CTL_BORDER * 2));
 
