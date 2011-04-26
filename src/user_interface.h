@@ -29,19 +29,30 @@
 #define CTL_SHOW_SEC 3
 #define CTL_FADE_DURATION 250
 
-#define CTL_BORDER 20
+#define CTL_BORDER 0
 #define SHADOW_CORRECT 15
-#define CTL_SPACING 5
+#define CTL_SPACING 0
 
-#define PLAY_TOGGLE_RATIO 10
-#define TITLE_RATIO 25
-#define SEEK_WIDTH_RATIO 2.2
-#define SEEK_HEIGHT_RATIO 45
-#define SEEK_BORDER 5
-#define POS_RATIO 38
-#define VOLUME_ICON_RATIO 30
-#define VOLUME_WIDTH_RATIO 5
-#define VOLUME_HEIGHT_RATIO 60
+#define CONTROLS_WIDTH_RATIO 0.8f
+#define CONTROLS_HEIGHT_RATIO 0.25f
+#define CONTROLS_ASPECT_RATIO 4.0f
+
+#define BG_W 986.0f
+#define BG_H 162.0f
+#define SHADOW_RIGHT 18.0f
+#define SHADOW_BOTTOM 11.0f
+
+#define MAIN_BOX_RATIO 0.9f
+
+#define PLAY_TOGGLE_RATIO 0.9f
+#define TITLE_RATIO 0.03f
+#define SEEK_WIDTH_RATIO 0.9f
+#define SEEK_HEIGHT_RATIO 0.2f
+#define SEEK_BORDER 2.0f
+#define POS_RATIO 0.1f
+#define VOLUME_ICON_RATIO 0.2f
+#define VOLUME_WIDTH_RATIO 0.6f
+#define VOLUME_HEIGHT_RATIO 0.1f
 
 #define TITLE_LENGTH 40
 
@@ -83,6 +94,7 @@ struct _UserInterface
   ClutterActor *volume_box;
   ClutterActor *volume_low, *volume_high;
   ClutterActor *vol_int, *vol_int_bg, *volume_point;
+  ClutterActor *info_box;
   ClutterActor *main_box;
 
   GstEngine *engine;
