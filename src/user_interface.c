@@ -394,7 +394,7 @@ load_controls (UserInterface * ui)
   clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
       ui->title_length);
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
-      ui->control_title, FALSE,              /* expand */
+      ui->control_title, TRUE,              /* expand */
       FALSE,                                 /* x-fill */
       FALSE,                                 /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,          /* x-align */
@@ -419,7 +419,7 @@ load_controls (UserInterface * ui)
       ui->control_seekbar);
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
-      seek_box, FALSE,                       /* expand */
+      seek_box, TRUE,                       /* expand */
       FALSE,                                 /* x-fill */
       FALSE,                                 /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,          /* x-align */
@@ -430,20 +430,6 @@ load_controls (UserInterface * ui)
   clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (bottom_box_layout),
       FALSE);
   bottom_box = clutter_box_new (bottom_box_layout);
-
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
-      bottom_box, FALSE,                     /* expand */
-      TRUE,                                  /* x-fill */
-      FALSE,                                 /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_CENTER,          /* x-align */
-      CLUTTER_BOX_ALIGNMENT_END);            /* y-align */
-
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->info_box,
-      FALSE,                            /* expand */
-      TRUE,                            /* x-fill */
-      FALSE,                            /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_END,      /* x-align */
-      CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
   // Controls volume box
   volume_box_layout = clutter_box_layout_new ();
@@ -505,6 +491,20 @@ load_controls (UserInterface * ui)
       "x-align", CLUTTER_BOX_ALIGNMENT_END,
       "expand", TRUE,
       NULL);
+
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
+      bottom_box, TRUE,                     /* expand */
+      FALSE,                                  /* x-fill */
+      FALSE,                                 /* y-fill */
+      CLUTTER_BOX_ALIGNMENT_CENTER,          /* x-align */
+      CLUTTER_BOX_ALIGNMENT_END);            /* y-align */
+
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->info_box,
+      FALSE,                            /* expand */
+      TRUE,                            /* x-fill */
+      FALSE,                            /* y-fill */
+      CLUTTER_BOX_ALIGNMENT_END,      /* x-align */
+      CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
   clutter_actor_lower_bottom (ui->control_bg);
 
@@ -778,22 +778,22 @@ update_controls_size (UserInterface * ui)
   g_print ("control box/bg: %fx%f\n", ctl_width + (ctl_width/BG_W) * SHADOW_RIGHT, ctl_height + (ctl_height/BG_H) * SHADOW_BOTTOM);
   clutter_actor_set_size (ui->control_box, ctl_width + (ctl_width/BG_W) * SHADOW_RIGHT, ctl_height + (ctl_height/BG_H) * SHADOW_BOTTOM);
   clutter_actor_set_size (ui->control_bg, ctl_width + (ctl_width/BG_W) * SHADOW_RIGHT, ctl_height + (ctl_height/BG_H) * SHADOW_BOTTOM);
-  g_print ("main box: %fx%f at (%f,%f)\n", ctl_width * MAIN_BOX_RATIO, ctl_height * MAIN_BOX_RATIO, ctl_width * (1.0f - MAIN_BOX_RATIO) / 2.0f, ctl_height * (1.0f - MAIN_BOX_RATIO) / 2.0f);
-  clutter_actor_set_size (ui->main_box, ctl_width * MAIN_BOX_RATIO, ctl_height * MAIN_BOX_RATIO);
-  clutter_actor_set_position (ui->main_box, ctl_width * (1.0f - MAIN_BOX_RATIO) / 2.0f, ctl_height * (1.0f - MAIN_BOX_RATIO) / 2.0f);
+  g_print ("main box: %fx%f at (%f,%f)\n", ctl_width * MAIN_BOX_W, ctl_height * MAIN_BOX_H, ctl_width * (1.0f - MAIN_BOX_W) / 2.0f, ctl_height * (1.0f - MAIN_BOX_H) / 2.0f);
+  clutter_actor_set_size (ui->main_box, ctl_width * MAIN_BOX_W, ctl_height * MAIN_BOX_H);
+  clutter_actor_set_position (ui->main_box, ctl_width * (1.0f - MAIN_BOX_W) / 2.0f, ctl_height * (1.0f - MAIN_BOX_H) / 2.0f);
 
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
   g_print ("play toggle: %fx%f\n", icon_size, icon_size);
-  clutter_actor_set_size (ui->info_box, ctl_width * MAIN_BOX_RATIO - icon_size, ctl_height * MAIN_BOX_RATIO);
+  clutter_actor_set_size (ui->info_box, ctl_width * MAIN_BOX_W - icon_size, ctl_height * MAIN_BOX_H * MAIN_BOX_H);
 
   font_name = g_strdup_printf ("Sans %dpx", (gint)(ctl_width * TITLE_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
   text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_title));
   g_print ("control title: %dpx, %fx%f\n", (gint)(ctl_height * TITLE_RATIO), text_width, clutter_actor_get_height (CLUTTER_ACTOR (ui->control_title)));
 
-  ui->seek_width = (ctl_width * MAIN_BOX_RATIO - icon_size) * SEEK_WIDTH_RATIO;
-  ui->seek_height = ctl_height * MAIN_BOX_RATIO * SEEK_HEIGHT_RATIO;
+  ui->seek_width = (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO;
+  ui->seek_height = ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO;
 
   clutter_actor_set_size (ui->control_seek1, ui->seek_width, ui->seek_height);
   clutter_actor_set_position (ui->control_seek1, 0, 0);
@@ -812,15 +812,15 @@ update_controls_size (UserInterface * ui)
   text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_pos));
   g_print ("control pos: %dpx, %fx%f\n", (gint)(ctl_height * POS_RATIO), text_width, clutter_actor_get_height (CLUTTER_ACTOR (ui->control_pos)));
 
-  ui->volume_width = (ctl_width * MAIN_BOX_RATIO - icon_size) * VOLUME_WIDTH_RATIO;
-  ui->volume_height = ctl_height * MAIN_BOX_RATIO * VOLUME_HEIGHT_RATIO;
+  ui->volume_width = (ctl_width * MAIN_BOX_W - icon_size - clutter_actor_get_width (CLUTTER_ACTOR (ui->control_pos))) * VOLUME_WIDTH_RATIO;
+  ui->volume_height = ctl_height * MAIN_BOX_H * VOLUME_HEIGHT_RATIO;
   clutter_actor_set_size (ui->vol_int_bg, ui->volume_width, ui->volume_height);
   clutter_actor_set_position (ui->vol_int_bg, 0, 0);
   g_print ("vol_int_bg: %fx%f at (%f,%f)\n", ui->volume_width, ui->volume_height, 0.0f, 0.0f);
 
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
-  clutter_actor_set_size (ui->volume_high, icon_size, icon_size);
+  clutter_actor_set_size (ui->volume_high, icon_size * 1.2f /* originally 120x100 */, icon_size);
   g_print ("vol_icon_size: %f\n", icon_size);
 
   update_volume (ui, -1);

@@ -42,17 +42,18 @@
 #define SHADOW_RIGHT 18.0f
 #define SHADOW_BOTTOM 11.0f
 
-#define MAIN_BOX_RATIO 0.9f
+#define MAIN_BOX_W 0.95f
+#define MAIN_BOX_H 0.8f
 
 #define PLAY_TOGGLE_RATIO 0.9f
 #define TITLE_RATIO 0.03f
 #define SEEK_WIDTH_RATIO 0.9f
-#define SEEK_HEIGHT_RATIO 0.2f
+#define SEEK_HEIGHT_RATIO 0.15f
 #define SEEK_BORDER 2.0f
 #define POS_RATIO 0.1f
 #define VOLUME_ICON_RATIO 0.2f
-#define VOLUME_WIDTH_RATIO 0.6f
-#define VOLUME_HEIGHT_RATIO 0.1f
+#define VOLUME_WIDTH_RATIO 0.65f
+#define VOLUME_HEIGHT_RATIO 0.05f
 
 #define TITLE_LENGTH 40
 
