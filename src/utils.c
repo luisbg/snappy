@@ -44,7 +44,7 @@ cut_long_filename (gchar * filename, gint length)
   }
 
   if (ret == NULL)
-    g_print ("really?\n");
+    g_print ("no filename. really?\n");
   return ret;
 }
 

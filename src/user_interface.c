@@ -640,8 +640,6 @@ size_change (ClutterStage * stage, UserInterface * ui)
   stage_width = clutter_actor_get_width (ui->stage);
   stage_height = clutter_actor_get_height (ui->stage);
 
-  g_print ("actor media %fx%f, stage %fx%f\n", media_width, media_height,
-      stage_width, stage_height);
   ui->stage_width = stage_width;
   ui->stage_height = stage_height;
 
@@ -761,8 +759,8 @@ update_controls_size (UserInterface * ui)
   gfloat ctl_width, ctl_height, text_width;
   gfloat icon_size;
 
-  g_print ("Updating controls size for stage: %ux%u\n", ui->stage_width,
-      ui->stage_height);
+  // g_print ("Updating controls size for stage: %ux%u\n", ui->stage_width,
+  //     ui->stage_height);
 
   ctl_width = ui->stage_width * CONTROLS_WIDTH_RATIO;
   ctl_height = ui->stage_height * CONTROLS_HEIGHT_RATIO;
@@ -773,18 +771,12 @@ update_controls_size (UserInterface * ui)
     ctl_height = ctl_width / CONTROLS_ASPECT_RATIO;
   }
 
-  g_print ("control box/bg: %fx%f\n",
-      ctl_width + (ctl_width / BG_W) * SHADOW_RIGHT,
-      ctl_height + (ctl_height / BG_H) * SHADOW_BOTTOM);
   clutter_actor_set_size (ui->control_box,
       ctl_width + (ctl_width / BG_W) * SHADOW_RIGHT,
       ctl_height + (ctl_height / BG_H) * SHADOW_BOTTOM);
   clutter_actor_set_size (ui->control_bg,
       ctl_width + (ctl_width / BG_W) * SHADOW_RIGHT,
       ctl_height + (ctl_height / BG_H) * SHADOW_BOTTOM);
-  g_print ("main box: %fx%f at (%f,%f)\n", ctl_width * MAIN_BOX_W,
-      ctl_height * MAIN_BOX_H, ctl_width * (1.0f - MAIN_BOX_W) / 2.0f,
-      ctl_height * (1.0f - MAIN_BOX_H) / 2.0f);
   clutter_actor_set_size (ui->main_box, ctl_width * MAIN_BOX_W,
       ctl_height * MAIN_BOX_H);
   clutter_actor_set_position (ui->main_box,
@@ -793,41 +785,30 @@ update_controls_size (UserInterface * ui)
 
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
-  g_print ("play toggle: %fx%f\n", icon_size, icon_size);
   clutter_actor_set_size (ui->info_box, ctl_width * MAIN_BOX_W - icon_size,
       ctl_height * MAIN_BOX_H * MAIN_BOX_H);
 
   font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_width * TITLE_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
   text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_title));
-  g_print ("control title: %dpx, %fx%f\n", (gint) (ctl_height * TITLE_RATIO),
-      text_width, clutter_actor_get_height (CLUTTER_ACTOR (ui->control_title)));
 
   ui->seek_width = (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO;
   ui->seek_height = ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO;
 
   clutter_actor_set_size (ui->control_seek1, ui->seek_width, ui->seek_height);
   clutter_actor_set_position (ui->control_seek1, 0, 0);
-  g_print ("control seek1: %fx%f at (%f,%f)\n", ui->seek_width, ui->seek_height,
-      0.0f, 0.0f);
 
   clutter_actor_set_size (ui->control_seek2,
       ui->seek_width - 2.0f * SEEK_BORDER,
       ui->seek_height - 2.0f * SEEK_BORDER);
   clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
-  g_print ("control seek2: %fx%f at (%f,%f)\n",
-      ui->seek_width - 2.0f * SEEK_BORDER, ui->seek_height - 2.0f * SEEK_BORDER,
-      SEEK_BORDER, SEEK_BORDER);
 
   progress_update_seekbar (ui);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
-  g_print ("control seekbar: at (%f,%f)\n", SEEK_BORDER, SEEK_BORDER);
 
   font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_height * POS_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_pos), font_name);
   text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_pos));
-  g_print ("control pos: %dpx, %fx%f\n", (gint) (ctl_height * POS_RATIO),
-      text_width, clutter_actor_get_height (CLUTTER_ACTOR (ui->control_pos)));
 
   ui->volume_width =
       (ctl_width * MAIN_BOX_W - icon_size -
@@ -836,14 +817,11 @@ update_controls_size (UserInterface * ui)
   ui->volume_height = ctl_height * MAIN_BOX_H * VOLUME_HEIGHT_RATIO;
   clutter_actor_set_size (ui->vol_int_bg, ui->volume_width, ui->volume_height);
   clutter_actor_set_position (ui->vol_int_bg, 0, 0);
-  g_print ("vol_int_bg: %fx%f at (%f,%f)\n", ui->volume_width,
-      ui->volume_height, 0.0f, 0.0f);
 
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
   clutter_actor_set_size (ui->volume_high,
       icon_size * 1.2f /* originally 120x100 */ , icon_size);
-  g_print ("vol_icon_size: %f\n", icon_size);
 
   update_volume (ui, -1);
 }
@@ -877,22 +855,26 @@ load_user_interface (UserInterface * ui)
 
   // Init UserInterface structure variables
   ui->filename = g_path_get_basename (ui->fileuri);
+
   ui->media_width = ui->engine->media_width;
   ui->media_height = ui->engine->media_height;
+
   ui->stage_width = ui->engine->media_width;
   ui->stage_height = ui->engine->media_height;
-  g_print ("ui media: %ux%u, stage: %ux%u\n", ui->media_width, ui->media_height,
-      ui->stage_width, ui->stage_height);
   ui->stage = clutter_stage_get_default ();
+
   ui->controls_showing = FALSE;
   ui->keep_showing_controls = FALSE;
   ui->penalty_box_active = FALSE;
   ui->controls_timeout = -1;
+
   ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
   ui->seek_height = ui->stage_height / SEEK_HEIGHT_RATIO;
+
   ui->progress_id = -1;
   ui->title_length = TITLE_LENGTH;
   ui->duration_str = position_ns_to_str (ui->engine->media_duration);
+
   ui->rotated = FALSE;
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
@@ -906,8 +888,6 @@ load_user_interface (UserInterface * ui)
     clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->stage_width,
         ui->stage_height);
   }
-
-  g_print ("Stage dimensions: %ux%u\n", ui->stage_width, ui->stage_height);
 
   // Controls
   load_controls (ui);

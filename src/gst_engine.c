@@ -128,15 +128,17 @@ discover (GstEngine * engine, gchar * uri)
   if (engine->has_video || engine->has_audio)
     engine->media_duration = gst_discoverer_info_get_duration (info);
 
-  g_print ("Found video %d, audio %d\n", engine->has_video, engine->has_audio);
+  // g_print ("Found video %d, audio %d\n", engine->has_video,
+  //     engine->has_audio);
 
   if (engine->has_video) {
     list = gst_discoverer_info_get_video_streams (info);
     v_info = (GstDiscovererVideoInfo *) list->data;
     engine->media_width = gst_discoverer_video_info_get_width (v_info);
     engine->media_height = gst_discoverer_video_info_get_height (v_info);
-    g_print ("Found video dimensions: %dx%d\n", engine->media_width,
-        engine->media_height);
+
+    // g_print ("Found video dimensions: %dx%d\n", engine->media_width,
+    //     engine->media_height);
   } else {
     g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
     g_object_set (G_OBJECT (engine->player), "flags",

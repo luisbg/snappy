@@ -151,7 +151,6 @@ main (int argc, char *argv[])
   sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (video_texture));
 
   ok = engine_init (engine, sink);
-  g_print ("media %dx%d\n", ui->engine->media_width, ui->engine->media_height);
   if (!ok)
     goto quit;
   ui->texture = video_texture;
@@ -166,7 +165,6 @@ main (int argc, char *argv[])
   }
 
   engine_load_uri (engine, uri);
-  g_print ("media %dx%d\n", ui->engine->media_width, ui->engine->media_height);
   interface_load_uri (ui, uri);
   load_user_interface (ui);
 
