@@ -30,10 +30,9 @@ G_BEGIN_DECLS
 
 typedef struct _ScreenSaver ScreenSaver;
 
-ScreenSaver * screensaver_new (ClutterStage * stage);
+ScreenSaver *screensaver_new (ClutterStage * stage);
 void screensaver_enable (ScreenSaver * screensaver, gboolean enable);
 void screensaver_free (ScreenSaver * screensaver);
 
 G_END_DECLS
-
 #endif /* __SCREENSAVER_H__ */

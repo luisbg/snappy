@@ -135,7 +135,8 @@ discover (GstEngine * engine, gchar * uri)
     v_info = (GstDiscovererVideoInfo *) list->data;
     engine->media_width = gst_discoverer_video_info_get_width (v_info);
     engine->media_height = gst_discoverer_video_info_get_height (v_info);
-    g_print ("Found video dimensions: %dx%d\n", engine->media_width, engine->media_height);
+    g_print ("Found video dimensions: %dx%d\n", engine->media_width,
+        engine->media_height);
   } else {
     g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
     g_object_set (G_OBJECT (engine->player), "flags",
