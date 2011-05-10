@@ -5,6 +5,7 @@ Common
 
 - Key controls configurable through a ~/.config/ file.
 
+- Save recent history of played files in ~/.config/snappy.
 
 UI
 --
