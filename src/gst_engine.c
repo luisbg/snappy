@@ -74,7 +74,7 @@ add_uri_unfinished_playback (GstEngine * engine, gchar * uri, gint64 position)
 
   // config file path
   config_dir = g_get_user_config_dir ();
-  path = g_strdup_printf ("%s/snappy/config", config_dir);
+  path = g_strdup_printf ("%s/snappy/history", config_dir);
 
   g_key_file_load_from_file (keyfile, path, flags, NULL);
   // if file doesn't exist it uses the newly created one
@@ -167,7 +167,7 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 
   // config file path
   config_dir = g_get_user_config_dir ();
-  path = g_strdup_printf ("%s/snappy/config", config_dir);
+  path = g_strdup_printf ("%s/snappy/history", config_dir);
 
   // remove key if gkeyfile exists
   if (g_key_file_load_from_file (keyfile, path, flags, NULL))
@@ -202,7 +202,7 @@ uri_is_unfinished_playback (GstEngine * engine, gchar * uri)
 
   // config file path
   config_dir = g_get_user_config_dir ();
-  path = g_strdup_printf ("%s/snappy/config", config_dir);
+  path = g_strdup_printf ("%s/snappy/history", config_dir);
 
   if (g_key_file_load_from_file (keyfile, path, flags, NULL))
     if (g_key_file_has_group (keyfile, "unfinished"))

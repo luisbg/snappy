@@ -56,9 +56,9 @@ config_load ()
 
   config_dir = g_get_user_config_dir ();
   path = g_strdup_printf ("%s/snappy/", config_dir);
-  g_print ("%s\n", path);
+
   if (!g_file_test (path, G_FILE_TEST_IS_DIR)) {
-    g_print ("doesn't exist\n");
+    g_print ("%s doesn't exist\n", path);
     g_mkdir_with_parents (path, 0700);
   }
 
