@@ -442,6 +442,30 @@ frame_stepping (GstEngine * engine, gboolean foward)
   return FALSE;
 }
 
+gchar **
+get_recently_played ()
+{
+  const gchar *config_dir;
+  gchar *path;
+  gchar **recent = NULL;
+  gsize length;
+  GKeyFile *keyfile;
+  GKeyFileFlags flags;
+
+  keyfile = g_key_file_new ();
+  flags = G_KEY_FILE_KEEP_COMMENTS;
+
+  // config file path
+  config_dir = g_get_user_config_dir ();
+  path = g_strdup_printf ("%s/snappy/history", config_dir);
+
+  if (g_key_file_load_from_file (keyfile, path, flags, NULL))
+    if (g_key_file_has_group (keyfile, "history"))
+      recent = g_key_file_get_keys (keyfile, "history", &length, NULL);
+
+  return recent;
+}
+
 GstState
 get_state (GstEngine * engine)
 {

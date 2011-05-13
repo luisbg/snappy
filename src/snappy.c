@@ -69,11 +69,13 @@ gboolean
 process_args (int argc, char *argv[],
     gchar * file_list[], gboolean * fullscreen, GOptionContext * context)
 {
-  gboolean version = FALSE;
+  gboolean recent = FALSE, version = FALSE;
   guint c, index, pos = 0;
   GOptionEntry entries[] = {
     {"fullscreen", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, fullscreen,
         "Fullscreen mode", NULL},
+    {"recent", 'r', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &recent,
+        "Recently played", NULL},
     {"version", 'v', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &version,
         "Print version", NULL},
     {NULL}
@@ -88,6 +90,19 @@ process_args (int argc, char *argv[],
   if (!g_option_context_parse (context, &argc, &argv, &err)) {
     g_print ("Error initializing: %s\n", err->message);
     g_error_free (err);
+    goto quit;
+  }
+
+  if (recent) {
+    gchar **recent = NULL;
+
+    g_print ("These are the recently played URIs: \n\n");
+
+    recent = get_recently_played ();
+
+    for (c = 0; recent[c] != NULL; c++)
+      g_print ("%d: %s \n", c + 1, recent[c]);
+
     goto quit;
   }
 

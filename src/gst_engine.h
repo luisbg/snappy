@@ -52,6 +52,7 @@ gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
 gboolean engine_init (GstEngine * engine, GstElement * sink);
 gboolean engine_load_uri (GstEngine * engine, gchar * uri);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);
+gchar **get_recently_played ();
 GstState get_state (GstEngine * engine);
 gint64 query_position (GstEngine * engine);
 gboolean seek (GstEngine * engine, gint64 position);
