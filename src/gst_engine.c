@@ -50,13 +50,14 @@ typedef enum
 gboolean
 add_uri_to_history (gchar * uri)
 {
+  gboolean ret;
   const gchar *config_dir;
   gchar *path, *data, *key;
+  gchar **history_keys;
   gsize length, max = 50;
   FILE *file;
   GKeyFile *keyfile;
   GKeyFileFlags flags;
-  gboolean ret;
 
   keyfile = g_key_file_new ();
   flags = G_KEY_FILE_KEEP_COMMENTS;
@@ -70,14 +71,19 @@ add_uri_to_history (gchar * uri)
     if (g_key_file_has_group (keyfile, "history")) {
       if (!g_key_file_has_key (keyfile, "history", uri, NULL)) {
         // uri is not already in history
-        g_key_file_get_keys (keyfile, "history", &length, NULL);
-        if (length < max)
-          g_key_file_set_boolean (keyfile, "history", uri, TRUE);
+        history_keys = g_key_file_get_keys (keyfile, "history", &length, NULL);
+
+        if (length >= max) {
+          // remove first uri of the list
+          g_key_file_remove_key (keyfile, "history", history_keys[0], NULL);
+        }
       }
     } else {
       // if group "history" doesn't exist create it and populate it
       g_key_file_set_boolean (keyfile, "history", uri, TRUE);
     }
+
+    g_key_file_set_int64 (keyfile, "history", uri, g_get_real_time ());
 
     // save gkeyfile to a file
     data = g_key_file_to_data (keyfile, NULL, NULL);
