@@ -48,6 +48,55 @@ typedef enum
 /* -------------------- static functions --------------------- */
 
 gboolean
+add_uri_to_history (gchar * uri)
+{
+  const gchar *config_dir;
+  gchar *path, *data, *key;
+  gsize length, max = 50;
+  FILE *file;
+  GKeyFile *keyfile;
+  GKeyFileFlags flags;
+  gboolean ret;
+
+  keyfile = g_key_file_new ();
+  flags = G_KEY_FILE_KEEP_COMMENTS;
+
+  // config file path
+  config_dir = g_get_user_config_dir ();
+  path = g_strdup_printf ("%s/snappy/history", config_dir);
+
+  if (g_key_file_load_from_file (keyfile, path, flags, NULL)) {
+    // set uri in history
+    if (g_key_file_has_group (keyfile, "history")) {
+      if (!g_key_file_has_key (keyfile, "history", uri, NULL)) {
+        // uri is not already in history
+        g_key_file_get_keys (keyfile, "history", &length, NULL);
+        if (length < max)
+          g_key_file_set_boolean (keyfile, "history", uri, TRUE);
+      }
+    } else {
+      // if group "history" doesn't exist create it and populate it
+      g_key_file_set_boolean (keyfile, "history", uri, TRUE);
+    }
+
+    // save gkeyfile to a file
+    data = g_key_file_to_data (keyfile, NULL, NULL);
+    file = fopen (path, "w");
+    fputs (data, file);
+    fclose (file);
+
+    g_free (data);
+    g_free (path);
+
+    ret = TRUE;
+  } else {
+    ret = FALSE;
+  }
+
+  return ret;
+}
+
+gboolean
 add_uri_unfinished_playback (GstEngine * engine, gchar * uri, gint64 position)
 {
   guint hash_key;
@@ -281,6 +330,8 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
           if (position != -1) {
             seek (engine, position);
           }
+
+          add_uri_to_history (engine->uri);
 
           update_controls (ui);
           engine->has_started = TRUE;
