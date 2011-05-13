@@ -150,6 +150,36 @@ discover (GstEngine * engine, gchar * uri)
   return TRUE;
 }
 
+gint64
+is_uri_unfinished_playback (GstEngine * engine, gchar * uri)
+{
+  guint hash_key;
+  gint64 position = -1;
+  const gchar *config_dir;
+  gchar *path, *key;
+  GKeyFile *keyfile;
+  GKeyFileFlags flags;
+
+  keyfile = g_key_file_new ();
+  flags = G_KEY_FILE_KEEP_COMMENTS;
+  hash_key = g_str_hash (uri);
+  key = g_strdup_printf ("%d", hash_key);
+
+  // config file path
+  config_dir = g_get_user_config_dir ();
+  path = g_strdup_printf ("%s/snappy/history", config_dir);
+
+  if (g_key_file_load_from_file (keyfile, path, flags, NULL))
+    if (g_key_file_has_group (keyfile, "unfinished"))
+      if (g_key_file_has_key (keyfile, "unfinished", key, NULL))
+        position = g_key_file_get_int64 (keyfile, "unfinished", key, NULL);
+
+  g_key_file_free (keyfile);
+  g_free (path);
+
+  return position;
+}
+
 gboolean
 remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 {
@@ -183,36 +213,6 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   g_free (path);
 
   return TRUE;
-}
-
-gint64
-uri_is_unfinished_playback (GstEngine * engine, gchar * uri)
-{
-  guint hash_key;
-  gint64 position = -1;
-  const gchar *config_dir;
-  gchar *path, *key;
-  GKeyFile *keyfile;
-  GKeyFileFlags flags;
-
-  keyfile = g_key_file_new ();
-  flags = G_KEY_FILE_KEEP_COMMENTS;
-  hash_key = g_str_hash (uri);
-  key = g_strdup_printf ("%d", hash_key);
-
-  // config file path
-  config_dir = g_get_user_config_dir ();
-  path = g_strdup_printf ("%s/snappy/history", config_dir);
-
-  if (g_key_file_load_from_file (keyfile, path, flags, NULL))
-    if (g_key_file_has_group (keyfile, "unfinished"))
-      if (g_key_file_has_key (keyfile, "unfinished", key, NULL))
-        position = g_key_file_get_int64 (keyfile, "unfinished", key, NULL);
-
-  g_key_file_free (keyfile);
-  g_free (path);
-
-  return position;
 }
 
 /* -------------------- non-static functions --------------------- */
@@ -277,7 +277,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
         if (!engine->has_started) {
           gint64 position;
 
-          position = uri_is_unfinished_playback (engine, engine->uri);
+          position = is_uri_unfinished_playback (engine, engine->uri);
           if (position != -1) {
             seek (engine, position);
           }
