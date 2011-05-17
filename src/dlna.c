@@ -23,7 +23,7 @@
 #include <gio/gio.h>
 #include <stdlib.h>
 
-#include "mpris.h"
+#include "dlna.h"
 
 const char *mpris_introspection_xml =
 	"<node>"
@@ -145,7 +145,7 @@ G_DEFINE_TYPE (SnappyMP, my_object, G_TYPE_OBJECT);
 static void
 my_object_init (SnappyMP * object)
 {
-  g_print ("my_object_init\n");
+  // g_print ("my_object_init\n");
 
   object->name = "snappy";
 }
@@ -168,8 +168,6 @@ my_object_get_property (GObject * object,
 {
   SnappyMP *myobj = (SnappyMP *) object;
 
-  g_print ("my_object_get_property\n");
-
   switch (prop_id) {
     case PROP_NAME:
       g_value_set_string (value, myobj->name);
@@ -188,8 +186,6 @@ my_object_set_property (GObject * object,
 {
   SnappyMP *myobj = (SnappyMP *) object;
 
-  g_print ("my_object_set_property\n");
-
   switch (prop_id) {
     case PROP_NAME:
       g_free (myobj->name);
@@ -205,8 +201,6 @@ static void
 my_object_class_init (SnappyMPClass * class)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (class);
-
-  g_print ("my_object_class_init\n");
 
   gobject_class->finalize = my_object_finalize;
   gobject_class->set_property = my_object_set_property;
@@ -232,15 +226,13 @@ my_object_class_init (SnappyMPClass * class)
 void
 my_object_change_uri (SnappyMP * myobj, gchar * uri)
 {
-  g_print ("my_object_change_uri\n");
-  if (myobj == NULL)
-    g_print ("object is NULL\n");
-  myobj->uri = uri;
+  if (myobj != NULL)
+    myobj->uri = uri;
 
-  g_print ("changing uri: %s\n", uri);
-  g_object_set (G_OBJECT (myobj), "uri", uri, NULL);
+    // g_print ("changing uri: %s\n", uri);
+    g_object_set (G_OBJECT (myobj), "uri", uri, NULL);
 
-  engine_open_uri (myobj->engine, uri);
+    engine_open_uri (myobj->engine, uri);
 }
 
 static void
@@ -252,11 +244,11 @@ handle_result (GDBusMethodInvocation * invocation,
     g_dbus_method_invocation_return_value (invocation, NULL);
   } else {
     if (error != NULL) {
-      g_print ("returning error: %s", error->message);
+      g_print ("DLNA returning error: %s", error->message);
       g_dbus_method_invocation_return_gerror (invocation, error);
       g_error_free (error);
     } else {
-      g_print ("returning unknown error");
+      g_print ("DLNA returning unknown error");
       g_dbus_method_invocation_return_error_literal (invocation,
           G_DBUS_ERROR, G_DBUS_ERROR_FAILED, "Unknown error");
     }
@@ -276,7 +268,7 @@ handle_method_call (GDBusConnection * connection,
   gboolean ret = TRUE;
   GError *error = NULL;
 
-  g_print ("handle_method_call: %s\n", method_name);
+  // g_print ("handle_method_call: %s\n", method_name);
 
   if (g_strcmp0 (object_path, MPRIS_OBJECT_NAME) != 0 ||
       g_strcmp0 (interface_name, MPRIS_PLAYER_INTERFACE) != 0) {
@@ -392,8 +384,6 @@ handle_set_property (GDBusConnection * connection,
 {
   SnappyMP *myobj = user_data;
 
-  g_print ("handle_set_property\n");
-
   if (g_strcmp0 (property_name, "Name") == 0) {
     g_object_set (myobj, "name", g_variant_get_string (value, NULL), NULL);
   }
@@ -438,7 +428,7 @@ get_root_property (GDBusConnection * connection,
     const char *interface_name,
     const char *property_name, GError ** error, SnappyMP * mp)
 {
-  g_print ("get_root_property: %s\n", property_name);
+  // g_print ("get_root_property: %s\n", property_name);
 
   if (g_strcmp0 (object_path, MPRIS_OBJECT_NAME) != 0 ||
       g_strcmp0 (interface_name, MPRIS_ROOT_INTERFACE) != 0) {
@@ -488,7 +478,6 @@ send_property_change (GObject * obj,
     GParamSpec * pspec,
     GDBusConnection * connection)
 {
-  g_print ("send_property_change\n");
 
   GVariantBuilder *builder;
   GVariantBuilder *invalidated_builder;
@@ -501,7 +490,7 @@ send_property_change (GObject * obj,
     g_variant_builder_add (builder,
         "{sv}", "Name", g_variant_new_string (myobj->name ? myobj->name : ""));
 
-  g_print ("some property changed %s\n", pspec->name);
+  // g_print ("some property changed %s\n", pspec->name);
 
   g_dbus_connection_emit_signal (connection,
       NULL,
@@ -517,7 +506,7 @@ on_name_acquired (GDBusConnection * connection,
     const gchar * name,
     gpointer user_data)
 {
-  g_print ("on_name_acquired\n");
+  // g_print ("DLNA MediaPlayer name acquired.\n");
 }
 
 static void
@@ -529,7 +518,7 @@ on_name_lost (GDBusConnection * connection,
 }
 
 gboolean
-load_mpris (SnappyMP *mp)
+load_dlna (SnappyMP *mp)
 {
   guint owner_id, player_id, root_id;
   GError *error = NULL;
@@ -579,7 +568,7 @@ load_mpris (SnappyMP *mp)
 }
 
 gboolean
-close_mpris (SnappyMP *mp)
+close_dlna (SnappyMP *mp)
 {
   g_bus_unown_name (mp->owner_id);
 

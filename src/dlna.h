@@ -20,8 +20,8 @@
  * USA
  */
 
-#ifndef __MPRIS_H__
-#define __MPRIS_H__
+#ifndef __DLNA_H__
+#define __DLNA_H__
 
 #include <gio/gio.h>
 #include <glib-object.h>
@@ -100,8 +100,8 @@ static guint
 mediaplayer_signals[LAST_SIGNAL] = { 0 };
 
 // Declaration of non-static functions
-gboolean load_mpris (SnappyMP *mp_obj);
-gboolean close_mpris (SnappyMP *mp_obj);
+gboolean load_dlna (SnappyMP *mp_obj);
+gboolean close_dlna (SnappyMP *mp_obj);
 
 void handle_method_call (GDBusConnection * connection,
     const gchar * sender,
@@ -140,4 +140,4 @@ GVariant * get_root_property (GDBusConnection * connection,
 
 
 G_END_DECLS
-#endif /* __MPRIS_H__ */
+#endif /* __DLNA_H__ */

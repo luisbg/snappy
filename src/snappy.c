@@ -29,7 +29,7 @@
 #include <clutter-gst/clutter-gst.h>
 
 #include "user_interface.h"
-#include "mpris.h"
+#include "dlna.h"
 #include "gst_engine.h"
 #include "utils.h"
 
@@ -139,6 +139,7 @@ main (int argc, char *argv[])
 {
   UserInterface *ui = NULL;
   GstEngine *engine = NULL;
+  SnappyMP *mp_obj = NULL;
   ClutterActor *video_texture;
   GstElement *sink;
 
@@ -196,7 +197,7 @@ main (int argc, char *argv[])
 
   mp_obj = g_new (SnappyMP, 1);
   mp_obj->engine = engine;
-  load_mpris (mp_obj);
+  load_dlna (mp_obj);
   //  g_signal_connect (mp_obj, "open-uri",
   //    G_CALLBACK (open_uri_callback), engine);
 
