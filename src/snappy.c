@@ -1,8 +1,8 @@
 /*
- * snappy - 0.1
+ * snappy - 0.2 beta
  *
  * Copyright (C) 2011 Collabora Multimedia Ltd.
- * <luis.debethencourt@collabora.co.uk>
+ * <luis.debethencourt@collabora.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * USA
  */
 
-#define VERSION "0.1"
+#define VERSION "0.2 beta"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -29,8 +29,8 @@
 #include <clutter-gst/clutter-gst.h>
 
 #include "user_interface.h"
-#include "gst_engine.h"
 #include "mpris.h"
+#include "gst_engine.h"
 #include "utils.h"
 
 void
@@ -160,14 +160,16 @@ main (int argc, char *argv[])
   config_load ();
 
   // User Interface
-  ui = g_new0 (UserInterface, 1);
+  ui = g_new (UserInterface, 1);
   ui->fullscreen = fullscreen;
   video_texture = clutter_texture_new ();
 
   clutter_gst_init (&argc, &argv);
 
   // Gstreamer
-  engine = g_new0 (GstEngine, 1);
+  engine = g_new (GstEngine, 1);
+  engine->media_width = -1;
+  engine->media_height = -1;
   ui->engine = engine;
   sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (video_texture));
 
@@ -192,10 +194,11 @@ main (int argc, char *argv[])
   change_state (engine, "Paused");
   change_state (engine, "Playing");
 
-  mp_obj = g_new0 (SnappyMP, 1);
+  mp_obj = g_new (SnappyMP, 1);
+  mp_obj->engine = engine;
   load_mpris (mp_obj);
-  g_signal_connect (mp_obj, "open-uri",
-      G_CALLBACK (open_uri_callback), engine);
+  //  g_signal_connect (mp_obj, "open-uri",
+  //    G_CALLBACK (open_uri_callback), engine);
 
   clutter_main ();
 

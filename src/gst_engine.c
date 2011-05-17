@@ -400,6 +400,37 @@ engine_load_uri (GstEngine * engine, gchar * uri)
 }
 
 gboolean
+engine_open_uri (GstEngine * engine, gchar * uri)
+{
+  g_print ("opennning uriii! %s \n", uri);
+
+  g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
+  gst_element_set_state (engine->player, GST_STATE_READY);
+
+  return TRUE;
+}
+
+gboolean
+engine_play (GstEngine * engine)
+{
+  g_print ("Plaaayingg\n");
+
+  gst_element_set_state (engine->player, GST_STATE_PLAYING);
+
+  return TRUE;
+}
+
+gboolean
+engine_stop (GstEngine * engine)
+{
+  g_print ("Stopping\n");
+
+  gst_element_set_state (engine->player, GST_STATE_READY);
+
+  return TRUE;
+}
+
+gboolean
 frame_stepping (GstEngine * engine, gboolean foward)
 {
   gboolean ok;

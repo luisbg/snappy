@@ -238,9 +238,9 @@ my_object_change_uri (SnappyMP * myobj, gchar * uri)
   myobj->uri = uri;
 
   g_print ("changing uri: %s\n", uri);
-  g_object_notify (G_OBJECT (myobj), "uri");
-  g_signal_emit (myobj, mediaplayer_signals[OPEN_URI], 0);
   g_object_set (G_OBJECT (myobj), "uri", uri, NULL);
+
+  engine_open_uri (myobj->engine, uri);
 }
 
 static void
@@ -292,30 +292,21 @@ handle_method_call (GDBusConnection * connection,
   if (g_strcmp0 (method_name, "OpenUri") == 0) {
     gchar *uri;
 
-    g_print ("name: %s\n", myobj->name);
-
     g_variant_get (parameters, "(s)", &uri);
     my_object_change_uri (myobj, uri);
 
     g_dbus_method_invocation_return_value (invocation, NULL);
 
   } else if (g_strcmp0 (method_name, "Next") == 0) {
-    g_print ("next\n");
     /// ToDo: next track call
-
-    g_print ("name: %s\n", myobj->name);
 
     handle_result (invocation, ret, error);
   } else if (g_strcmp0 (method_name, "Play") == 0) {
-    // send play signal
-
-    g_print ("name: %s\n", myobj->name);
+    engine_play (myobj->engine);
 
     handle_result (invocation, ret, error);
   } else if (g_strcmp0 (method_name, "Stop") == 0) {
-    // send stop signal
-
-    g_print ("name: %s\n", myobj->name);
+    engine_stop (myobj->engine);
 
     handle_result (invocation, ret, error);
   }
@@ -332,7 +323,7 @@ handle_get_property (GDBusConnection * connection,
   GVariant *ret;
   SnappyMP *myobj = user_data;
 
-  g_print ("handle_get_property: %s\n", property_name);
+  // g_print ("handle_get_property: %s\n", property_name);
 
   ret = NULL;
   if (g_strcmp0 (property_name, "Name") == 0) {

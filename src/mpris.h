@@ -26,6 +26,8 @@
 #include <gio/gio.h>
 #include <glib-object.h>
 
+#include "gst_engine.h"
+
 G_BEGIN_DECLS
 
 #define MPRIS_BUS_NAME_PREFIX "org.mpris.MediaPlayer2"
@@ -70,6 +72,8 @@ struct _SnappyMP
   gint64 last_elapsed;
 
   gchar *uri;
+
+  GstEngine *engine;
 };
 
 struct _SnappyMPClass

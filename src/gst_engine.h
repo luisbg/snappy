@@ -23,6 +23,8 @@
 #ifndef __GST_ENGINE_H__
 #define __GST_ENGINE_H__
 
+#include <gst/gst.h>
+
 G_BEGIN_DECLS
 
 typedef struct _GstEngine GstEngine;
@@ -51,6 +53,9 @@ gboolean at_the_eos (GstEngine * engine);
 gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
 gboolean engine_init (GstEngine * engine, GstElement * sink);
 gboolean engine_load_uri (GstEngine * engine, gchar * uri);
+gboolean engine_open_uri (GstEngine * engine, gchar * uri);
+gboolean engine_play (GstEngine * engine);
+gboolean engine_stop (GstEngine * engine);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);
 gchar **get_recently_played ();
 GstState get_state (GstEngine * engine);
