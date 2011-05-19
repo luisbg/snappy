@@ -284,6 +284,7 @@ handle_method_call (GDBusConnection * connection,
   if (g_strcmp0 (method_name, "OpenUri") == 0) {
     gchar *uri;
 
+    // g_print ("openUri.. uri: %s\n", uri);
     g_variant_get (parameters, "(s)", &uri);
     my_object_change_uri (myobj, uri);
 
@@ -293,16 +294,29 @@ handle_method_call (GDBusConnection * connection,
     /// ToDo: next track call
 
     handle_result (invocation, ret, error);
+
   } else if (g_strcmp0 (method_name, "Play") == 0) {
     engine_play (myobj->engine);
 
     handle_result (invocation, ret, error);
+
   } else if (g_strcmp0 (method_name, "Stop") == 0) {
     engine_stop (myobj->engine);
 
     handle_result (invocation, ret, error);
-  }
 
+  } else if (g_strcmp0 (method_name, "Seek") == 0) {
+    gint64 offset, position;
+    gfloat relative;
+
+    g_variant_get (parameters, "(x)", &offset);
+    relative = offset / 100000000.0;
+    position = myobj->engine->media_duration * relative;
+    // g_print ("offset: %ld    relative: %f", offset, relative);
+    engine_seek (myobj->engine, position);
+
+    handle_result (invocation, ret, error);
+  }
 }
 
 GVariant *

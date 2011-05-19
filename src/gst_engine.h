@@ -60,7 +60,7 @@ gboolean frame_stepping (GstEngine * engine, gboolean foward);
 gchar **get_recently_played ();
 GstState get_state (GstEngine * engine);
 gint64 query_position (GstEngine * engine);
-gboolean seek (GstEngine * engine, gint64 position);
+gboolean engine_seek (GstEngine * engine, gint64 position);
 gboolean change_state (GstEngine * engine, gchar * state);
 gboolean update_media_duration (GstEngine * engine);
 

@@ -334,7 +334,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
           position = is_uri_unfinished_playback (engine, engine->uri);
           if (position != -1) {
-            seek (engine, position);
+            engine_seek (engine, position);
           }
 
           add_uri_to_history (engine->uri);
@@ -511,7 +511,7 @@ query_position (GstEngine * engine)
 }
 
 gboolean
-seek (GstEngine * engine, gint64 position)
+engine_seek (GstEngine * engine, gint64 position)
 {
   GstFormat fmt = GST_FORMAT_TIME;
 
