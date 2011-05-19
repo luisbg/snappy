@@ -300,6 +300,10 @@ handle_method_call (GDBusConnection * connection,
 
     handle_result (invocation, ret, error);
 
+  } else if (g_strcmp0 (method_name, "Pause") == 0) {
+    change_state (myobj->engine, "Paused");
+
+    handle_result (invocation, ret, error);
   } else if (g_strcmp0 (method_name, "Stop") == 0) {
     engine_stop (myobj->engine);
 
@@ -356,17 +360,17 @@ handle_get_property (GDBusConnection * connection,
   } else if (g_strcmp0 (property_name, "MaximumRate") == 0) {
     ret = g_variant_new_double (0);
   } else if (g_strcmp0 (property_name, "CanGoNext") == 0) {
-    ret = g_variant_new_boolean (FALSE);
+    ret = g_variant_new_boolean (TRUE);
   } else if (g_strcmp0 (property_name, "CanGoPrevious") == 0) {
     ret = g_variant_new_boolean (FALSE);
   } else if (g_strcmp0 (property_name, "CanPlay") == 0) {
-    ret = g_variant_new_boolean (FALSE);
+    ret = g_variant_new_boolean (TRUE);
   } else if (g_strcmp0 (property_name, "CanPause") == 0) {
-    ret = g_variant_new_boolean (FALSE);
+    ret = g_variant_new_boolean (TRUE);
   } else if (g_strcmp0 (property_name, "CanSeek") == 0) {
-    ret = g_variant_new_boolean (FALSE);
+    ret = g_variant_new_boolean (TRUE);
   } else if (g_strcmp0 (property_name, "CanControl") == 0) {
-    ret = g_variant_new_boolean (FALSE);
+    ret = g_variant_new_boolean (TRUE);
 
   } else if (g_strcmp0 (property_name, "Identity") == 0) {
     return g_variant_new_string ("snappy");
@@ -380,7 +384,9 @@ handle_get_property (GDBusConnection * connection,
     /* nor this */
     const char *fake_supported_mimetypes[] = {
       "application/ogg", "audio/x-vorbis+ogg", "audio/x-flac", "audio/mpeg",
-          NULL
+      "video/mpeg", "video/quicktime", "video/x-ms-asf", "video/x-msvideo",
+      "video/ogg", "audio/ogg", "application/annodex", "video/annodex",
+      NULL
     };
     return g_variant_new_strv (fake_supported_mimetypes, -1);
   }
@@ -474,8 +480,10 @@ get_root_property (GDBusConnection * connection,
   } else if (g_strcmp0 (property_name, "SupportedMimeTypes") == 0) {
     /* nor this */
     const char *fake_supported_mimetypes[] = {
+      "video/mpeg", "video/quicktime", "video/x-ms-asf", "video/x-msvideo",
+      "video/ogg", "audio/ogg", "application/annodex", "video/annodex",
       "application/ogg", "audio/x-vorbis+ogg", "audio/x-flac", "audio/mpeg",
-          NULL
+      NULL
     };
     return g_variant_new_strv (fake_supported_mimetypes, -1);
   }
