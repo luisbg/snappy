@@ -792,15 +792,15 @@ update_controls_size (UserInterface * ui)
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
   text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_title));
 
-  ui->seek_width = (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO;
-  ui->seek_height = ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO;
+  ui->seek_width = (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO - 2.0f * SEEK_BORDER;
+  ui->seek_height = ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 2.0f * SEEK_BORDER;
 
-  clutter_actor_set_size (ui->control_seek1, ui->seek_width, ui->seek_height);
+  clutter_actor_set_size (ui->control_seek1,
+      ui->seek_width + 2.0f * SEEK_BORDER,
+      ui->seek_height + 2.0f * SEEK_BORDER);
   clutter_actor_set_position (ui->control_seek1, 0, 0);
 
-  clutter_actor_set_size (ui->control_seek2,
-      ui->seek_width - 2.0f * SEEK_BORDER,
-      ui->seek_height - 2.0f * SEEK_BORDER);
+  clutter_actor_set_size (ui->control_seek2, ui->seek_width, ui->seek_height);
   clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
 
   progress_update_seekbar (ui);
