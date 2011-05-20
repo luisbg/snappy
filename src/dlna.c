@@ -372,7 +372,7 @@ handle_get_property (GDBusConnection * connection,
       "application/ogg", "audio/x-vorbis+ogg", "audio/x-flac", "audio/mpeg",
       "video/mpeg", "video/quicktime", "video/x-ms-asf", "video/x-msvideo",
       "video/ogg", "audio/ogg", "application/annodex", "video/annodex",
-      "video/x-matroska", "audio/x-matroska",
+      "video/x-matroska", "audio/x-matroska", "video/x-theora+ogg",
       NULL
     };
     return g_variant_new_strv (fake_supported_mimetypes, -1);
@@ -472,7 +472,7 @@ get_root_property (GDBusConnection * connection,
       "video/mpeg", "video/quicktime", "video/x-ms-asf", "video/x-msvideo",
       "video/ogg", "audio/ogg", "application/annodex", "video/annodex",
       "application/ogg", "audio/x-vorbis+ogg", "audio/x-flac", "audio/mpeg",
-      "video/x-matroska", "audio/x-matroska",
+      "video/x-matroska", "audio/x-matroska", "video/x-theora+ogg",
       NULL
     };
     return g_variant_new_strv (fake_supported_mimetypes, -1);
