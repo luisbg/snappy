@@ -209,18 +209,6 @@ my_object_class_init (SnappyMPClass * class)
   g_object_class_install_property (gobject_class,
       PROP_NAME,
       g_param_spec_string ("name", "Name", "Name", NULL, G_PARAM_READWRITE));
-
-  mediaplayer_signals[OPEN_URI] =
-    g_signal_newv ("open-uri",
-		   G_TYPE_FROM_CLASS (class),
-		   G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-		   NULL,
-		   NULL,
-		   NULL,
-		   g_cclosure_marshal_VOID__VOID,
-		   G_TYPE_NONE,
-		   0,
-		   NULL);
 }
 
 void
@@ -229,7 +217,6 @@ my_object_change_uri (SnappyMP * myobj, gchar * uri)
   if (myobj != NULL)
     myobj->uri = uri;
 
-    // g_print ("changing uri: %s\n", uri);
     g_object_set (G_OBJECT (myobj), "uri", uri, NULL);
 
     engine_open_uri (myobj->engine, uri);
@@ -267,8 +254,6 @@ handle_method_call (GDBusConnection * connection,
 {
   gboolean ret = TRUE;
   GError *error = NULL;
-
-  // g_print ("handle_method_call: %s\n", method_name);
 
   if (g_strcmp0 (object_path, MPRIS_OBJECT_NAME) != 0 ||
       g_strcmp0 (interface_name, MPRIS_PLAYER_INTERFACE) != 0) {
@@ -320,6 +305,7 @@ handle_method_call (GDBusConnection * connection,
     engine_seek (myobj->engine, position);
 
     handle_result (invocation, ret, error);
+
   }
 }
 
@@ -333,12 +319,10 @@ handle_get_property (GDBusConnection * connection,
   GVariant *ret;
   SnappyMP *myobj = user_data;
 
-  // g_print ("handle_get_property: %s\n", property_name);
-
   ret = NULL;
   if (g_strcmp0 (property_name, "Name") == 0) {
-    //ret = g_variant_new_string (myobj->name ? myobj->name : "");
-    ret = g_variant_new_string ("snappy");
+    ret = g_variant_new_string (myobj->name ? myobj->name : "snappy");
+    //ret = g_variant_new_string ("snappy");
 
   } else if (g_strcmp0 (property_name, "PlaybackStatus") == 0) {
     ret = g_variant_new_string ("Paused");
@@ -386,6 +370,7 @@ handle_get_property (GDBusConnection * connection,
       "application/ogg", "audio/x-vorbis+ogg", "audio/x-flac", "audio/mpeg",
       "video/mpeg", "video/quicktime", "video/x-ms-asf", "video/x-msvideo",
       "video/ogg", "audio/ogg", "application/annodex", "video/annodex",
+      "video/x-matroska", "audio/x-matroska",
       NULL
     };
     return g_variant_new_strv (fake_supported_mimetypes, -1);
@@ -406,6 +391,12 @@ handle_set_property (GDBusConnection * connection,
 
   if (g_strcmp0 (property_name, "Name") == 0) {
     g_object_set (myobj, "name", g_variant_get_string (value, NULL), NULL);
+
+  } else if (g_strcmp0 (property_name, "Volume") == 0) {
+    gdouble level;
+
+    level = g_variant_get_double (value);
+    engine_volume (myobj->engine, level);
   }
 
   return TRUE;
@@ -448,8 +439,6 @@ get_root_property (GDBusConnection * connection,
     const char *interface_name,
     const char *property_name, GError ** error, SnappyMP * mp)
 {
-  // g_print ("get_root_property: %s\n", property_name);
-
   if (g_strcmp0 (object_path, MPRIS_OBJECT_NAME) != 0 ||
       g_strcmp0 (interface_name, MPRIS_ROOT_INTERFACE) != 0) {
     g_set_error (error,
@@ -468,9 +457,7 @@ get_root_property (GDBusConnection * connection,
   } else if (g_strcmp0 (property_name, "Identity") == 0) {
     return g_variant_new_string ("snappy");
   } else if (g_strcmp0 (property_name, "DesktopEntry") == 0) {
-    GVariant *v = NULL;
-    char *path;
-    return v;
+    return g_variant_new_string ("snappy");
   } else if (g_strcmp0 (property_name, "SupportedUriSchemes") == 0) {
     /* not planning to support this seriously */
     const char *fake_supported_schemes[] = {
@@ -483,6 +470,7 @@ get_root_property (GDBusConnection * connection,
       "video/mpeg", "video/quicktime", "video/x-ms-asf", "video/x-msvideo",
       "video/ogg", "audio/ogg", "application/annodex", "video/annodex",
       "application/ogg", "audio/x-vorbis+ogg", "audio/x-flac", "audio/mpeg",
+      "video/x-matroska", "audio/x-matroska",
       NULL
     };
     return g_variant_new_strv (fake_supported_mimetypes, -1);
@@ -511,8 +499,6 @@ send_property_change (GObject * obj,
   if (g_strcmp0 (pspec->name, "name") == 0)
     g_variant_builder_add (builder,
         "{sv}", "Name", g_variant_new_string (myobj->name ? myobj->name : ""));
-
-  // g_print ("some property changed %s\n", pspec->name);
 
   g_dbus_connection_emit_signal (connection,
       NULL,
@@ -585,6 +571,8 @@ load_dlna (SnappyMP *mp)
       g_object_ref (mp),
       g_object_unref);
   g_assert (mp->owner_id > 0);
+
+  mp->name = "snappy";
 
   return TRUE;
 }

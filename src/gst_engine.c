@@ -425,6 +425,14 @@ engine_stop (GstEngine * engine)
 }
 
 gboolean
+engine_volume (GstEngine * engine, gdouble level)
+{
+  g_object_set (G_OBJECT (engine->player), "volume", level, NULL);
+
+  return TRUE;
+}
+
+gboolean
 frame_stepping (GstEngine * engine, gboolean foward)
 {
   gboolean ok;

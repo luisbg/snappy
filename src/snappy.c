@@ -204,6 +204,7 @@ main (int argc, char *argv[])
   clutter_main ();
 
   close_down (ui, engine);
+  close_dlna (mp_obj);
 
 quit:
   g_option_context_free (context);
