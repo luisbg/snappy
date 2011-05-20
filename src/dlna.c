@@ -26,104 +26,103 @@
 #include "dlna.h"
 
 const char *mpris_introspection_xml =
-	"<node>"
-	"  <interface name='org.mpris.MediaPlayer2'>"
-	"    <method name='Raise'/>"
-	"    <method name='Quit'/>"
-	"    <property name='CanQuit' type='b' access='read'/>"
-	"    <property name='CanRaise' type='b' access='read'/>"
-	"    <property name='HasTrackList' type='b' access='read'/>"
-	"    <property name='Identity' type='s' access='read'/>"
-	"    <property name='DesktopEntry' type='s' access='read'/>"
-	"    <property name='SupportedUriSchemes' type='as' access='read'/>"
-	"    <property name='SupportedMimeTypes' type='as' access='read'/>"
-	"  </interface>"
-	"  <interface name='org.mpris.MediaPlayer2.Player'>"
-	"    <method name='Next'/>"
-	"    <method name='Previous'/>"
-	"    <method name='Pause'/>"
-	"    <method name='PlayPause'/>"
-	"    <method name='Stop'/>"
-	"    <method name='Play'/>"
-	"    <method name='Seek'>"
-	"      <arg direction='in' name='Offset' type='x'/>"
-	"    </method>"
-	"    <method name='SetPosition'>"
-	"      <arg direction='in' name='TrackId' type='o'/>"
-	"      <arg direction='in' name='Position' type='x'/>"
-	"    </method>"
-	"    <method name='OpenUri'>"
-	"      <arg direction='in' name='Uri' type='s'/>"
-	"    </method>"
-	"    <signal name='Seeked'>"
-	"      <arg name='Position' type='x'/>"
-	"    </signal>"
-	"    <property name='PlaybackStatus' type='s' access='read'/>"
-	"    <property name='LoopStatus' type='s' access='readwrite'/>"
-	"    <property name='Rate' type='d' access='readwrite'/>"
-	"    <property name='Shuffle' type='b' access='readwrite'/>"
-	"    <property name='Metadata' type='a{sv}' access='read'/>"
-	"    <property name='Volume' type='d' access='readwrite'/>"
-	"    <property name='Position' type='x' access='read'/>"
-	"    <property name='MinimumRate' type='d' access='read'/>"
-	"    <property name='MaximumRate' type='d' access='read'/>"
-	"    <property name='CanGoNext' type='b' access='read'/>"
-	"    <property name='CanGoPrevious' type='b' access='read'/>"
-	"    <property name='CanPlay' type='b' access='read'/>"
-	"    <property name='CanPause' type='b' access='read'/>"
-	"    <property name='CanSeek' type='b' access='read'/>"
-	"    <property name='CanControl' type='b' access='read'/>"
-	"  </interface>"
-	"  <interface name='org.mpris.MediaPlayer2.TrackList'>"
-	"    <method name='GetTracksMetadata'>"
-	"      <arg direction='in' name='TrackIds' type='ao'/>"
-	"      <arg direction='out' name='Metadata' type='aa{sv}'/>"
-	"    </method>"
-	"    <method name='AddTrack'>"
-	"      <arg direction='in' name='Uri' type='s'/>"
-	"      <arg direction='in' name='AfterTrack' type='o'/>"
-	"      <arg direction='in' name='SetAsCurrent' type='b'/>"
-	"    </method>"
-	"    <method name='RemoveTrack'>"
-	"      <arg direction='in' name='TrackId' type='o'/>"
-	"    </method>"
-	"    <method name='GoTo'>"
-	"      <arg direction='in' name='TrackId' type='o'/>"
-	"    </method>"
-	"    <signal name='TrackListReplaced'>"
-	"      <arg name='Tracks' type='ao'/>"
-	"      <arg name='CurrentTrack' type='o'/>"
-	"    </signal>"
-	"    <signal name='TrackAdded'>"
-	"      <arg name='Metadata' type='a{sv}'/>"
-	"      <arg name='AfterTrack' type='o'/>"
-	"    </signal>"
-	"    <signal name='TrackRemoved'>"
-	"      <arg name='TrackId' type='o'/>"
-	"    </signal>"
-	"    <signal name='TrackMetadataChanged'>"
-	"      <arg name='TrackId' type='o'/>"
-	"      <arg name='Metadata' type='a{sv}'/>"
-	"    </signal>"
-	"    <property name='Tracks' type='ao' access='read'/>"
-	"    <property name='CanEditTracks' type='b' access='read'/>"
-	"  </interface>"
-	"  <interface name='org.mpris.MediaPlayer2.Playlists'>"
-	"    <method name='ActivatePlaylist'>"
-	"      <arg direction='in' name='PlaylistId' type='o'/>"
-	"    </method>"
-	"    <method name='GetPlaylists'>"
-	"      <arg direction='in' name='Index' type='u'/>"
-	"      <arg direction='in' name='MaxCount' type='u'/>"
-	"      <arg direction='in' name='Order' type='s'/>"
-	"      <arg direction='in' name='ReverseOrder' type='b'/>"
-	"      <arg direction='out' type='a(oss)'/>"
-	"    </method>"
-	"    <property name='PlaylistCount' type='u' access='read'/>"
-	"    <property name='Orderings' type='as' access='read'/>"
-	"    <property name='ActivePlaylist' type='(b(oss))' access='read'/>"
-	"  </interface>"
-	"</node>";
+    "<node>"
+    "  <interface name='org.mpris.MediaPlayer2'>"
+    "    <method name='Raise'/>"
+    "    <method name='Quit'/>"
+    "    <property name='CanQuit' type='b' access='read'/>"
+    "    <property name='CanRaise' type='b' access='read'/>"
+    "    <property name='HasTrackList' type='b' access='read'/>"
+    "    <property name='Identity' type='s' access='read'/>"
+    "    <property name='DesktopEntry' type='s' access='read'/>"
+    "    <property name='SupportedUriSchemes' type='as' access='read'/>"
+    "    <property name='SupportedMimeTypes' type='as' access='read'/>"
+    "  </interface>"
+    "  <interface name='org.mpris.MediaPlayer2.Player'>"
+    "    <method name='Next'/>"
+    "    <method name='Previous'/>"
+    "    <method name='Pause'/>"
+    "    <method name='PlayPause'/>"
+    "    <method name='Stop'/>"
+    "    <method name='Play'/>"
+    "    <method name='Seek'>"
+    "      <arg direction='in' name='Offset' type='x'/>"
+    "    </method>"
+    "    <method name='SetPosition'>"
+    "      <arg direction='in' name='TrackId' type='o'/>"
+    "      <arg direction='in' name='Position' type='x'/>"
+    "    </method>"
+    "    <method name='OpenUri'>"
+    "      <arg direction='in' name='Uri' type='s'/>"
+    "    </method>"
+    "    <signal name='Seeked'>"
+    "      <arg name='Position' type='x'/>"
+    "    </signal>"
+    "    <property name='PlaybackStatus' type='s' access='read'/>"
+    "    <property name='LoopStatus' type='s' access='readwrite'/>"
+    "    <property name='Rate' type='d' access='readwrite'/>"
+    "    <property name='Shuffle' type='b' access='readwrite'/>"
+    "    <property name='Metadata' type='a{sv}' access='read'/>"
+    "    <property name='Volume' type='d' access='readwrite'/>"
+    "    <property name='Position' type='x' access='read'/>"
+    "    <property name='MinimumRate' type='d' access='read'/>"
+    "    <property name='MaximumRate' type='d' access='read'/>"
+    "    <property name='CanGoNext' type='b' access='read'/>"
+    "    <property name='CanGoPrevious' type='b' access='read'/>"
+    "    <property name='CanPlay' type='b' access='read'/>"
+    "    <property name='CanPause' type='b' access='read'/>"
+    "    <property name='CanSeek' type='b' access='read'/>"
+    "    <property name='CanControl' type='b' access='read'/>"
+    "  </interface>"
+    "  <interface name='org.mpris.MediaPlayer2.TrackList'>"
+    "    <method name='GetTracksMetadata'>"
+    "      <arg direction='in' name='TrackIds' type='ao'/>"
+    "      <arg direction='out' name='Metadata' type='aa{sv}'/>"
+    "    </method>"
+    "    <method name='AddTrack'>"
+    "      <arg direction='in' name='Uri' type='s'/>"
+    "      <arg direction='in' name='AfterTrack' type='o'/>"
+    "      <arg direction='in' name='SetAsCurrent' type='b'/>"
+    "    </method>"
+    "    <method name='RemoveTrack'>"
+    "      <arg direction='in' name='TrackId' type='o'/>"
+    "    </method>"
+    "    <method name='GoTo'>"
+    "      <arg direction='in' name='TrackId' type='o'/>"
+    "    </method>"
+    "    <signal name='TrackListReplaced'>"
+    "      <arg name='Tracks' type='ao'/>"
+    "      <arg name='CurrentTrack' type='o'/>"
+    "    </signal>"
+    "    <signal name='TrackAdded'>"
+    "      <arg name='Metadata' type='a{sv}'/>"
+    "      <arg name='AfterTrack' type='o'/>"
+    "    </signal>"
+    "    <signal name='TrackRemoved'>"
+    "      <arg name='TrackId' type='o'/>"
+    "    </signal>"
+    "    <signal name='TrackMetadataChanged'>"
+    "      <arg name='TrackId' type='o'/>"
+    "      <arg name='Metadata' type='a{sv}'/>"
+    "    </signal>"
+    "    <property name='Tracks' type='ao' access='read'/>"
+    "    <property name='CanEditTracks' type='b' access='read'/>"
+    "  </interface>"
+    "  <interface name='org.mpris.MediaPlayer2.Playlists'>"
+    "    <method name='ActivatePlaylist'>"
+    "      <arg direction='in' name='PlaylistId' type='o'/>"
+    "    </method>"
+    "    <method name='GetPlaylists'>"
+    "      <arg direction='in' name='Index' type='u'/>"
+    "      <arg direction='in' name='MaxCount' type='u'/>"
+    "      <arg direction='in' name='Order' type='s'/>"
+    "      <arg direction='in' name='ReverseOrder' type='b'/>"
+    "      <arg direction='out' type='a(oss)'/>"
+    "    </method>"
+    "    <property name='PlaylistCount' type='u' access='read'/>"
+    "    <property name='Orderings' type='as' access='read'/>"
+    "    <property name='ActivePlaylist' type='(b(oss))' access='read'/>"
+    "  </interface>" "</node>";
 
 /* for now */
 static const GDBusInterfaceVTable interface_vtable = {
@@ -162,9 +161,7 @@ my_object_finalize (GObject * object)
 
 static void
 my_object_get_property (GObject * object,
-    guint prop_id,
-    GValue * value,
-    GParamSpec * pspec)
+    guint prop_id, GValue * value, GParamSpec * pspec)
 {
   SnappyMP *myobj = (SnappyMP *) object;
 
@@ -180,9 +177,7 @@ my_object_get_property (GObject * object,
 
 static void
 my_object_set_property (GObject * object,
-    guint prop_id,
-    const GValue * value,
-    GParamSpec * pspec)
+    guint prop_id, const GValue * value, GParamSpec * pspec)
 {
   SnappyMP *myobj = (SnappyMP *) object;
 
@@ -217,16 +212,14 @@ my_object_change_uri (SnappyMP * myobj, gchar * uri)
   if (myobj != NULL)
     myobj->uri = uri;
 
-    g_object_set (G_OBJECT (myobj), "uri", uri, NULL);
+  g_object_set (G_OBJECT (myobj), "uri", uri, NULL);
 
-    engine_open_uri (myobj->engine, uri);
-    interface_load_uri (myobj->ui, uri);
+  engine_open_uri (myobj->engine, uri);
+  interface_load_uri (myobj->ui, uri);
 }
 
 static void
-handle_result (GDBusMethodInvocation * invocation,
-    gboolean ret,
-    GError * error)
+handle_result (GDBusMethodInvocation * invocation, gboolean ret, GError * error)
 {
   if (ret) {
     g_dbus_method_invocation_return_value (invocation, NULL);
@@ -249,9 +242,7 @@ handle_method_call (GDBusConnection * connection,
     const gchar * object_path,
     const gchar * interface_name,
     const gchar * method_name,
-    GVariant * parameters,
-    GDBusMethodInvocation * invocation,
-    SnappyMP * myobj)
+    GVariant * parameters, GDBusMethodInvocation * invocation, SnappyMP * myobj)
 {
   gboolean ret = TRUE;
   GError *error = NULL;
@@ -260,10 +251,8 @@ handle_method_call (GDBusConnection * connection,
       g_strcmp0 (interface_name, MPRIS_PLAYER_INTERFACE) != 0) {
     g_dbus_method_invocation_return_error (invocation,
         G_DBUS_ERROR,
-	G_DBUS_ERROR_NOT_SUPPORTED,
-	"Method %s.%s not supported",
-	interface_name,
-	method_name);
+        G_DBUS_ERROR_NOT_SUPPORTED,
+        "Method %s.%s not supported", interface_name, method_name);
     return;
   }
 
@@ -410,8 +399,7 @@ handle_root_method_call (GDBusConnection * connection,
     const char *object_path,
     const char *interface_name,
     const char *method_name,
-    GVariant * parameters,
-    GDBusMethodInvocation * invocation, SnappyMP * mp)
+    GVariant * parameters, GDBusMethodInvocation * invocation, SnappyMP * mp)
 {
   if (g_strcmp0 (object_path, MPRIS_OBJECT_NAME) != 0 ||
       g_strcmp0 (interface_name, MPRIS_ROOT_INTERFACE) != 0) {
@@ -487,8 +475,7 @@ get_root_property (GDBusConnection * connection,
 
 static void
 send_property_change (GObject * obj,
-    GParamSpec * pspec,
-    GDBusConnection * connection)
+    GParamSpec * pspec, GDBusConnection * connection)
 {
 
   GVariantBuilder *builder;
@@ -513,22 +500,20 @@ send_property_change (GObject * obj,
 
 static void
 on_name_acquired (GDBusConnection * connection,
-    const gchar * name,
-    gpointer user_data)
+    const gchar * name, gpointer user_data)
 {
   // g_print ("DLNA MediaPlayer name acquired.\n");
 }
 
 static void
 on_name_lost (GDBusConnection * connection,
-    const gchar * name,
-    gpointer user_data)
+    const gchar * name, gpointer user_data)
 {
   exit (1);
 }
 
 gboolean
-load_dlna (SnappyMP *mp)
+load_dlna (SnappyMP * mp)
 {
   guint owner_id, player_id, root_id;
   GError *error = NULL;
@@ -546,19 +531,19 @@ load_dlna (SnappyMP *mp)
 
   /* register media player interface */
   ifaceinfo =
-    g_dbus_node_info_lookup_interface (introspection_data,
-        MPRIS_PLAYER_INTERFACE);
+      g_dbus_node_info_lookup_interface (introspection_data,
+      MPRIS_PLAYER_INTERFACE);
   mp->player_id =
-    g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
-        ifaceinfo, &interface_vtable, mp, NULL, &error);
+      g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
+      ifaceinfo, &interface_vtable, mp, NULL, &error);
 
   /* register root interface */
   ifaceinfo =
-    g_dbus_node_info_lookup_interface (introspection_data,
-        MPRIS_ROOT_INTERFACE);
+      g_dbus_node_info_lookup_interface (introspection_data,
+      MPRIS_ROOT_INTERFACE);
   mp->root_id =
-    g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
-        ifaceinfo, &root_vtable, NULL, NULL, &error);
+      g_dbus_connection_register_object (connection, MPRIS_OBJECT_NAME,
+      ifaceinfo, &root_vtable, NULL, NULL, &error);
   if (error != NULL) {
     g_warning ("unable to register MPRIS root interface: %s", error->message);
     g_error_free (error);
@@ -569,9 +554,7 @@ load_dlna (SnappyMP *mp)
       G_BUS_NAME_OWNER_FLAGS_NONE,
       NULL,
       (GBusNameAcquiredCallback) on_name_acquired,
-      (GBusNameLostCallback) on_name_lost,
-      g_object_ref (mp),
-      g_object_unref);
+      (GBusNameLostCallback) on_name_lost, g_object_ref (mp), g_object_unref);
   g_assert (mp->owner_id > 0);
 
   mp->name = "snappy";
@@ -580,7 +563,7 @@ load_dlna (SnappyMP *mp)
 }
 
 gboolean
-close_dlna (SnappyMP *mp)
+close_dlna (SnappyMP * mp)
 {
   g_bus_unown_name (mp->owner_id);
 

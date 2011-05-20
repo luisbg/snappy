@@ -49,7 +49,8 @@ close_down (UserInterface * ui, GstEngine * engine)
   gst_object_unref (G_OBJECT (engine->player));
 }
 
-void open_uri_callback (SnappyMP *self, gpointer user_data)
+void
+open_uri_callback (SnappyMP * self, gpointer user_data)
 {
   g_print ("received the open-uri signal!\n");
 }
