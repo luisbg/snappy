@@ -417,6 +417,16 @@ engine_play (GstEngine * engine)
 }
 
 gboolean
+engine_seek (GstEngine * engine, gint64 position)
+{
+  GstFormat fmt = GST_FORMAT_TIME;
+
+  gst_element_seek_simple (engine->player, fmt, GST_SEEK_FLAG_FLUSH, position);
+
+  return TRUE;
+}
+
+gboolean
 engine_stop (GstEngine * engine)
 {
   gst_element_set_state (engine->player, GST_STATE_READY);
@@ -516,16 +526,6 @@ query_position (GstEngine * engine)
 
   gst_element_query_position (engine->player, &fmt, &position);
   return position;
-}
-
-gboolean
-engine_seek (GstEngine * engine, gint64 position)
-{
-  GstFormat fmt = GST_FORMAT_TIME;
-
-  gst_element_seek_simple (engine->player, fmt, GST_SEEK_FLAG_FLUSH, position);
-
-  return TRUE;
 }
 
 gboolean
