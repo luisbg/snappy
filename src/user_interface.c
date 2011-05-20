@@ -844,6 +844,12 @@ gboolean
 interface_load_uri (UserInterface * ui, gchar * uri)
 {
   ui->fileuri = uri;
+  ui->filename = g_path_get_basename (ui->fileuri);
+
+  if (ui->stage != NULL) {
+    clutter_stage_set_title (CLUTTER_STAGE (ui->stage), ui->filename);
+    clutter_text_set_text (CLUTTER_TEXT (ui->control_title), ui->filename);
+  }
 }
 
 void

@@ -220,6 +220,7 @@ my_object_change_uri (SnappyMP * myobj, gchar * uri)
     g_object_set (G_OBJECT (myobj), "uri", uri, NULL);
 
     engine_open_uri (myobj->engine, uri);
+    interface_load_uri (myobj->ui, uri);
 }
 
 static void
@@ -355,15 +356,16 @@ handle_get_property (GDBusConnection * connection,
     ret = g_variant_new_boolean (TRUE);
   } else if (g_strcmp0 (property_name, "CanControl") == 0) {
     ret = g_variant_new_boolean (TRUE);
-
   } else if (g_strcmp0 (property_name, "Identity") == 0) {
-    return g_variant_new_string ("snappy");
+    ret = g_variant_new_string ("snappy");
+
   } else if (g_strcmp0 (property_name, "SupportedUriSchemes") == 0) {
     /* not planning to support this seriously */
     const char *fake_supported_schemes[] = {
       "file", "http", "cdda", "smb", "sftp", NULL
     };
     return g_variant_new_strv (fake_supported_schemes, -1);
+
   } else if (g_strcmp0 (property_name, "SupportedMimeTypes") == 0) {
     /* nor this */
     const char *fake_supported_mimetypes[] = {
@@ -449,9 +451,9 @@ get_root_property (GDBusConnection * connection,
   }
 
   if (g_strcmp0 (property_name, "CanQuit") == 0) {
-    return g_variant_new_boolean (TRUE);
+    return g_variant_new_boolean (FALSE);
   } else if (g_strcmp0 (property_name, "CanRaise") == 0) {
-    return g_variant_new_boolean (TRUE);
+    return g_variant_new_boolean (FALSE);
   } else if (g_strcmp0 (property_name, "HasTrackList") == 0) {
     return g_variant_new_boolean (FALSE);
   } else if (g_strcmp0 (property_name, "Identity") == 0) {

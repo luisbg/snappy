@@ -27,6 +27,7 @@
 #include <glib-object.h>
 
 #include "gst_engine.h"
+#include "user_interface.h"
 
 G_BEGIN_DECLS
 
@@ -74,6 +75,7 @@ struct _SnappyMP
   gchar *uri;
 
   GstEngine *engine;
+  UserInterface *ui;
 };
 
 struct _SnappyMPClass

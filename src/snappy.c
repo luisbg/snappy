@@ -197,9 +197,8 @@ main (int argc, char *argv[])
 
   mp_obj = g_new (SnappyMP, 1);
   mp_obj->engine = engine;
+  mp_obj->ui = ui;
   load_dlna (mp_obj);
-  //  g_signal_connect (mp_obj, "open-uri",
-  //    G_CALLBACK (open_uri_callback), engine);
 
   clutter_main ();
 

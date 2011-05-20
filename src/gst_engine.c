@@ -412,6 +412,8 @@ gboolean
 engine_play (GstEngine * engine)
 {
   gst_element_set_state (engine->player, GST_STATE_PLAYING);
+  engine->has_started = TRUE;
+  engine->playing = TRUE;
 
   return TRUE;
 }
@@ -430,6 +432,7 @@ gboolean
 engine_stop (GstEngine * engine)
 {
   gst_element_set_state (engine->player, GST_STATE_READY);
+  engine->playing = FALSE;
 
   return TRUE;
 }
