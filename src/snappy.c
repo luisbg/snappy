@@ -164,6 +164,7 @@ main (int argc, char *argv[])
   // User Interface
   ui = g_new (UserInterface, 1);
   ui->fullscreen = fullscreen;
+  ui->stage = NULL;
   video_texture = clutter_texture_new ();
 
   clutter_gst_init (&argc, &argv);
