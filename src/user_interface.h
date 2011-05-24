@@ -105,8 +105,9 @@ struct _UserInterface
 };
 
 // Declaration of non-static functions
+void interface_init (UserInterface * ui);
 gboolean interface_load_uri (UserInterface * ui, gchar * uri);
-void interface_load (UserInterface * ui, gchar * uri);
+void interface_start (UserInterface * ui, gchar * uri);
 gboolean interface_update_controls (UserInterface * ui);
 
 G_END_DECLS

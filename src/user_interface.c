@@ -840,6 +840,47 @@ update_volume (UserInterface * ui, gdouble volume)
 
 /* -------------------- non-static functions --------------------- */
 
+void
+interface_init (UserInterface * ui)
+{
+  ui->filename = NULL;
+  ui->fileuri = NULL;
+
+  ui->play_png = NULL;
+  ui->pause_png = NULL;
+
+  ui->volume_low_png = NULL;
+  ui->volume_high_png = NULL;
+
+  ui->duration_str = NULL;
+
+  ui->stage = NULL;
+  ui->texture = NULL;
+
+  ui->control_box = NULL;
+  ui->control_bg = NULL;
+  ui->control_title = NULL;
+  ui->control_play_toggle = NULL;
+
+  ui->control_seek1 = NULL;
+  ui->control_seek2 = NULL;
+  ui->control_seekbar = NULL;
+  ui->control_pos = NULL;
+
+  ui->volume_box = NULL;
+  ui->volume_low = NULL;
+  ui->volume_high = NULL;
+  ui->vol_int = NULL;
+  ui->vol_int_bg = NULL;
+  ui->volume_point = NULL;
+
+  ui->info_box = NULL;
+  ui->main_box = NULL;
+
+  ui->engine = NULL;
+  ui->screensaver = NULL;
+}
+
 gboolean
 interface_load_uri (UserInterface * ui, gchar * uri)
 {
@@ -854,7 +895,7 @@ interface_load_uri (UserInterface * ui, gchar * uri)
 }
 
 void
-interface_load (UserInterface * ui, gchar * uri)
+interface_start (UserInterface * ui, gchar * uri)
 {
   ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
 

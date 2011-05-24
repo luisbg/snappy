@@ -164,7 +164,7 @@ main (int argc, char *argv[])
   // User Interface
   ui = g_new (UserInterface, 1);
   ui->fullscreen = fullscreen;
-  ui->stage = NULL;
+  interface_init (ui);
   video_texture = clutter_texture_new ();
 
   clutter_gst_init (&argc, &argv);
@@ -191,7 +191,7 @@ main (int argc, char *argv[])
   }
 
   engine_load_uri (engine, uri);
-  interface_load (ui, uri);
+  interface_start (ui, uri);
 
   change_state (engine, "Paused");
   change_state (engine, "Playing");
