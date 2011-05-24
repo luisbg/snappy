@@ -33,45 +33,28 @@
 #include "gst_engine.h"
 #include "utils.h"
 
+
+/*               Close snappy down               */
 void
 close_down (UserInterface * ui, GstEngine * engine)
 {
   g_print ("closing snappy\n");
 
-  // save position if file isn't finished playing
+  /* Save position if file isn't finished playing */
   add_uri_unfinished (engine);
 
+  /* Close gstreamer gracefully */
   change_state (engine, "Null");
 
+  /* Re-enable screensaver */
   screensaver_enable (ui->screensaver, TRUE);
   screensaver_free (ui->screensaver);
 
   gst_object_unref (G_OBJECT (engine->player));
 }
 
-void
-open_uri_callback (SnappyMP * self, gpointer user_data)
-{
-  g_print ("received the open-uri signal!\n");
-}
 
-gboolean
-config_load ()
-{
-  const gchar *config_dir;
-  gchar *path;
-
-  config_dir = g_get_user_config_dir ();
-  path = g_strdup_printf ("%s/snappy/", config_dir);
-
-  if (!g_file_test (path, G_FILE_TEST_IS_DIR)) {
-    g_print ("%s doesn't exist\n", path);
-    g_mkdir_with_parents (path, 0700);
-  }
-
-  return TRUE;
-}
-
+/*           Process command arguments           */
 gboolean
 process_args (int argc, char *argv[],
     gchar * file_list[], gboolean * fullscreen, GOptionContext * context)
@@ -93,13 +76,14 @@ process_args (int argc, char *argv[],
   g_option_context_add_group (context, gst_init_get_option_group ());
   g_option_context_add_group (context, clutter_get_option_group ());
 
-  // Command line arguments.
+  /* Check command arguments and update entry variables */
   if (!g_option_context_parse (context, &argc, &argv, &err)) {
     g_print ("Error initializing: %s\n", err->message);
     g_error_free (err);
     goto quit;
   }
 
+  /* Recent played uris */
   if (recent) {
     gchar **recent = NULL;
 
@@ -113,16 +97,19 @@ process_args (int argc, char *argv[],
     goto quit;
   }
 
+  /* Show snappy's version */
   if (version) {
     g_print ("snappy version %s\n", VERSION);
     goto quit;
   }
-  // File arguments
+
+  /* Check that at least one URI has been introduced */
   if (argc < 2) {
     g_print ("%s", g_option_context_get_help (context, TRUE, NULL));
     goto quit;
   }
 
+  /* Save uris in the file_list array */
   for (index = 1; index < argc; index++) {
     file_list[pos] = argv[index];
     g_debug ("Adding file: %s\n", file_list[pos]);
@@ -135,6 +122,8 @@ quit:
   return FALSE;
 }
 
+
+/*            snappy's main function             */
 int
 main (int argc, char *argv[])
 {
@@ -156,12 +145,12 @@ main (int argc, char *argv[])
 
   context = g_option_context_new ("<media file> - Play movie files");
 
+  /* Process command arguments */
   ok = process_args (argc, argv, file_list, &fullscreen, context);
   if (!ok)
     goto quit;
-  config_load ();
 
-  // User Interface
+  /* User Interface */
   ui = g_new (UserInterface, 1);
   ui->fullscreen = fullscreen;
   interface_init (ui);
@@ -169,7 +158,7 @@ main (int argc, char *argv[])
 
   clutter_gst_init (&argc, &argv);
 
-  // Gstreamer
+  /* Gstreamer engine */
   engine = g_new (GstEngine, 1);
   engine->media_width = -1;
   engine->media_height = -1;
@@ -183,6 +172,7 @@ main (int argc, char *argv[])
   gst_bus_add_watch (engine->bus, bus_call, ui);
   gst_object_unref (engine->bus);
 
+  /* Get uri to load */
   if (gst_uri_is_valid (file_list[0]))
     uri = g_strdup (file_list[0]);
   else {
@@ -190,19 +180,24 @@ main (int argc, char *argv[])
     uri = g_strdup_printf ("file://%s", fileuri);
   }
 
+  /* Load engine and start interface */
   engine_load_uri (engine, uri);
   interface_start (ui, uri);
 
+  /* Start playing */
   change_state (engine, "Paused");
   change_state (engine, "Playing");
 
+  /* Start MPRIS Dbus object */
   mp_obj = g_new (SnappyMP, 1);
   mp_obj->engine = engine;
   mp_obj->ui = ui;
   load_dlna (mp_obj);
 
+  /* Main loop */
   clutter_main ();
 
+  /* Close snappy */
   close_down (ui, engine);
   close_dlna (mp_obj);
 
