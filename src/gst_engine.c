@@ -360,15 +360,20 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 gboolean
 engine_init (GstEngine * engine, GstElement * sink)
 {
+  engine->playing = FALSE;
+  engine->direction_foward = TRUE;
+  engine->prev_done = TRUE;
+
+  engine->has_started = FALSE;
+  engine->has_video = FALSE;
+  engine->has_audio = FALSE;
+
   engine->media_width = 600;
   engine->media_height = 400;
   engine->media_duration = -1;
-  engine->direction_foward = TRUE;
-  engine->prev_done = TRUE;
   engine->second = GST_SECOND;
-  engine->has_video = FALSE;
-  engine->has_audio = FALSE;
-  engine->has_started = FALSE;
+
+  engine->uri = NULL;
 
   engine->player = gst_element_factory_make ("playbin2", "playbin2");
   if (engine->player == NULL) {

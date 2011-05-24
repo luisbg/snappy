@@ -160,15 +160,16 @@ main (int argc, char *argv[])
 
   /* Gstreamer engine */
   engine = g_new (GstEngine, 1);
-  engine->media_width = -1;
-  engine->media_height = -1;
-  ui->engine = engine;
+
   sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (video_texture));
 
   ok = engine_init (engine, sink);
   if (!ok)
     goto quit;
+
+  ui->engine = engine;
   ui->texture = video_texture;
+
   gst_bus_add_watch (engine->bus, bus_call, ui);
   gst_object_unref (engine->bus);
 
