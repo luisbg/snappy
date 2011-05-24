@@ -339,7 +339,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
           add_uri_to_history (engine->uri);
 
-          update_controls (ui);
+          interface_update_controls (ui);
           engine->has_started = TRUE;
         }
       }

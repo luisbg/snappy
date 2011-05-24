@@ -844,6 +844,7 @@ gboolean
 interface_load_uri (UserInterface * ui, gchar * uri)
 {
   ui->fileuri = uri;
+
   ui->filename = g_path_get_basename (ui->fileuri);
 
   if (ui->stage != NULL) {
@@ -853,13 +854,14 @@ interface_load_uri (UserInterface * ui, gchar * uri)
 }
 
 void
-load_user_interface (UserInterface * ui)
+interface_load (UserInterface * ui, gchar * uri)
 {
   ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
 
   g_print ("Loading ui!\n");
 
   // Init UserInterface structure variables
+  ui->fileuri = uri;
   ui->filename = g_path_get_basename (ui->fileuri);
 
   ui->media_width = ui->engine->media_width;
@@ -929,7 +931,7 @@ load_user_interface (UserInterface * ui)
 }
 
 gboolean
-update_controls (UserInterface * ui)
+interface_update_controls (UserInterface * ui)
 {
   progress_update_text (ui);
   progress_update_seekbar (ui);

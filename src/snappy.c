@@ -191,8 +191,7 @@ main (int argc, char *argv[])
   }
 
   engine_load_uri (engine, uri);
-  interface_load_uri (ui, uri);
-  load_user_interface (ui);
+  interface_load (ui, uri);
 
   change_state (engine, "Paused");
   change_state (engine, "Playing");
