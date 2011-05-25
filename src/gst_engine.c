@@ -47,6 +47,8 @@ typedef enum
 
 /* -------------------- static functions --------------------- */
 
+
+/*         Add URI to recently played list       */
 gboolean
 add_uri_to_history (gchar * uri)
 {
@@ -62,30 +64,30 @@ add_uri_to_history (gchar * uri)
   keyfile = g_key_file_new ();
   flags = G_KEY_FILE_KEEP_COMMENTS;
 
-  // config file path
+  /* Config file path */
   config_dir = g_get_user_config_dir ();
   path = g_strdup_printf ("%s/snappy/history", config_dir);
 
   if (g_key_file_load_from_file (keyfile, path, flags, NULL)) {
-    // set uri in history
+    /* Set uri in history */
     if (g_key_file_has_group (keyfile, "history")) {
       if (!g_key_file_has_key (keyfile, "history", uri, NULL)) {
-        // uri is not already in history
+        /* Uri is not already in history */
         history_keys = g_key_file_get_keys (keyfile, "history", &length, NULL);
 
         if (length >= max) {
-          // remove first uri of the list
+          /* Remove first uri of the list */
           g_key_file_remove_key (keyfile, "history", history_keys[0], NULL);
         }
       }
     } else {
-      // if group "history" doesn't exist create it and populate it
+      /* If group "history" doesn't exist create it and populate it */
       g_key_file_set_boolean (keyfile, "history", uri, TRUE);
     }
 
     g_key_file_set_int64 (keyfile, "history", uri, g_get_real_time ());
 
-    // save gkeyfile to a file
+    /* Save gkeyfile to a file  */
     data = g_key_file_to_data (keyfile, NULL, NULL);
     file = fopen (path, "w");
     fputs (data, file);
@@ -102,6 +104,8 @@ add_uri_to_history (gchar * uri)
   return ret;
 }
 
+
+/* Add URI's last playback position to the unfinished list */
 gboolean
 add_uri_unfinished_playback (GstEngine * engine, gchar * uri, gint64 position)
 {
@@ -117,25 +121,26 @@ add_uri_unfinished_playback (GstEngine * engine, gchar * uri, gint64 position)
   if (duration < SAVE_POSITION_MIN_DURATION ||
       (duration - position) < (duration * SAVE_POSITION_THRESHOLD) ||
       (position < duration * SAVE_POSITION_THRESHOLD)) {
-    // remove in case position is already stored and close
+    /* Remove in case position is already stored and close */
     remove_uri_unfinished_playback (engine, uri);
     return FALSE;
   }
 
+  /* New keyfile with uri as hash key */
   keyfile = g_key_file_new ();
   flags = G_KEY_FILE_KEEP_COMMENTS;
   hash_key = g_str_hash (uri);
   key = g_strdup_printf ("%d", hash_key);
 
-  // config file path
+  /* Config file path */
   config_dir = g_get_user_config_dir ();
   path = g_strdup_printf ("%s/snappy/history", config_dir);
 
+  /* Store uri and position in key file */
   g_key_file_load_from_file (keyfile, path, flags, NULL);
-  // if file doesn't exist it uses the newly created one
   g_key_file_set_int64 (keyfile, "unfinished", key, position);
 
-  // save gkeyfile to a file
+  /* Save gkeyfile to a file, if file doesn't exist it creates a new one */
   data = g_key_file_to_data (keyfile, NULL, NULL);
   file = fopen (path, "w");
   fputs (data, file);
@@ -147,6 +152,8 @@ add_uri_unfinished_playback (GstEngine * engine, gchar * uri, gint64 position)
   return TRUE;
 }
 
+
+/* Discover URI's properties: duration and dimensions */
 gboolean
 discover (GstEngine * engine, gchar * uri)
 {
@@ -159,6 +166,7 @@ discover (GstEngine * engine, gchar * uri)
   GList *list;
   GstPlayFlags flags;
 
+  /* new GST Discoverer */
   dc = gst_discoverer_new (timeout * GST_SECOND, &error);
   if (G_UNLIKELY (error)) {
     g_error ("Error in GST Discoverer initializing: %s\n", error->message);
@@ -166,26 +174,31 @@ discover (GstEngine * engine, gchar * uri)
     return FALSE;
   }
 
+  /* Discover URI */
   info = gst_discoverer_discover_uri (dc, uri, &error);
   if (G_UNLIKELY (error)) {
     g_error ("Error discovering URI: %s\n", error->message);
     g_error_free (error);
     return FALSE;
   }
+  /* Check if it has a video stream */
   list = gst_discoverer_info_get_video_streams (info);
   engine->has_video = (g_list_length (list) > 0);
   gst_discoverer_stream_info_list_free (list);
 
+  /* Check if it has an audio stream */
   list = gst_discoverer_info_get_audio_streams (info);
   engine->has_audio = (g_list_length (list) > 0);
   gst_discoverer_stream_info_list_free (list);
 
+  /* If it has any stream, get duration */
   if (engine->has_video || engine->has_audio)
     engine->media_duration = gst_discoverer_info_get_duration (info);
 
   // g_print ("Found video %d, audio %d\n", engine->has_video,
   //     engine->has_audio);
 
+  /* If it has video stream, get dimensions */
   if (engine->has_video) {
     list = gst_discoverer_info_get_video_streams (info);
     v_info = (GstDiscovererVideoInfo *) list->data;
@@ -195,6 +208,7 @@ discover (GstEngine * engine, gchar * uri)
     // g_print ("Found video dimensions: %dx%d\n", engine->media_width,
     //     engine->media_height);
   } else {
+    /* If only audio stream, play visualizations */
     g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
     g_object_set (G_OBJECT (engine->player), "flags",
         flags | GST_PLAY_FLAG_VIS, NULL);
@@ -205,6 +219,8 @@ discover (GstEngine * engine, gchar * uri)
   return TRUE;
 }
 
+
+/* Check if URI is in the unfinished playback list */
 gint64
 is_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 {
@@ -220,10 +236,11 @@ is_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   hash_key = g_str_hash (uri);
   key = g_strdup_printf ("%d", hash_key);
 
-  // config file path
+  /* Config file path */
   config_dir = g_get_user_config_dir ();
   path = g_strdup_printf ("%s/snappy/history", config_dir);
 
+  /* If URI hash key is in the list, load position */
   if (g_key_file_load_from_file (keyfile, path, flags, NULL))
     if (g_key_file_has_group (keyfile, "unfinished"))
       if (g_key_file_has_key (keyfile, "unfinished", key, NULL))
@@ -235,6 +252,8 @@ is_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   return position;
 }
 
+
+/*    Remove URI from unfinished playback list   */
 gboolean
 remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 {
@@ -250,15 +269,15 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   hash_key = g_str_hash (uri);
   key = g_strdup_printf ("%d", hash_key);
 
-  // config file path
+  /* Config file path */
   config_dir = g_get_user_config_dir ();
   path = g_strdup_printf ("%s/snappy/history", config_dir);
 
-  // remove key if gkeyfile exists
+  /* Remove key from history file */
   if (g_key_file_load_from_file (keyfile, path, flags, NULL))
     g_key_file_remove_key (keyfile, "unfinished", key, NULL);
 
-  // save gkeyfile to a file
+  /* Save gkeyfile to a file */
   data = g_key_file_to_data (keyfile, NULL, NULL);
   file = fopen (path, "w");
   fputs (data, file);
@@ -272,6 +291,8 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 
 /* -------------------- non-static functions --------------------- */
 
+
+/*           Add URI to uninished list           */
 gboolean
 add_uri_unfinished (GstEngine * engine)
 {
@@ -283,6 +304,8 @@ add_uri_unfinished (GstEngine * engine)
   return TRUE;
 }
 
+
+/*     Check if playback is at End of Stream     */
 gboolean
 at_the_eos (GstEngine * engine)
 {
@@ -296,6 +319,8 @@ at_the_eos (GstEngine * engine)
   return ret;
 }
 
+
+/*          Gstreamer pipeline bus call          */
 gboolean
 bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 {
@@ -305,10 +330,12 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
   switch (GST_MESSAGE_TYPE (msg)) {
     case GST_MESSAGE_EOS:
       g_debug ("End-of-stream\n");
+      /* When URI is finished remove from unfinished list */
       remove_uri_unfinished_playback (engine, engine->uri);
       break;
     case GST_MESSAGE_ERROR:
     {
+      /* Parse and share Gst Error */
       gchar *debug = NULL;
       GError *err = NULL;
 
@@ -329,9 +356,11 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       GstState old, new, pending;
       gst_message_parse_state_changed (msg, &old, &new, &pending);
       if (new == GST_STATE_PLAYING) {
+        /* If loading file */
         if (!engine->has_started) {
           gint64 position;
 
+          /* Check if URI was left unfinished, if so seek to last position */
           position = is_uri_unfinished_playback (engine, engine->uri);
           if (position != -1) {
             engine_seek (engine, position);
@@ -357,6 +386,8 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
   return TRUE;
 }
 
+
+/*            Init GstEngine variables           */
 gboolean
 engine_init (GstEngine * engine, GstElement * sink)
 {
@@ -375,12 +406,14 @@ engine_init (GstEngine * engine, GstElement * sink)
 
   engine->uri = NULL;
 
+  /* Make playbin2 element */
   engine->player = gst_element_factory_make ("playbin2", "playbin2");
   if (engine->player == NULL) {
     g_print ("ERROR: Failed to create playbin element\n");
     return FALSE;
   }
 
+  /* Set Clutter texture as playbin2's videos sink */
   engine->sink = sink;
   g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
   engine->bus = gst_pipeline_get_bus (GST_PIPELINE (engine->player));
@@ -388,13 +421,15 @@ engine_init (GstEngine * engine, GstElement * sink)
   return TRUE;
 }
 
+
+/*               Load URI to engine              */
 gboolean
 engine_load_uri (GstEngine * engine, gchar * uri)
 {
   engine->uri = uri;
   g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
 
-  /* loading a new URI means we haven't started playing this URI yet */
+  /* Loading a new URI means we haven't started playing this URI yet */
   engine->has_started = FALSE;
 
   g_print ("Loading: %s\n", uri);
@@ -404,15 +439,20 @@ engine_load_uri (GstEngine * engine, gchar * uri)
   return TRUE;
 }
 
+
+/*               Open Uri in engine              */
 gboolean
 engine_open_uri (GstEngine * engine, gchar * uri)
 {
   g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
+  /* Need to set back to Ready state so Playbin2 loads uri */
   gst_element_set_state (engine->player, GST_STATE_READY);
 
   return TRUE;
 }
 
+
+/*                  Set to Playing               */
 gboolean
 engine_play (GstEngine * engine)
 {
@@ -423,6 +463,8 @@ engine_play (GstEngine * engine)
   return TRUE;
 }
 
+
+/*            Seek engine to position            */
 gboolean
 engine_seek (GstEngine * engine, gint64 position)
 {
@@ -433,6 +475,8 @@ engine_seek (GstEngine * engine, gint64 position)
   return TRUE;
 }
 
+
+/*                 Stop playback                 */
 gboolean
 engine_stop (GstEngine * engine)
 {
@@ -442,6 +486,8 @@ engine_stop (GstEngine * engine)
   return TRUE;
 }
 
+
+/*                   Set volume                  */
 gboolean
 engine_volume (GstEngine * engine, gdouble level)
 {
@@ -450,6 +496,8 @@ engine_volume (GstEngine * engine, gdouble level)
   return TRUE;
 }
 
+
+/*       Move one step foward or backwards       */
 gboolean
 frame_stepping (GstEngine * engine, gboolean foward)
 {
@@ -458,10 +506,12 @@ frame_stepping (GstEngine * engine, gboolean foward)
   gdouble rate;
   GstFormat fmt;
 
+  /* Continue if previous frame step is done */
   if (engine->prev_done) {
     engine->prev_done = FALSE;
 
     if (foward != engine->direction_foward) {
+      /* Change of direction needed */
       engine->direction_foward = foward;
 
       fmt = GST_FORMAT_TIME;
@@ -473,6 +523,7 @@ frame_stepping (GstEngine * engine, gboolean foward)
       else
         rate = -1.0;
 
+      /* Seek with current position and reverse rate */
       if (rate >= 0.0) {
         ok = gst_element_seek (engine->player, rate, fmt,
             GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE,
@@ -485,6 +536,7 @@ frame_stepping (GstEngine * engine, gboolean foward)
       gst_element_get_state (engine->player, NULL, NULL, GST_SECOND);
     }
 
+    /* Send new step event */
     fmt = GST_FORMAT_BUFFERS;
     gst_element_send_event (engine->player,
         gst_event_new_step (fmt, 1, 1.0, TRUE, FALSE));
@@ -493,6 +545,8 @@ frame_stepping (GstEngine * engine, gboolean foward)
   return FALSE;
 }
 
+
+/*            Get recently played URIs           */
 gchar **
 get_recently_played ()
 {
@@ -506,10 +560,11 @@ get_recently_played ()
   keyfile = g_key_file_new ();
   flags = G_KEY_FILE_KEEP_COMMENTS;
 
-  // config file path
+  /* Config file path */
   config_dir = g_get_user_config_dir ();
   path = g_strdup_printf ("%s/snappy/history", config_dir);
 
+  /* Get keys */
   if (g_key_file_load_from_file (keyfile, path, flags, NULL))
     if (g_key_file_has_group (keyfile, "history"))
       recent = g_key_file_get_keys (keyfile, "history", &length, NULL);
@@ -517,6 +572,8 @@ get_recently_played ()
   return recent;
 }
 
+
+/*               Get pipeline state              */
 GstState
 get_state (GstEngine * engine)
 {
@@ -526,6 +583,8 @@ get_state (GstEngine * engine)
   return state;
 }
 
+
+/*             Query playback position           */
 gint64
 query_position (GstEngine * engine)
 {
@@ -536,6 +595,8 @@ query_position (GstEngine * engine)
   return position;
 }
 
+
+/*             Change pipeline state             */
 gboolean
 change_state (GstEngine * engine, gchar * state)
 {
@@ -558,6 +619,8 @@ change_state (GstEngine * engine, gchar * state)
   return TRUE;
 }
 
+
+/*          Update duration of URI streams       */
 gboolean
 update_media_duration (GstEngine * engine)
 {
