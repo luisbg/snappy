@@ -5,7 +5,7 @@ Common
 
 - Key controls configurable through a ~/.config/ file.
 
-- Display playback time/date of history files.
+- Display playback date of history files.
 
 UI
 --
@@ -13,15 +13,8 @@ UI
 - ncurses based interface, for entirely command line base control.
   - example use case: controlled through ssh
 
-- Fix the positions of the bottom part of the controls (volume & stream position).
-
-- Load UI with visualizations when media is a music file.
-
 - Clean up controls
-  - Vertically centre play/pause button
-  - Vertically centre seek bar
-  - Make UI theme borders thinner and sleeker
-  - Make UI fonts thinner but still appropriately large for distance-viewing
+  - Space between volume controls and position
 
 - Single playback or loop mode button
 
@@ -29,8 +22,6 @@ UI
 
 Engine
 ------
-
-- GUPnP media server.
 
 - Handle playlists.
 
@@ -43,3 +34,5 @@ Engine
 - gst-launch-esque pipeline handling
 
 - support for picture files
+
+- buffering modes
