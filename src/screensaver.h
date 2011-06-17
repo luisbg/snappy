@@ -1,5 +1,5 @@
 /*
- * snappy - 0.1 beta
+ * snappy - 0.2
  *
  * Copyright (C) 2011 Collabora Multimedia Ltd.
  * <sebastian.droege@collabora.co.uk>

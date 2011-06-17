@@ -1,5 +1,5 @@
 /*
- * snappy - 0.2 beta
+ * snappy - 0.2
  *
  * Copyright (C) 2011 Collabora Multimedia Ltd.
  * <luis.debethencourt@collabora.com>
@@ -20,7 +20,7 @@
  * USA
  */
 
-#define VERSION "0.2 beta"
+#define VERSION "0.2"
 
 #include <stdlib.h>
 #include <unistd.h>
