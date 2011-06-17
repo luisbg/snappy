@@ -25,6 +25,7 @@
 
 #include "user_interface.h"
 #include "gst_engine.h"
+#include "utils.h"
 
 #define SAVE_POSITION_MIN_DURATION 300 * 1000   // don't save >5 minute files
 #define SAVE_POSITION_THRESHOLD 0.05    // percentage threshold
@@ -54,7 +55,7 @@ add_uri_to_history (gchar * uri)
 {
   gboolean ret;
   const gchar *config_dir;
-  gchar *path, *data, *key;
+  gchar *path, *data, *clean_uri;
   gchar **history_keys;
   gsize length, max = 50;
   FILE *file;
@@ -68,10 +69,13 @@ add_uri_to_history (gchar * uri)
   config_dir = g_get_user_config_dir ();
   path = g_strdup_printf ("%s/snappy/history", config_dir);
 
+  /* Keynames can't include brackets */
+  clean_uri = clean_brackets_in_uri (uri);
+
   if (g_key_file_load_from_file (keyfile, path, flags, NULL)) {
     /* Set uri in history */
     if (g_key_file_has_group (keyfile, "history")) {
-      if (!g_key_file_has_key (keyfile, "history", uri, NULL)) {
+      if (!g_key_file_has_key (keyfile, "history", clean_uri, NULL)) {
         /* Uri is not already in history */
         history_keys = g_key_file_get_keys (keyfile, "history", &length, NULL);
 
@@ -82,10 +86,10 @@ add_uri_to_history (gchar * uri)
       }
     } else {
       /* If group "history" doesn't exist create it and populate it */
-      g_key_file_set_boolean (keyfile, "history", uri, TRUE);
+      g_key_file_set_boolean (keyfile, "history", clean_uri, TRUE);
     }
 
-    g_key_file_set_int64 (keyfile, "history", uri, g_get_real_time ());
+    g_key_file_set_int64 (keyfile, "history", clean_uri, g_get_real_time());
 
     /* Save gkeyfile to a file  */
     data = g_key_file_to_data (keyfile, NULL, NULL);

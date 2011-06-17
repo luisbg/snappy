@@ -26,7 +26,8 @@
 G_BEGIN_DECLS
 
 gchar * cut_long_filename (gchar * filename, gint length);
-gchar *clean_uri (gchar * input_arg);
+gchar * clean_uri (gchar * input_arg);
+gchar * clean_brackets_in_uri (gchar * uri);
 
 G_END_DECLS
 #endif /* __UTILS_H__ */

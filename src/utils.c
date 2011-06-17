@@ -63,3 +63,20 @@ clean_uri (gchar * input_arg)
 
   return filepath;
 }
+
+gchar *
+clean_brackets_in_uri (gchar * uri)
+{
+  gchar *clean_uri;
+  gchar **split;
+
+  split = g_strsplit (uri, "[", 0);
+  clean_uri = g_strjoinv (NULL, split);
+  g_strfreev (split);
+  split = g_strsplit (clean_uri, "]", 0);
+  g_free (clean_uri);
+  clean_uri = g_strjoinv (NULL, split);
+  g_strfreev (split);
+
+  return clean_uri;
+}
