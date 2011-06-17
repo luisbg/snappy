@@ -90,6 +90,9 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
   switch (event->type) {
     case CLUTTER_KEY_PRESS:
     {
+      /* Clutter key codes based on */
+      /* http://cgit.freedesktop.org/xorg/proto/x11proto/plain/keysymdef.h */
+
       ClutterVertex center = { 0, };
       ClutterAnimation *animation = NULL;
 
@@ -155,6 +158,8 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_Down:
         case CLUTTER_Left:
         case CLUTTER_Right:
+        case CLUTTER_Page_Up:
+        case CLUTTER_Page_Down:
         {
           gint64 pos, second;
           gfloat progress;
@@ -162,22 +167,30 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           pos = query_position (ui->engine);
           second = ui->engine->second;
 
-          // Seek 1 minute foward
           if (keyval == CLUTTER_Up) {
+	    // Seek 1 minute foward
             pos += 60 * second;
 
-            // Seek 1 minute back
           } else if (keyval == CLUTTER_Down) {
+	    // Seek 1 minute back
             pos -= 60 * second;
 
-            // Seek 10 seconds back
+          } else if (keyval == CLUTTER_Right) {
+            // Seek 10 seconds foward
+            pos += 10 * second;
+
           } else if (keyval == CLUTTER_Left) {
+	    // Seek 10 seconds back
             pos -= 10 * second;
 
-            // Seek 10 seconds foward
-          } else if (keyval == CLUTTER_Right) {
-            pos += 10 * second;
-          }
+          } else if (keyval == CLUTTER_Page_Up) {
+	    // Seek 10 minutes foward
+	    pos += 600 * second;
+
+	  } else if (keyval == CLUTTER_Page_Down) {
+	    // Seek 10 minutes back
+	    pos -= 600 * second;
+	  }
 
           /* clamp the timestamp to be within the media */
           pos = CLAMP (pos, 0, ui->engine->media_duration);
