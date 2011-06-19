@@ -57,7 +57,7 @@ close_down (UserInterface * ui, GstEngine * engine)
 /*           Process command arguments           */
 gboolean
 process_args (int argc, char *argv[],
-    gchar * file_list[], gboolean * fullscreen, GOptionContext * context)
+    gchar * file_list[], gboolean * fullscreen, gboolean * secret, GOptionContext * context)
 {
   gboolean recent = FALSE, version = FALSE;
   guint c, index, pos = 0;
@@ -65,9 +65,11 @@ process_args (int argc, char *argv[],
     {"fullscreen", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, fullscreen,
         "Fullscreen mode", NULL},
     {"recent", 'r', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &recent,
-        "Recently viewed", NULL},
+        "Show recently viewed", NULL},
+    {"secret", 's', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, secret,
+        "Views not saved in recently viewed history", NULL},
     {"version", 'v', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &version,
-        "Print version", NULL},
+        "Shows snappy's version", NULL},
     {NULL}
   };
   GError *err = NULL;
@@ -137,7 +139,7 @@ main (int argc, char *argv[])
   ClutterActor *video_texture;
   GstElement *sink;
 
-  gboolean ok, fullscreen = FALSE;
+  gboolean ok, fullscreen = FALSE, secret = FALSE;
   gint ret = 0;
   guint c, index, pos = 0;
   gchar *fileuri, *uri;
@@ -150,7 +152,7 @@ main (int argc, char *argv[])
   context = g_option_context_new ("<media file> - Play movie files");
 
   /* Process command arguments */
-  ok = process_args (argc, argv, file_list, &fullscreen, context);
+  ok = process_args (argc, argv, file_list, &fullscreen, &secret, context);
   if (!ok)
     goto quit;
 
@@ -164,6 +166,7 @@ main (int argc, char *argv[])
 
   /* Gstreamer engine */
   engine = g_new (GstEngine, 1);
+  engine->secret = secret;
 
   sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (video_texture));
 

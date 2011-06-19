@@ -372,7 +372,10 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
             engine_seek (engine, position);
           }
 
-          add_uri_to_history (engine->uri);
+          if (!engine->secret)
+            add_uri_to_history (engine->uri);
+          else
+            g_print ("Secret mode. Not saving uri in history.\n");
 
           interface_update_controls (ui);
           engine->has_started = TRUE;
