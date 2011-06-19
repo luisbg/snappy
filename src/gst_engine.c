@@ -51,7 +51,7 @@ typedef enum
 /* -------------------- static functions --------------------- */
 
 
-/*         Add URI to recently played list       */
+/*         Add URI to recently viewed list       */
 gboolean
 add_uri_to_history (gchar * uri)
 {
@@ -552,9 +552,9 @@ frame_stepping (GstEngine * engine, gboolean foward)
 }
 
 
-/*            Get recently played URIs           */
+/*            Get recently viewed URIs           */
 gchar **
-get_recently_played ()
+get_recently_viewed ()
 {
   const gchar *config_dir;
   gchar *path;

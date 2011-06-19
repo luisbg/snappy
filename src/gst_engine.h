@@ -59,7 +59,7 @@ gboolean engine_seek (GstEngine * engine, gint64 position);
 gboolean engine_stop (GstEngine * engine);
 gboolean engine_volume (GstEngine * engine, gdouble level);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);
-gchar **get_recently_played ();
+gchar **get_recently_viewed ();
 GstState get_state (GstEngine * engine);
 gint64 query_position (GstEngine * engine);
 gboolean change_state (GstEngine * engine, gchar * state);
