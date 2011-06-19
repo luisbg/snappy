@@ -91,7 +91,7 @@ add_uri_to_history (gchar * uri)
       g_key_file_set_boolean (keyfile, "history", clean_uri, TRUE);
     }
 
-    g_key_file_set_int64 (keyfile, "history", clean_uri, g_get_real_time());
+    g_key_file_set_int64 (keyfile, "history", clean_uri, g_get_real_time ());
 
     /* Save gkeyfile to a file  */
     data = g_key_file_to_data (keyfile, NULL, NULL);

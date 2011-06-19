@@ -168,11 +168,11 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           second = ui->engine->second;
 
           if (keyval == CLUTTER_Up) {
-	    // Seek 1 minute foward
+            // Seek 1 minute foward
             pos += 60 * second;
 
           } else if (keyval == CLUTTER_Down) {
-	    // Seek 1 minute back
+            // Seek 1 minute back
             pos -= 60 * second;
 
           } else if (keyval == CLUTTER_Right) {
@@ -180,17 +180,17 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
             pos += 10 * second;
 
           } else if (keyval == CLUTTER_Left) {
-	    // Seek 10 seconds back
+            // Seek 10 seconds back
             pos -= 10 * second;
 
           } else if (keyval == CLUTTER_Page_Up) {
-	    // Seek 10 minutes foward
-	    pos += 600 * second;
+            // Seek 10 minutes foward
+            pos += 600 * second;
 
-	  } else if (keyval == CLUTTER_Page_Down) {
-	    // Seek 10 minutes back
-	    pos -= 600 * second;
-	  }
+          } else if (keyval == CLUTTER_Page_Down) {
+            // Seek 10 minutes back
+            pos -= 600 * second;
+          }
 
           /* clamp the timestamp to be within the media */
           pos = CLAMP (pos, 0, ui->engine->media_duration);
@@ -386,9 +386,7 @@ load_controls (UserInterface * ui)
     error = NULL;
   }
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
-      ui->control_play_toggle,
-      FALSE,        			/* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->control_play_toggle, FALSE,        /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
@@ -407,9 +405,7 @@ load_controls (UserInterface * ui)
       cut_long_filename (ui->filename, ui->title_length), &control_color1);
   clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
       ui->title_length);
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
-      ui->control_title,
-      TRUE,				       /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), ui->control_title, TRUE,       /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
@@ -500,15 +496,13 @@ load_controls (UserInterface * ui)
   clutter_box_pack (CLUTTER_BOX (bottom_box), ui->control_pos,
       "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", TRUE, NULL);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), bottom_box,
-      TRUE,						/* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), bottom_box, TRUE,      /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->info_box,
-      FALSE,					/* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->info_box, FALSE,   /* expand */
       TRUE,                     /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
@@ -805,8 +799,11 @@ update_controls_size (UserInterface * ui)
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
   text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_title));
 
-  ui->seek_width = (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO - 2.0f * SEEK_BORDER;
-  ui->seek_height = ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 2.0f * SEEK_BORDER;
+  ui->seek_width =
+      (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO -
+      2.0f * SEEK_BORDER;
+  ui->seek_height =
+      ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 2.0f * SEEK_BORDER;
 
   clutter_actor_set_size (ui->control_seek1,
       ui->seek_width + 2.0f * SEEK_BORDER,

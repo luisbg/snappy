@@ -30,22 +30,18 @@
 #include "user_interface.h"
 
 G_BEGIN_DECLS
-
 #define MPRIS_BUS_NAME_PREFIX "org.mpris.MediaPlayer2"
 #define MPRIS_OBJECT_NAME "/org/mpris/MediaPlayer2"
-
 #define MPRIS_ROOT_INTERFACE "org.mpris.MediaPlayer2"
 #define MPRIS_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
 #define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
 #define MPRIS_PLAYLISTS_INTERFACE "org.mpris.MediaPlayer2.Playlists"
-
 #define SNAPPY_TYPE_MP              (snappy_mp_get_type ())
 #define SNAPPY_MP(obj)              (G_TYPE_CHECK_INSTANCE_CAST ((obj), SNAPPY_TYPE_MP, SnappyMP))
 #define SNAPPY_IS_MP(obj)           (G_TYPE_CHECK_INSTANCE_TYPE ((obj), SNAPPY_TYPE_MP))
 #define SNAPPY_MP_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST ((klass), SNAPPY_TYPE_MP, SnappyMPClass))
 #define SNAPPY_IS_MP_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), SNAPPY_TYPE_MP))
 #define SNAPPY_MP_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS ((obj), SNAPPY_TYPE_MP, SnappyMPClass))
-
 /* The object we want to export */
 typedef struct _SnappyMP SnappyMP;
 typedef struct _SnappyMPClass SnappyMPClass;
@@ -84,7 +80,7 @@ struct _SnappyMPClass
 };
 
 /* used by SNAPPY_TYPE_MP */
-GType snappy_mp_get_type();
+GType snappy_mp_get_type ();
 
 enum
 {
@@ -93,17 +89,17 @@ enum
   PROP_NAME
 };
 
-enum {
-        OPEN_URI,
-        LAST_SIGNAL
+enum
+{
+  OPEN_URI,
+  LAST_SIGNAL
 };
 
-static guint
-mediaplayer_signals[LAST_SIGNAL] = { 0 };
+static guint mediaplayer_signals[LAST_SIGNAL] = { 0 };
 
 // Declaration of non-static functions
-gboolean load_dlna (SnappyMP *mp_obj);
-gboolean close_dlna (SnappyMP *mp_obj);
+gboolean load_dlna (SnappyMP * mp_obj);
+gboolean close_dlna (SnappyMP * mp_obj);
 
 void handle_method_call (GDBusConnection * connection,
     const gchar * sender,
@@ -113,7 +109,7 @@ void handle_method_call (GDBusConnection * connection,
     GVariant * parameters,
     GDBusMethodInvocation * invocation, SnappyMP * myobj);
 
-GVariant * handle_get_property (GDBusConnection * connection,
+GVariant *handle_get_property (GDBusConnection * connection,
     const gchar * sender,
     const gchar * object_path,
     const gchar * interface_name,
@@ -131,10 +127,9 @@ void handle_root_method_call (GDBusConnection * connection,
     const char *object_path,
     const char *interface_name,
     const char *method_name,
-    GVariant * parameters,
-    GDBusMethodInvocation * invocation, SnappyMP * mp);
+    GVariant * parameters, GDBusMethodInvocation * invocation, SnappyMP * mp);
 
-GVariant * get_root_property (GDBusConnection * connection,
+GVariant *get_root_property (GDBusConnection * connection,
     const char *sender,
     const char *object_path,
     const char *interface_name,
