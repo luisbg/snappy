@@ -91,8 +91,12 @@ process_args (int argc, char *argv[],
 
     recent = get_recently_played ();
 
-    for (c = 0; recent[c] != NULL; c++)
-      g_print ("%d: %s \n", c + 1, recent[c]);
+    for (c = 0; recent[c] != NULL; c++) {
+      if (c < 9)
+        g_print ("0%d: %s \n", c + 1, recent[c]);
+      else
+        g_print ("%d: %s \n", c + 1, recent[c]);
+    }
 
     goto quit;
   }
