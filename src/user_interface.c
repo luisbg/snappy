@@ -405,9 +405,10 @@ load_controls (UserInterface * ui)
       cut_long_filename (ui->filename, ui->title_length), &control_color1);
   clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
       ui->title_length);
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), ui->control_title, TRUE,       /* expand */
-      FALSE,                    /* x-fill */
-      FALSE,                    /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), ui->control_title,
+      TRUE,                             /* expand */
+      FALSE,                            /* x-fill */
+      FALSE,                            /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
@@ -429,9 +430,10 @@ load_controls (UserInterface * ui)
   clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
       ui->control_seekbar);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), seek_box, TRUE,        /* expand */
-      FALSE,                    /* x-fill */
-      FALSE,                    /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), seek_box,
+      TRUE,                             /* expand */
+      FALSE,                            /* x-fill */
+      FALSE,                            /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
@@ -490,21 +492,23 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_END, NULL);
 
   // Controls position text
-  duration_str = g_strdup_printf ("0:00:00/%s", ui->duration_str);
+  duration_str = g_strdup_printf ("   0:00:00/%s", ui->duration_str);
   ui->control_pos = clutter_text_new_full ("Sans 22px", duration_str,
       &control_color1);
   clutter_box_pack (CLUTTER_BOX (bottom_box), ui->control_pos,
       "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", TRUE, NULL);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), bottom_box, TRUE,      /* expand */
-      FALSE,                    /* x-fill */
-      FALSE,                    /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), bottom_box,
+      TRUE,                             /* expand */
+      FALSE,                            /* x-fill */
+      FALSE,                            /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->info_box, FALSE,   /* expand */
-      TRUE,                     /* x-fill */
-      FALSE,                    /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->info_box,
+      FALSE,                            /* expand */
+      TRUE,                             /* x-fill */
+      FALSE,                            /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
@@ -568,7 +572,7 @@ progress_update_text (gpointer data)
     gint64 pos;
 
     pos = query_position (ui->engine);
-    duration_str = g_strdup_printf ("%s/%s", position_ns_to_str (pos),
+    duration_str = g_strdup_printf ("   %s/%s", position_ns_to_str (pos),
         ui->duration_str);
     clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
   }
