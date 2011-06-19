@@ -30,6 +30,8 @@
 #define SAVE_POSITION_MIN_DURATION 300 * 1000   // don't save >5 minute files
 #define SAVE_POSITION_THRESHOLD 0.05    // percentage threshold
 
+#define RECENTLY_VIEWED_MAX 50
+
 // GstPlayFlags flags from playbin2. It is the policy of GStreamer to
 // not publicly expose element-specific enums. That's why this
 // GstPlayFlags enum has been copied here.
@@ -57,7 +59,7 @@ add_uri_to_history (gchar * uri)
   const gchar *config_dir;
   gchar *path, *data, *clean_uri;
   gchar **history_keys;
-  gsize length, max = 50;
+  gsize length;
   FILE *file;
   GKeyFile *keyfile;
   GKeyFileFlags flags;
@@ -79,7 +81,7 @@ add_uri_to_history (gchar * uri)
         /* Uri is not already in history */
         history_keys = g_key_file_get_keys (keyfile, "history", &length, NULL);
 
-        if (length >= max) {
+        if (length >= RECENTLY_VIEWED_MAX) {
           /* Remove first uri of the list */
           g_key_file_remove_key (keyfile, "history", history_keys[0], NULL);
         }
