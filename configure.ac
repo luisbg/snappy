@@ -13,7 +13,7 @@ AM_CONFIG_HEADER([config.h])
 AC_CONFIG_AUX_DIR([build-aux])
 
 dnl initialize automake
-AM_INIT_AUTOMAKE([1.9 dist-bzip2 no-dist-gzip])
+AM_INIT_AUTOMAKE([1.11.1 no-dist-gzip dist-xz dist-bzip2 tar-ustar])
 
 dnl use pretty build output with automake >= 1.11
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])],

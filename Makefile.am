@@ -6,7 +6,7 @@ SUBDIRS = 		\
 DIST_SUBDIRS = $(SUBDIRS)
 
 EXTRA_DIST = \
-	ChangeLog autogen.sh depcomp \
+	ChangeLog autogen.sh \
 	AUTHORS COPYING NEWS README
 
 pkgconfigdir = $(libdir)pkgconfig
