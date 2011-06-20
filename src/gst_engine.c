@@ -338,6 +338,10 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       g_debug ("End-of-stream\n");
       /* When URI is finished remove from unfinished list */
       remove_uri_unfinished_playback (engine, engine->uri);
+
+      if (engine->loop)
+        engine_seek (engine, 0);
+
       break;
     case GST_MESSAGE_ERROR:
     {
@@ -388,6 +392,11 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     {
       engine->prev_done = TRUE;
     }
+    case GST_MESSAGE_SEGMENT_DONE:
+    {
+      if (engine->loop)
+        engine_seek (engine, 0);
+    }
     default:
       break;
   }
@@ -407,6 +416,8 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->has_started = FALSE;
   engine->has_video = FALSE;
   engine->has_audio = FALSE;
+  engine->loop = FALSE;
+  engine->secret = FALSE;
 
   engine->media_width = 600;
   engine->media_height = 400;
@@ -479,7 +490,9 @@ engine_seek (GstEngine * engine, gint64 position)
 {
   GstFormat fmt = GST_FORMAT_TIME;
 
-  gst_element_seek_simple (engine->player, fmt, GST_SEEK_FLAG_FLUSH, position);
+  gst_element_seek_simple (engine->player, fmt,
+      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
+      position);
 
   return TRUE;
 }

@@ -34,6 +34,7 @@ struct _GstEngine
   gboolean playing, direction_foward, prev_done;
   gboolean has_started;
   gboolean has_video, has_audio;
+  gboolean loop;
   gboolean secret;
 
   guint media_width, media_height;

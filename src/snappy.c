@@ -57,13 +57,16 @@ close_down (UserInterface * ui, GstEngine * engine)
 /*           Process command arguments           */
 gboolean
 process_args (int argc, char *argv[],
-    gchar * file_list[], gboolean * fullscreen, gboolean * secret, GOptionContext * context)
+    gchar * file_list[], gboolean * fullscreen, gboolean * secret,
+    gboolean * loop, GOptionContext * context)
 {
   gboolean recent = FALSE, version = FALSE;
   guint c, index, pos = 0;
   GOptionEntry entries[] = {
     {"fullscreen", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, fullscreen,
         "Fullscreen mode", NULL},
+    {"loop", 'l', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, loop,
+        "Looping mode", NULL},
     {"recent", 'r', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &recent,
         "Show recently viewed", NULL},
     {"secret", 's', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, secret,
@@ -139,7 +142,7 @@ main (int argc, char *argv[])
   ClutterActor *video_texture;
   GstElement *sink;
 
-  gboolean ok, fullscreen = FALSE, secret = FALSE;
+  gboolean ok, fullscreen = FALSE, loop = FALSE, secret = FALSE;
   gint ret = 0;
   guint c, index, pos = 0;
   gchar *fileuri, *uri;
@@ -152,7 +155,8 @@ main (int argc, char *argv[])
   context = g_option_context_new ("<media file> - Play movie files");
 
   /* Process command arguments */
-  ok = process_args (argc, argv, file_list, &fullscreen, &secret, context);
+  ok = process_args (argc, argv, file_list, &fullscreen, &secret, &loop,
+      context);
   if (!ok)
     goto quit;
 
@@ -166,13 +170,13 @@ main (int argc, char *argv[])
 
   /* Gstreamer engine */
   engine = g_new (GstEngine, 1);
-  engine->secret = secret;
-
   sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (video_texture));
-
   ok = engine_init (engine, sink);
   if (!ok)
     goto quit;
+
+  engine->secret = secret;
+  engine->loop = loop;
 
   ui->engine = engine;
   ui->texture = video_texture;
