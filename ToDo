@@ -3,7 +3,7 @@ Common
 
 - Port to Windows and Mac OS X.
 
-- Key controls configurable through a ~/.config/ file.
+- Key controls configurable through a ~/.config/ file
 
 - Display playback date of history files.
 
@@ -13,17 +13,18 @@ UI
 - ncurses based interface, for entirely command line base control.
   - example use case: controlled through ssh
 
-- Clean up controls
-  - Space between volume controls and position
-
 - Single playback or loop mode button
 
 - Playback In/Out points
 
+- Working rotated video aspect ratio for the all positions
+
 Engine
 ------
 
-- Handle playlists.
+- Support subtitles
+
+- Handle playlists
 
 - Change speed of playback
 
