@@ -101,24 +101,39 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
       switch (keyval) {
         case CLUTTER_q:
         case CLUTTER_Escape:
+        {
           clutter_main_quit ();
+
+	  handled = TRUE;
           break;
+        }
+
         case CLUTTER_f:
+        {
           // Fullscreen button
           toggle_fullscreen (ui);
+
           handled = TRUE;
           break;
+        }
+
         case CLUTTER_space:
+        {
           // Spacebar
           toggle_playing (ui);
+
           handled = TRUE;
           break;
+        }
+
         case CLUTTER_l:
         {
           ui->engine->loop = !ui->engine->loop;
 
+	  handled = TRUE;
           break;
         }
+
         case CLUTTER_8:
         {
           // Mute button
@@ -127,9 +142,9 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
           g_object_get (G_OBJECT (ui->engine->player), "mute", &muteval, NULL);
           g_object_set (G_OBJECT (ui->engine->player), "mute", !muteval, NULL);
-          handled = TRUE;
           update_volume (ui, volume);
 
+          handled = TRUE;
           break;
         }
 
@@ -156,6 +171,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           }
 
           update_volume (ui, volume);
+
           handled = TRUE;
           break;
         }
@@ -211,13 +227,18 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           handled = TRUE;
           break;
         }
+
         case CLUTTER_r:
+        {
           // rotate texture 90 degrees.
           rotate_video (ui);
+
           handled = TRUE;
           break;
+        }
 
         case CLUTTER_c:
+        {
           // show or hide controls
           penalty_box (ui);
           ui->keep_showing_controls = !ui->controls_showing;
@@ -225,18 +246,31 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
           handled = TRUE;
           break;
+        }
+
         case CLUTTER_period:
+        {
           frame_stepping (ui->engine, TRUE);
+
           handled = TRUE;
           break;
+        }
+
         case CLUTTER_comma:
+        {
           frame_stepping (ui->engine, FALSE);
+
           handled = TRUE;
           break;
+        }
+
         default:
+        {
           handled = FALSE;
           break;
+        }
       }
+
       break;
     }
 
@@ -298,6 +332,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           }
         }
       }
+
       handled = TRUE;
       break;
     }
@@ -306,6 +341,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
     {
       if (!ui->penalty_box_active)
         show_controls (ui, TRUE);
+
       handled = TRUE;
       break;
     }
