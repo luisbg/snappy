@@ -113,6 +113,12 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           toggle_playing (ui);
           handled = TRUE;
           break;
+        case CLUTTER_l:
+        {
+          ui->engine->loop = !ui->engine->loop;
+
+          break;
+        }
         case CLUTTER_8:
         {
           // Mute button
@@ -386,9 +392,11 @@ load_controls (UserInterface * ui)
     error = NULL;
   }
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->control_play_toggle, FALSE,        /* expand */
-      FALSE,                    /* x-fill */
-      FALSE,                    /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
+      ui->control_play_toggle,
+      FALSE,                            /* expand */
+      FALSE,                            /* x-fill */
+      FALSE,                            /* y-fill */
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
   clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
@@ -405,7 +413,8 @@ load_controls (UserInterface * ui)
       cut_long_filename (ui->filename, ui->title_length), &control_color1);
   clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
       ui->title_length);
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), ui->control_title,
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
+      ui->control_title,
       TRUE,                             /* expand */
       FALSE,                            /* x-fill */
       FALSE,                            /* y-fill */
