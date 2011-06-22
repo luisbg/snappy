@@ -12,12 +12,29 @@ ui->control_box (fixed alignment bin)
 			ui->control_title
 			seek_box (fixed alignment bin)
 			[
+				ui->in_point
 				ui->control_seek1
 				ui->control_seek2
 				ui->control_seekbar
+				ui->out_point
 			]
 
-                        ui->control_pos
+			bottom_box (horizontal alignment box)
+			[
+				volume_box (horizontal alignment box)
+				[
+					ui->volume_low
+					volume_intensity (fixed alignment bin)
+					[
+						ui->vol_int
+						ui->vol_int_bg
+					]
+
+					ui->volume_high
+				]
+
+				ui->control_pos
+			]
 		]
 	]
 ]
