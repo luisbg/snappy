@@ -342,7 +342,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       remove_uri_unfinished_playback (engine, engine->uri);
 
       if (engine->loop)
-        engine_seek (engine, 0);
+        engine_seek (engine, engine->in_point, TRUE);
 
       break;
     case GST_MESSAGE_ERROR:
@@ -375,7 +375,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
           /* Check if URI was left unfinished, if so seek to last position */
           position = is_uri_unfinished_playback (engine, engine->uri);
           if (position != -1) {
-            engine_seek (engine, position);
+            engine_seek (engine, engine->in_point, TRUE);
           }
 
           if (!engine->secret)
@@ -397,7 +397,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     case GST_MESSAGE_SEGMENT_DONE:
     {
       if (engine->loop)
-        engine_seek (engine, 0);
+        engine_seek (engine, engine->in_point, TRUE);
     }
     default:
       break;
@@ -491,13 +491,24 @@ engine_play (GstEngine * engine)
 
 /*            Seek engine to position            */
 gboolean
-engine_seek (GstEngine * engine, gint64 position)
+engine_seek (GstEngine * engine, gint64 position, gboolean current)
 {
   GstFormat fmt = GST_FORMAT_TIME;
 
-  gst_element_seek_simple (engine->player, fmt,
-      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
-      position);
+  if (current) {
+    if (position > engine->out_point) {
+      engine->in_point = 0;
+      engine->out_point = engine->media_duration;
+    }
+
+    gst_element_seek (engine->player, 1.0, fmt,
+        GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
+        GST_SEEK_TYPE_SET, position, GST_SEEK_TYPE_SET, engine->out_point);
+  } else {
+    gst_element_seek (engine->player, 1.0, fmt,
+        GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
+        GST_SEEK_TYPE_SET, engine->in_point, GST_SEEK_TYPE_SET, position);
+  }
 
   return TRUE;
 }

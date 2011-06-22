@@ -217,7 +217,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           /* clamp the timestamp to be within the media */
           pos = CLAMP (pos, 0, ui->engine->media_duration);
 
-          engine_seek (ui->engine, pos);
+          engine_seek (ui->engine, pos, TRUE);
 
           progress = (float) pos / ui->engine->media_duration;
           clutter_actor_set_size (ui->control_seekbar,
@@ -230,7 +230,12 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         case CLUTTER_i:
         {
-	  ui->engine->in_point = query_position (ui->engine);
+	  // set in point for segment
+	  gint64 in_point;
+
+	  in_point = query_position (ui->engine);
+	  ui->engine->in_point = in_point;
+	  engine_seek (ui->engine, in_point, TRUE);
 
 	  handled = TRUE;
 	  break;
@@ -238,7 +243,12 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         case CLUTTER_o:
         {
-	  ui->engine->out_point = query_position (ui->engine);
+	  // set out point for segment
+	  gint64 out_point;
+
+	  out_point = query_position (ui->engine);
+	  ui->engine->out_point = out_point;
+	  engine_seek (ui->engine, out_point, FALSE);
 
 	  handled = TRUE;
 	  break;
@@ -315,7 +325,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           }
 
           progress = ui->engine->media_duration * (dist / ui->seek_width);
-          engine_seek (ui->engine, progress);
+          engine_seek (ui->engine, progress, TRUE);
           clutter_actor_set_size (ui->control_seekbar, dist, ui->seek_height);
           progress_update_text (ui);
 

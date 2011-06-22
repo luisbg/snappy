@@ -292,7 +292,7 @@ handle_method_call (GDBusConnection * connection,
     relative = offset / 100000000.0;
     position = myobj->engine->media_duration * relative;
     // g_print ("offset: %ld    relative: %f", offset, relative);
-    engine_seek (myobj->engine, position);
+    engine_seek (myobj->engine, position, TRUE);
 
     handle_result (invocation, ret, error);
 
