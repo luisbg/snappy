@@ -381,7 +381,7 @@ load_controls (UserInterface * ui)
 {
   // Check icon files exist
   gchar *vid_panel_png;
-  gchar *icon_files[5];
+  gchar *icon_files[6];
   gchar *duration_str;
   gint c;
   ClutterColor control_color1 = { 0x12, 0x12, 0x12, 0xff };
@@ -407,14 +407,17 @@ load_controls (UserInterface * ui)
       "/audio-volume-low.png");
   ui->volume_high_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
       "/audio-volume-high.png");
+  ui->segment_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
+      "/media-actions-in_point.png");
 
   icon_files[0] = vid_panel_png;
   icon_files[1] = ui->play_png;
   icon_files[2] = ui->pause_png;
   icon_files[3] = ui->volume_low_png;
   icon_files[4] = ui->volume_high_png;
+  icon_files[5] = ui->segment_png;
 
-  for (c = 0; c < 5; c++) {
+  for (c = 0; c < 6; c++) {
     if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS)) {
       g_print ("Icon file doesn't exist, are you sure you have "
           " installed snappy correctly?\nThis file needed is: %s\n",
@@ -488,6 +491,16 @@ load_controls (UserInterface * ui)
       CLUTTER_BIN_ALIGNMENT_FIXED);
   seek_box = clutter_box_new (seek_box_layout);
 
+  // In point
+  ui->in_point = clutter_texture_new_from_file (ui->segment_png, &error);
+  if (!ui->in_point && error)
+    g_debug ("Clutter error: %s\n", error->message);
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
+  clutter_container_add_actor (CLUTTER_CONTAINER (seek_box), ui->in_point);
+
   // background box rectangle shows as the border
   ui->control_seek1 = clutter_rectangle_new_with_color (&control_color1);
   clutter_container_add_actor (CLUTTER_CONTAINER (seek_box), ui->control_seek1);
@@ -507,6 +520,16 @@ load_controls (UserInterface * ui)
       FALSE,                            /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
+
+  // Out point
+  ui->out_point = clutter_texture_new_from_file (ui->segment_png, &error);
+  if (!ui->out_point && error)
+    g_debug ("Clutter error: %s\n", error->message);
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
+  clutter_container_add_actor (CLUTTER_CONTAINER (seek_box), ui->out_point);
 
   // Controls bottom box
   bottom_box_layout = clutter_box_layout_new ();
@@ -880,6 +903,9 @@ update_controls_size (UserInterface * ui)
   ui->seek_height =
       ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 2.0f * SEEK_BORDER;
 
+  ui->in_point_pos  = (ui->seek_height / - 4) + (SEEK_BORDER * 2);
+  ui->out_point_pos = (ui->seek_width - (ui->seek_height / 4));
+
   clutter_actor_set_size (ui->control_seek1,
       ui->seek_width + 2.0f * SEEK_BORDER,
       ui->seek_height + 2.0f * SEEK_BORDER);
@@ -890,6 +916,16 @@ update_controls_size (UserInterface * ui)
 
   progress_update_seekbar (ui);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
+
+  clutter_actor_set_size (ui->in_point, (ui->seek_height / 2),
+      (ui->seek_height / 2));
+  clutter_actor_set_position (ui->in_point, ui->in_point_pos,
+      (ui->seek_height * -0.5));
+
+  clutter_actor_set_size (ui->out_point, (ui->seek_height / 2),
+      (ui->seek_height / 2));
+  clutter_actor_set_position (ui->out_point, ui->out_point_pos,
+      (ui->seek_height * -0.5));
 
   font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_height * POS_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_pos), font_name);
@@ -951,6 +987,9 @@ interface_init (UserInterface * ui)
   ui->control_seek2 = NULL;
   ui->control_seekbar = NULL;
   ui->control_pos = NULL;
+
+  ui->in_point = NULL;
+  ui->out_point = NULL;
 
   ui->volume_box = NULL;
   ui->volume_low = NULL;
