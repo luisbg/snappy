@@ -39,6 +39,7 @@ struct _GstEngine
 
   guint media_width, media_height;
   gint64 media_duration;
+  gint64 in_point, out_point;
   gint64 second;
 
   gchar *uri;

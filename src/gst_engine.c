@@ -198,8 +198,10 @@ discover (GstEngine * engine, gchar * uri)
   gst_discoverer_stream_info_list_free (list);
 
   /* If it has any stream, get duration */
-  if (engine->has_video || engine->has_audio)
+  if (engine->has_video || engine->has_audio) {
     engine->media_duration = gst_discoverer_info_get_duration (info);
+    engine->out_point = engine->media_duration;
+  }
 
   // g_print ("Found video %d, audio %d\n", engine->has_video,
   //     engine->has_audio);
@@ -419,6 +421,9 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->loop = FALSE;
   engine->secret = FALSE;
 
+  engine->in_point = 0;
+  engine->out_point = 0;
+
   engine->media_width = 600;
   engine->media_height = 400;
   engine->media_duration = -1;
@@ -632,10 +637,14 @@ change_state (GstEngine * engine, gchar * state)
     gst_element_set_state (engine->player, GST_STATE_READY);
     engine->playing = FALSE;
     engine->media_duration = -1;
+    engine->in_point = 0;
+    engine->out_point = 0;
   } else if (!g_strcmp0 (state, "Null")) {
     gst_element_set_state (engine->player, GST_STATE_NULL);
     engine->playing = FALSE;
     engine->media_duration = -1;
+    engine->in_point = 0;
+    engine->out_point = 0;
   }
 
   return TRUE;
@@ -653,6 +662,7 @@ update_media_duration (GstEngine * engine)
           &engine->media_duration)) {
     if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {
       success = TRUE;
+      engine->out_point = engine->media_duration;
     } else {
       g_debug ("Could not get media's duration\n");
       success = FALSE;

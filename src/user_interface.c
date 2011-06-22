@@ -228,6 +228,22 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           break;
         }
 
+        case CLUTTER_i:
+        {
+	  ui->engine->in_point = query_position (ui->engine);
+
+	  handled = TRUE;
+	  break;
+        }
+
+        case CLUTTER_o:
+        {
+	  ui->engine->out_point = query_position (ui->engine);
+
+	  handled = TRUE;
+	  break;
+        }
+
         case CLUTTER_r:
         {
           // rotate texture 90 degrees.
