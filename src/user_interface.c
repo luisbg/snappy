@@ -408,7 +408,7 @@ load_controls (UserInterface * ui)
   ui->volume_high_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
       "/audio-volume-high.png");
   ui->segment_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-      "/media-actions-in_point.png");
+      "/media-actions-segment-point.png");
 
   icon_files[0] = vid_panel_png;
   icon_files[1] = ui->play_png;
