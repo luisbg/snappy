@@ -20,6 +20,12 @@
  * USA
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef ENABLE_DBUS
+
 #include <gio/gio.h>
 #include <stdlib.h>
 
@@ -573,3 +579,5 @@ close_dlna (SnappyMP * mp)
 
   return TRUE;
 }
+
+#endif

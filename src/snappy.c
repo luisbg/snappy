@@ -22,6 +22,10 @@
 
 #define VERSION "0.2"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -29,7 +33,11 @@
 #include <clutter-gst/clutter-gst.h>
 
 #include "user_interface.h"
+
+#ifdef ENABLE_DBUS
 #include "dlna.h"
+#endif
+
 #include "gst_engine.h"
 #include "utils.h"
 
@@ -138,7 +146,6 @@ main (int argc, char *argv[])
 {
   UserInterface *ui = NULL;
   GstEngine *engine = NULL;
-  SnappyMP *mp_obj = NULL;
   ClutterActor *video_texture;
   GstElement *sink;
 
@@ -148,6 +155,10 @@ main (int argc, char *argv[])
   gchar *fileuri, *uri;
   gchar *file_list[argc];
   GOptionContext *context;
+
+#ifdef ENABLE_DBUS
+  SnappyMP *mp_obj = NULL;
+#endif
 
   if (!g_thread_supported ())
     g_thread_init (NULL);
@@ -200,18 +211,22 @@ main (int argc, char *argv[])
   change_state (engine, "Paused");
   change_state (engine, "Playing");
 
+#ifdef ENABLE_DBUS
   /* Start MPRIS Dbus object */
   mp_obj = g_new (SnappyMP, 1);
   mp_obj->engine = engine;
   mp_obj->ui = ui;
   load_dlna (mp_obj);
+#endif
 
   /* Main loop */
   clutter_main ();
 
   /* Close snappy */
   close_down (ui, engine);
+#ifdef ENABLE_DBUS
   close_dlna (mp_obj);
+#endif
 
 quit:
   g_option_context_free (context);
