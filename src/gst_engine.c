@@ -91,7 +91,18 @@ add_uri_to_history (gchar * uri)
       g_key_file_set_boolean (keyfile, "history", clean_uri, TRUE);
     }
 
+    /* g_get_real_time () is not available until glib 2.28.0 */
+#if GLIB_CHECK_VERSION (2, 28, 0)
     g_key_file_set_int64 (keyfile, "history", clean_uri, g_get_real_time ());
+#else
+    {
+      GTimeVal time;
+
+      g_get_current_time (&time);
+      g_key_file_set_int64 (keyfile, "history", clean_uri,
+          (gint64) time.tv_sec);
+    }
+#endif
 
     /* Save gkeyfile to a file  */
     data = g_key_file_to_data (keyfile, NULL, NULL);
@@ -202,7 +213,6 @@ discover (GstEngine * engine, gchar * uri)
     engine->media_duration = gst_discoverer_info_get_duration (info);
     engine->out_point = engine->media_duration;
   }
-
   // g_print ("Found video %d, audio %d\n", engine->has_video,
   //     engine->has_audio);
 
