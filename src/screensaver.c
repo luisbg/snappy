@@ -31,6 +31,10 @@
 
 #include "screensaver.h"
 
+#ifdef HAVE_WIN32
+#include <clutter/win32/clutter-win32.h>
+#endif
+
 #ifdef HAVE_X11
 #include <clutter/x11/clutter-x11.h>
 #ifdef HAVE_XTEST

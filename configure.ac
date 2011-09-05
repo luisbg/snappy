@@ -27,6 +27,25 @@ AM_PROG_CC_C_O
 AC_STDC_HEADERS
 AM_PROG_LIBTOOL
 
+dnl instruct libtool machinery that the package supports DLLs 
+AC_LIBTOOL_WIN32_DLL
+
+AC_CANONICAL_HOST
+
+AC_MSG_CHECKING([for Win32 host])
+case "$host" in
+  *-*-mingw*)
+    os_win32=yes
+    ;;
+  *)
+    os_win32=no
+    ;;
+esac
+AC_MSG_RESULT([$os_win32])
+
+AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
+
+
 GST_0_10_REQS=0.10.20
 GST_PBUTILS=0.10.30
 CLUTTER_REQS=1.2.0
@@ -74,9 +93,16 @@ PKG_CHECK_MODULES(GIO, gio-2.0 >= $GIO_REQUIRED)
 AC_SUBST(GIO_CFLAGS)
 AC_SUBST(GIO_LIBS)
 
-PKG_CHECK_MODULES(CLUTTER_X11, clutter-x11-1.0,
-    [AC_DEFINE(HAVE_X11, 1, [Define if Clutter X11 is available.])],
-    [])
+if ${OS_WIN32}; then
+  PKG_CHECK_MODULES(CLUTTER_WIN32, clutter-win32-1.0,
+      [AC_DEFINE(HAVE_WIN32, 1, [Define if Clutter Win32 is available.])],
+      [])
+else
+  PKG_CHECK_MODULES(CLUTTER_X11, clutter-x11-1.0,
+      [AC_DEFINE(HAVE_X11, 1, [Define if Clutter X11 is available.])],
+      [])
+fi
+  
 
 PKG_CHECK_MODULES(XTEST, xtst,
     [AC_DEFINE(HAVE_XTEST, 1, [Define if XTest is available.])],
