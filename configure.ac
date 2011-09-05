@@ -106,7 +106,7 @@ fi
 
 PKG_CHECK_MODULES(XTEST, xtst,
     [AC_DEFINE(HAVE_XTEST, 1, [Define if XTest is available.])],
-    [])
+    [AC_DEFINE(HAVE_XTEST, 0, [Define if XTest is available.])])
 AC_SUBST(XTEST_CFLAGS)
 AC_SUBST(XTEST_LIBS)
 
