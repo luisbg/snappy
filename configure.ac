@@ -43,9 +43,6 @@ case "$host" in
 esac
 AC_MSG_RESULT([$os_win32])
 
-AM_CONDITIONAL(OS_WIN32, test "$os_win32" = "yes")
-
-
 GST_0_10_REQS=0.10.20
 GST_PBUTILS=0.10.30
 CLUTTER_REQS=1.2.0
@@ -93,7 +90,7 @@ PKG_CHECK_MODULES(GIO, gio-2.0 >= $GIO_REQUIRED)
 AC_SUBST(GIO_CFLAGS)
 AC_SUBST(GIO_LIBS)
 
-if ${OS_WIN32}; then
+if test "$os_win32" = "xyes"; then
   PKG_CHECK_MODULES(CLUTTER_WIN32, clutter-win32-1.0,
       [AC_DEFINE(HAVE_WIN32, 1, [Define if Clutter Win32 is available.])],
       [])
@@ -102,7 +99,6 @@ else
       [AC_DEFINE(HAVE_X11, 1, [Define if Clutter X11 is available.])],
       [])
 fi
-  
 
 PKG_CHECK_MODULES(XTEST, xtst,
     [AC_DEFINE(HAVE_XTEST, 1, [Define if XTest is available.])],
