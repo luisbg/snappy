@@ -22,6 +22,7 @@
 
 #include <clutter-gst/clutter-gst.h>
 #include <gst/pbutils/pbutils.h>
+#include <string.h>
 
 #include "user_interface.h"
 #include "gst_engine.h"
@@ -50,6 +51,21 @@ typedef enum
 
 /* -------------------- static functions --------------------- */
 
+static void
+write_key_file_to_file (GKeyFile *keyfile, const char *path)
+{
+  gchar *data;
+  GError *error = NULL;
+
+  data = g_key_file_to_data (keyfile, NULL, NULL);
+  g_file_set_contents (path, data, strlen (data), &error);
+  if (error != NULL) {
+    g_warning ("Failed to write history file to %s: %s", path, error->message);
+    g_error_free (error);
+  }
+
+  g_free (data);
+}
 
 /*         Add URI to recently viewed list       */
 gboolean
@@ -57,10 +73,9 @@ add_uri_to_history (gchar * uri)
 {
   gboolean ret;
   const gchar *config_dir;
-  gchar *path, *data, *clean_uri;
+  gchar *path, *clean_uri;
   gchar **history_keys;
   gsize length;
-  FILE *file;
   GKeyFile *keyfile;
   GKeyFileFlags flags;
 
@@ -105,12 +120,7 @@ add_uri_to_history (gchar * uri)
 #endif
 
     /* Save gkeyfile to a file  */
-    data = g_key_file_to_data (keyfile, NULL, NULL);
-    file = fopen (path, "w");
-    fputs (data, file);
-    fclose (file);
-
-    g_free (data);
+    write_key_file_to_file (keyfile, path);
     g_free (path);
 
     ret = TRUE;
@@ -129,8 +139,7 @@ add_uri_unfinished_playback (GstEngine * engine, gchar * uri, gint64 position)
   guint hash_key;
   gint64 duration;
   const gchar *config_dir;
-  gchar *path, *data, *key;
-  FILE *file;
+  gchar *path, *key;
   GKeyFile *keyfile;
   GKeyFileFlags flags;
 
@@ -158,12 +167,7 @@ add_uri_unfinished_playback (GstEngine * engine, gchar * uri, gint64 position)
   g_key_file_set_int64 (keyfile, "unfinished", key, position);
 
   /* Save gkeyfile to a file, if file doesn't exist it creates a new one */
-  data = g_key_file_to_data (keyfile, NULL, NULL);
-  file = fopen (path, "w");
-  fputs (data, file);
-  fclose (file);
-
-  g_free (data);
+  write_key_file_to_file (keyfile, path);
   g_free (path);
 
   return TRUE;
@@ -278,7 +282,7 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   guint hash_key;
   const gchar *config_dir;
   gchar *path, *data, *key;
-  FILE *file;
+  GError *error = NULL;
   GKeyFile *keyfile;
   GKeyFileFlags flags;
 
@@ -297,9 +301,11 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 
   /* Save gkeyfile to a file */
   data = g_key_file_to_data (keyfile, NULL, NULL);
-  file = fopen (path, "w");
-  fputs (data, file);
-  fclose (file);
+  g_file_set_contents (path, data, strlen (data), &error);
+  if (error != NULL) {
+    g_warning ("Failed to write history file to %s: %s", path, error->message);
+    g_error_free (error);
+  }
 
   g_free (data);
   g_free (path);
