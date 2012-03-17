@@ -485,9 +485,9 @@ engine_load_uri (GstEngine * engine, gchar * uri)
 gboolean
 engine_open_uri (GstEngine * engine, gchar * uri)
 {
-  g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
   /* Need to set back to Ready state so Playbin2 loads uri */
   gst_element_set_state (engine->player, GST_STATE_READY);
+  g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
 
   return TRUE;
 }
