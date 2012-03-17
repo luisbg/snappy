@@ -222,6 +222,7 @@ my_object_change_uri (SnappyMP * myobj, gchar * uri)
 
   engine_open_uri (myobj->engine, uri);
   interface_load_uri (myobj->ui, uri);
+  engine_play (myobj->engine);
 }
 
 static void
