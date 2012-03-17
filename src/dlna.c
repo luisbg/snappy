@@ -329,8 +329,7 @@ handle_get_property (GDBusConnection * connection,
   } else if (g_strcmp0 (property_name, "Shuffle") == 0) {
     ret = g_variant_new_boolean (FALSE);
   } else if (g_strcmp0 (property_name, "Metadata") == 0) {
-    const char *strv[] = { "", NULL };
-    ret = g_variant_new_strv (strv, -1);
+    ret = g_variant_new_array (G_VARIANT_TYPE_VARDICT, NULL, 0);
   } else if (g_strcmp0 (property_name, "Volume") == 0) {
     ret = g_variant_new_double (0);
   } else if (g_strcmp0 (property_name, "Position") == 0) {
