@@ -314,6 +314,38 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           break;
         }
 
+        case CLUTTER_numbersign:
+        case CLUTTER_underscore:
+        {
+          // cycle through available audio/video streams
+          gint current;
+          gint streams;
+          gchar *n;
+          gchar *c;
+
+          if (keyval == CLUTTER_numbersign) {
+            n = "n-audio";
+            c = "current-audio";
+          } else {
+            n = "n-video";
+            c = "current-video";
+          }
+
+          g_object_get (G_OBJECT (ui->engine->player), n, &streams, NULL);
+          g_object_get (G_OBJECT (ui->engine->player), c, &current, NULL);
+
+          if (current < (streams-1)) {
+            current++;
+          } else {
+            current = 0;
+          }
+
+          g_object_set (G_OBJECT (ui->engine->player), c, current, NULL);
+
+          handled = TRUE;
+          break;
+        }
+
         default:
         {
           handled = FALSE;
