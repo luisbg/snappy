@@ -19,6 +19,9 @@ right      - seek 10 seconds foward
 
 c          - show/hide visual controls
 
+v          - toggle subtitles
+_          - cycle through available audio/video streams
+
 r          - rotate video
 
 .          - frame step foward
