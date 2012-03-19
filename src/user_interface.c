@@ -276,6 +276,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         case CLUTTER_period:
         {
+          // frame step forward
           frame_stepping (ui->engine, TRUE);
 
           handled = TRUE;
@@ -284,7 +285,30 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         case CLUTTER_comma:
         {
+          // frame step backward
           frame_stepping (ui->engine, FALSE);
+
+          handled = TRUE;
+          break;
+        }
+
+        case CLUTTER_v:
+        {
+          // toggle subtitles
+
+          gint flags;
+          gboolean sub_state;
+
+          g_object_get (G_OBJECT (ui->engine->player), "flags", &flags, NULL);
+          sub_state = flags & (1 << 2);
+
+          if (sub_state) {
+            flags &= ~(1 << 2);                         //GST_PLAY_FLAG_TEXT off
+          } else {
+            flags |= (1 << 2);                          //GST_PLAY_FLAG_TEXT on
+          }
+
+          g_object_set (G_OBJECT (ui->engine->player), "flags", flags, NULL);
 
           handled = TRUE;
           break;
