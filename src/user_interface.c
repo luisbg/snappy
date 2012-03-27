@@ -1030,7 +1030,7 @@ update_controls_size (UserInterface * ui)
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
   clutter_actor_set_size (ui->volume_high,
-      icon_size * 1.2f /* originally 120x100 */ , icon_size);
+      icon_size * 1.2f, icon_size); /* originally 120x100 */
   clutter_actor_set_size (ui->subtitle_toggle, icon_size, icon_size);
 
   update_volume (ui, -1);
