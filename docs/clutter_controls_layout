@@ -19,7 +19,7 @@ ui->control_box (fixed alignment bin)
 				ui->out_point
 			]
 
-			bottom_box (horizontal alignment box)
+			middle_box (horizontal alignment box)
 			[
 				volume_box (horizontal alignment box)
 				[
@@ -35,6 +35,11 @@ ui->control_box (fixed alignment bin)
 
 				ui->control_pos
 			]
+
+                        bottom_box (horizontal alignment box)
+                        [
+                                ui->subtitle_toggle
+                        ]
 		]
 	]
 ]
