@@ -5,7 +5,8 @@ icons_DATA = \
     audio-volume-low.png \
     audio-volume-high.png \
     vid-panel.png \
-    subtitle-toggle.png
+    subtitle-toggle.png \
+    video-stream-toggle.png
 iconsdir = $(datadir)/snappy
 
 EXTRA_DIST = \

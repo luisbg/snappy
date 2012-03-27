@@ -87,6 +87,7 @@ struct _UserInterface
   gchar *segment_png;
   gchar *volume_low_png, *volume_high_png;
   gchar *subtitle_toggle_png;
+  gchar *video_stream_toggle_png;
   gchar *duration_str;
 
   ClutterColor stage_color, control_color1, control_color2;
@@ -101,6 +102,7 @@ struct _UserInterface
   ClutterActor *volume_box;
   ClutterActor *volume_low, *volume_high;
   ClutterActor *subtitle_toggle;
+  ClutterActor *video_stream_toggle;
   ClutterActor *vol_int, *vol_int_bg, *volume_point;
   ClutterActor *info_box;
   ClutterActor *main_box;
