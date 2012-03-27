@@ -20,7 +20,8 @@ right      - seek 10 seconds foward
 c          - show/hide visual controls
 
 v          - toggle subtitles
-_          - cycle through available audio/video streams
+_          - cycle through available video streams
+#          - cycle through available audio streams
 
 r          - rotate video
 
