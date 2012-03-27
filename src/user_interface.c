@@ -295,20 +295,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_v:
         {
           // toggle subtitles
-
-          gint flags;
-          gboolean sub_state;
-
-          g_object_get (G_OBJECT (ui->engine->player), "flags", &flags, NULL);
-          sub_state = flags & (1 << 2);
-
-          if (sub_state) {
-            flags &= ~(1 << 2);                         //GST_PLAY_FLAG_TEXT off
-          } else {
-            flags |= (1 << 2);                          //GST_PLAY_FLAG_TEXT on
-          }
-
-          g_object_set (G_OBJECT (ui->engine->player), "flags", flags, NULL);
+          toggle_subtitles (ui->engine);
 
           handled = TRUE;
           break;
@@ -413,19 +400,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
             show_controls (ui, FALSE);
           }
         } else if (actor == ui->subtitle_toggle) {
-          gint flags;
-          gboolean sub_state;
-
-          g_object_get (G_OBJECT (ui->engine->player), "flags", &flags, NULL);
-          sub_state = flags & (1 << 2);
-
-          if (sub_state) {
-            flags &= ~(1 << 2);                         //GST_PLAY_FLAG_TEXT off
-          } else {
-            flags |= (1 << 2);                          //GST_PLAY_FLAG_TEXT on
-          }
-
-          g_object_set (G_OBJECT (ui->engine->player), "flags", flags, NULL);
+          toggle_subtitles (ui->engine);
         }
       }
 

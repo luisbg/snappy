@@ -677,6 +677,26 @@ change_state (GstEngine * engine, gchar * state)
   return TRUE;
 }
 
+/*               Toggle subtitles                */
+gboolean
+toggle_subtitles (GstEngine * engine)
+{
+  gint flags;
+  gboolean sub_state;
+
+  g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
+  sub_state = flags & (1 << 2);
+
+  if (sub_state) {
+    flags &= ~(1 << 2);                         //GST_PLAY_FLAG_TEXT off
+  } else {
+    flags |= (1 << 2);                          //GST_PLAY_FLAG_TEXT on
+  }
+
+  g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
+
+  return TRUE;
+}
 
 /*          Update duration of URI streams       */
 gboolean
