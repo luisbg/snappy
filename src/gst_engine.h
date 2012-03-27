@@ -67,6 +67,7 @@ GstState get_state (GstEngine * engine);
 gint64 query_position (GstEngine * engine);
 gboolean change_state (GstEngine * engine, gchar * state);
 gboolean toggle_subtitles (GstEngine * engine);
+gboolean toggle_streams (GstEngine * engine, gboolean video_stream);
 gboolean update_media_duration (GstEngine * engine);
 
 G_END_DECLS

@@ -677,6 +677,37 @@ change_state (GstEngine * engine, gchar * state)
   return TRUE;
 }
 
+/*                  Toggle streams               */
+gboolean
+toggle_streams (GstEngine * engine, gboolean video_stream)
+{
+  gint current;
+  gint streams;
+  gchar *n;
+  gchar *c;
+
+  if (video_stream) {
+    n = "n-video";
+    c = "current-video";
+  } else {
+    n = "n-audio";
+    c = "current-audio";
+  }
+
+  g_object_get (G_OBJECT (engine->player), n, &streams, NULL);
+  g_object_get (G_OBJECT (engine->player), c, &current, NULL);
+
+  if (current < (streams-1)) {
+    current++;
+  } else {
+    current = 0;
+  }
+
+  g_object_set (G_OBJECT (engine->player), c, current, NULL);
+
+  return TRUE;
+}
+
 /*               Toggle subtitles                */
 gboolean
 toggle_subtitles (GstEngine * engine)

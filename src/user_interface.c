@@ -305,29 +305,10 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_underscore:
         {
           // cycle through available audio/video streams
-          gint current;
-          gint streams;
-          gchar *n;
-          gchar *c;
+          gboolean video_stream;
 
-          if (keyval == CLUTTER_numbersign) {
-            n = "n-audio";
-            c = "current-audio";
-          } else {
-            n = "n-video";
-            c = "current-video";
-          }
-
-          g_object_get (G_OBJECT (ui->engine->player), n, &streams, NULL);
-          g_object_get (G_OBJECT (ui->engine->player), c, &current, NULL);
-
-          if (current < (streams-1)) {
-            current++;
-          } else {
-            current = 0;
-          }
-
-          g_object_set (G_OBJECT (ui->engine->player), c, current, NULL);
+          video_stream = (keyval == CLUTTER_underscore);
+          toggle_streams (ui->engine, video_stream);
 
           handled = TRUE;
           break;
@@ -394,13 +375,19 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
             penalty_box (ui);
             show_controls (ui, FALSE);
           }
+
         } else if (actor == ui->texture || actor == ui->stage) {
           if (!ui->penalty_box_active) {
             penalty_box (ui);
             show_controls (ui, FALSE);
           }
+
         } else if (actor == ui->subtitle_toggle) {
           toggle_subtitles (ui->engine);
+
+        } else if (actor == ui->video_stream_toggle) {
+          toggle_streams (ui->engine, TRUE);
+          g_print ("here\n");
         }
       }
 
