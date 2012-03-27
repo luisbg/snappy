@@ -445,11 +445,13 @@ load_controls (UserInterface * ui)
   ClutterLayoutManager *controls_layout;
   ClutterLayoutManager *main_box_layout;
   ClutterLayoutManager *info_box_layout;
+  ClutterLayoutManager *middle_box_layout;
   ClutterLayoutManager *bottom_box_layout;
   ClutterLayoutManager *volume_box_layout;
   ClutterLayoutManager *seek_box_layout;
   ClutterLayoutManager *vol_int_box_layout;
   ClutterActor *seek_box;
+  ClutterActor *middle_box;
   ClutterActor *bottom_box;
   ClutterActor *vol_int_box;
   GError *error = NULL;
@@ -465,6 +467,8 @@ load_controls (UserInterface * ui)
       "/audio-volume-high.png");
   ui->segment_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
       "/media-actions-segment-point.png");
+  ui->subtitle_toggle_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
+      "/subtitle-toggle.png");
 
   icon_files[0] = vid_panel_png;
   icon_files[1] = ui->play_png;
@@ -472,8 +476,9 @@ load_controls (UserInterface * ui)
   icon_files[3] = ui->volume_low_png;
   icon_files[4] = ui->volume_high_png;
   icon_files[5] = ui->segment_png;
+  icon_files[6] = ui->subtitle_toggle_png;
 
-  for (c = 0; c < 6; c++) {
+  for (c = 0; c < 7; c++) {
     if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS)) {
       g_print ("Icon file doesn't exist, are you sure you have "
           " installed snappy correctly?\nThis file needed is: %s\n",
@@ -587,11 +592,11 @@ load_controls (UserInterface * ui)
   }
   clutter_container_add_actor (CLUTTER_CONTAINER (seek_box), ui->out_point);
 
-  // Controls bottom box
-  bottom_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (bottom_box_layout),
+  // Controls middle box
+  middle_box_layout = clutter_box_layout_new ();
+  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (middle_box_layout),
       FALSE);
-  bottom_box = clutter_box_new (bottom_box_layout);
+  middle_box = clutter_box_new (middle_box_layout);
 
   // Controls volume box
   volume_box_layout = clutter_box_layout_new ();
@@ -600,7 +605,7 @@ load_controls (UserInterface * ui)
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (volume_box_layout), 0);
   ui->volume_box = clutter_box_new (volume_box_layout);
 
-  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->volume_box,
+  clutter_box_pack (CLUTTER_BOX (middle_box), ui->volume_box,
       "x-align", CLUTTER_BOX_ALIGNMENT_START, "expand", TRUE, NULL);
 
   // Controls volume low
@@ -645,14 +650,41 @@ load_controls (UserInterface * ui)
   duration_str = g_strdup_printf ("   0:00:00/%s", ui->duration_str);
   ui->control_pos = clutter_text_new_full ("Sans 22px", duration_str,
       &control_color1);
-  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->control_pos,
+  clutter_box_pack (CLUTTER_BOX (middle_box), ui->control_pos,
       "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", TRUE, NULL);
+
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), middle_box,
+      TRUE,                             /* expand */
+      FALSE,                            /* x-fill */
+      FALSE,                            /* y-fill */
+      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
+      CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
+
+  // Controls bottom box
+  bottom_box_layout = clutter_box_layout_new ();
+  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (bottom_box_layout),
+      FALSE);
+  bottom_box = clutter_box_new (bottom_box_layout);
+
+  clutter_box_pack (CLUTTER_BOX (middle_box), ui->volume_box,
+      "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", FALSE, NULL);
+
+  // Controls subtitle toggle
+  ui->subtitle_toggle = clutter_texture_new_from_file (ui->subtitle_toggle_png, &error);
+  if (!ui->subtitle_toggle && error)
+    g_debug ("Clutter error: %s\n", error->message);
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
+  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->subtitle_toggle, "x-align",
+      CLUTTER_BOX_ALIGNMENT_END, NULL);
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), bottom_box,
       TRUE,                             /* expand */
       FALSE,                            /* x-fill */
       FALSE,                            /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
+      CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->info_box,
@@ -999,6 +1031,7 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
   clutter_actor_set_size (ui->volume_high,
       icon_size * 1.2f /* originally 120x100 */ , icon_size);
+  clutter_actor_set_size (ui->subtitle_toggle, icon_size, icon_size);
 
   update_volume (ui, -1);
 }
@@ -1028,6 +1061,8 @@ interface_init (UserInterface * ui)
 
   ui->volume_low_png = NULL;
   ui->volume_high_png = NULL;
+
+  ui->subtitle_toggle_png = NULL;
 
   ui->duration_str = NULL;
 
