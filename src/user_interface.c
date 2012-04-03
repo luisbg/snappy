@@ -413,7 +413,7 @@ load_controls (UserInterface * ui)
 {
   // Check icon files exist
   gchar *vid_panel_png;
-  gchar *icon_files[8];
+  gchar *icon_files[9];
   gchar *duration_str;
   gint c;
   ClutterColor control_color1 = { 0x12, 0x12, 0x12, 0xff };
@@ -447,6 +447,8 @@ load_controls (UserInterface * ui)
       "/subtitle-toggle.png");
   ui->video_stream_toggle_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
       "/video-stream-toggle.png");
+  ui->audio_stream_toggle_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
+      "/audio-stream-toggle.png");
 
   icon_files[0] = vid_panel_png;
   icon_files[1] = ui->play_png;
@@ -456,8 +458,9 @@ load_controls (UserInterface * ui)
   icon_files[5] = ui->segment_png;
   icon_files[6] = ui->subtitle_toggle_png;
   icon_files[7] = ui->video_stream_toggle_png;
+  icon_files[8] = ui->audio_stream_toggle_png;
 
-  for (c = 0; c < 8; c++) {
+  for (c = 0; c < 9; c++) {
     if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS)) {
       g_print ("Icon file doesn't exist, are you sure you have "
           " installed snappy correctly?\nThis file needed is: %s\n",
@@ -659,6 +662,18 @@ load_controls (UserInterface * ui)
   }
   clutter_box_pack (CLUTTER_BOX (bottom_box), ui->video_stream_toggle, "x-align",
       CLUTTER_BOX_ALIGNMENT_START, NULL);
+
+  // Controls audio stream toggle
+  ui->audio_stream_toggle = clutter_texture_new_from_file
+    (ui->audio_stream_toggle_png, &error);
+  if (!ui->audio_stream_toggle && error)
+    g_debug ("Clutter error: %s\n", error->message);
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
+  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->audio_stream_toggle, "x-align",
+      CLUTTER_BOX_ALIGNMENT_END, NULL);
 
   // Controls subtitle toggle
   ui->subtitle_toggle = clutter_texture_new_from_file (ui->subtitle_toggle_png,
@@ -1025,6 +1040,7 @@ update_controls_size (UserInterface * ui)
       icon_size * 1.2f, icon_size); /* originally 120x100 */
   clutter_actor_set_size (ui->subtitle_toggle, icon_size, icon_size);
   clutter_actor_set_size (ui->video_stream_toggle, icon_size, icon_size);
+  clutter_actor_set_size (ui->audio_stream_toggle, icon_size, icon_size);
 
   update_volume (ui, -1);
 }
@@ -1057,6 +1073,7 @@ interface_init (UserInterface * ui)
 
   ui->subtitle_toggle_png = NULL;
   ui->video_stream_toggle_png = NULL;
+  ui->audio_stream_toggle_png = NULL;
 
   ui->duration_str = NULL;
 
