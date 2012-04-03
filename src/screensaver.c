@@ -340,6 +340,20 @@ screensaver_enable (ScreenSaver * screensaver, gboolean enable)
 #endif
 }
 
+void
+screensaver_free (ScreenSaver * screensaver)
+{
+#ifdef ENABLE_DBUS
+  screensaver_free_dbus (screensaver);
+#endif
+
+#ifdef HAVE_X11
+  screensaver_free_x11 (screensaver);
+#endif
+
+  g_free (screensaver);
+}
+
 ScreenSaver *
 screensaver_new (ClutterStage * stage)
 {
@@ -362,18 +376,4 @@ screensaver_new (ClutterStage * stage)
 #endif
 
   return screensaver;
-}
-
-void
-screensaver_free (ScreenSaver * screensaver)
-{
-#ifdef ENABLE_DBUS
-  screensaver_free_dbus (screensaver);
-#endif
-
-#ifdef HAVE_X11
-  screensaver_free_x11 (screensaver);
-#endif
-
-  g_free (screensaver);
 }

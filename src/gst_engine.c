@@ -423,6 +423,34 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 }
 
 
+/*             Change pipeline state             */
+gboolean
+change_state (GstEngine * engine, gchar * state)
+{
+  if (!g_strcmp0 (state, "Playing")) {
+    gst_element_set_state (engine->player, GST_STATE_PLAYING);
+    engine->playing = TRUE;
+  } else if (!g_strcmp0 (state, "Paused")) {
+    gst_element_set_state (engine->player, GST_STATE_PAUSED);
+    engine->playing = FALSE;
+  } else if (!g_strcmp0 (state, "Ready")) {
+    gst_element_set_state (engine->player, GST_STATE_READY);
+    engine->playing = FALSE;
+    engine->media_duration = -1;
+    engine->in_point = 0;
+    engine->out_point = 0;
+  } else if (!g_strcmp0 (state, "Null")) {
+    gst_element_set_state (engine->player, GST_STATE_NULL);
+    engine->playing = FALSE;
+    engine->media_duration = -1;
+    engine->in_point = 0;
+    engine->out_point = 0;
+  }
+
+  return TRUE;
+}
+
+
 /*            Init GstEngine variables           */
 gboolean
 engine_init (GstEngine * engine, GstElement * sink)
@@ -647,34 +675,6 @@ query_position (GstEngine * engine)
 
   gst_element_query_position (engine->player, &fmt, &position);
   return position;
-}
-
-
-/*             Change pipeline state             */
-gboolean
-change_state (GstEngine * engine, gchar * state)
-{
-  if (!g_strcmp0 (state, "Playing")) {
-    gst_element_set_state (engine->player, GST_STATE_PLAYING);
-    engine->playing = TRUE;
-  } else if (!g_strcmp0 (state, "Paused")) {
-    gst_element_set_state (engine->player, GST_STATE_PAUSED);
-    engine->playing = FALSE;
-  } else if (!g_strcmp0 (state, "Ready")) {
-    gst_element_set_state (engine->player, GST_STATE_READY);
-    engine->playing = FALSE;
-    engine->media_duration = -1;
-    engine->in_point = 0;
-    engine->out_point = 0;
-  } else if (!g_strcmp0 (state, "Null")) {
-    gst_element_set_state (engine->player, GST_STATE_NULL);
-    engine->playing = FALSE;
-    engine->media_duration = -1;
-    engine->in_point = 0;
-    engine->out_point = 0;
-  }
-
-  return TRUE;
 }
 
 /*                  Toggle streams               */
