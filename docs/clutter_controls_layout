@@ -39,6 +39,7 @@ ui->control_box (fixed alignment bin)
                         bottom_box (horizontal alignment box)
                         [
                                 ui->video_stream_toggle
+                                ui->audio_stream_toggle
                                 ui->subtitle_toggle
                         ]
 		]
