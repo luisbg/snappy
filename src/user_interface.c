@@ -387,7 +387,9 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         } else if (actor == ui->video_stream_toggle) {
           toggle_streams (ui->engine, TRUE);
-          g_print ("here\n");
+
+        } else if (actor == ui->audio_stream_toggle) {
+          toggle_streams (ui->engine, FALSE);
         }
       }
 
