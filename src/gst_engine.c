@@ -213,12 +213,11 @@ discover (GstEngine * engine, gchar * uri)
   gst_discoverer_stream_info_list_free (list);
 
   /* If it has any stream, get duration */
-  if (engine->has_video || engine->has_audio) {
+  if (engine->has_video || engine->has_audio)
     engine->media_duration = gst_discoverer_info_get_duration (info);
-    engine->out_point = engine->media_duration;
-  }
-  // g_print ("Found video %d, audio %d\n", engine->has_video,
-  //     engine->has_audio);
+
+  g_debug ("Found video %d, audio %d\n", engine->has_video,
+        engine->has_audio);
 
   /* If it has video stream, get dimensions */
   if (engine->has_video) {
@@ -358,7 +357,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       remove_uri_unfinished_playback (engine, engine->uri);
 
       if (engine->loop)
-        engine_seek (engine, engine->in_point, TRUE);
+        engine_seek (engine, 0);
 
       break;
     case GST_MESSAGE_ERROR:
@@ -391,7 +390,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
           /* Check if URI was left unfinished, if so seek to last position */
           position = is_uri_unfinished_playback (engine, engine->uri);
           if (position != -1) {
-            engine_seek (engine, engine->in_point, TRUE);
+            engine_seek (engine, position);
           }
 
           if (!engine->secret)
@@ -413,7 +412,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     case GST_MESSAGE_SEGMENT_DONE:
     {
       if (engine->loop)
-        engine_seek (engine, engine->in_point, TRUE);
+        engine_seek (engine, 0);
     }
     default:
       break;
@@ -437,14 +436,10 @@ change_state (GstEngine * engine, gchar * state)
     gst_element_set_state (engine->player, GST_STATE_READY);
     engine->playing = FALSE;
     engine->media_duration = -1;
-    engine->in_point = 0;
-    engine->out_point = 0;
   } else if (!g_strcmp0 (state, "Null")) {
     gst_element_set_state (engine->player, GST_STATE_NULL);
     engine->playing = FALSE;
     engine->media_duration = -1;
-    engine->in_point = 0;
-    engine->out_point = 0;
   }
 
   return TRUE;
@@ -464,9 +459,6 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->has_audio = FALSE;
   engine->loop = FALSE;
   engine->secret = FALSE;
-
-  engine->in_point = 0;
-  engine->out_point = 0;
 
   engine->media_width = 600;
   engine->media_height = 400;
@@ -535,24 +527,13 @@ engine_play (GstEngine * engine)
 
 /*            Seek engine to position            */
 gboolean
-engine_seek (GstEngine * engine, gint64 position, gboolean current)
+engine_seek (GstEngine * engine, gint64 position)
 {
   GstFormat fmt = GST_FORMAT_TIME;
 
-  if (current) {
-    if (position > engine->out_point) {
-      engine->in_point = 0;
-      engine->out_point = engine->media_duration;
-    }
-
-    gst_element_seek (engine->player, 1.0, fmt,
+  gst_element_seek_simple (engine->player, fmt,
         GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
-        GST_SEEK_TYPE_SET, position, GST_SEEK_TYPE_SET, engine->out_point);
-  } else {
-    gst_element_seek (engine->player, 1.0, fmt,
-        GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
-        GST_SEEK_TYPE_SET, engine->in_point, GST_SEEK_TYPE_SET, position);
-  }
+        position);
 
   return TRUE;
 }
@@ -740,7 +721,6 @@ update_media_duration (GstEngine * engine)
           &engine->media_duration)) {
     if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {
       success = TRUE;
-      engine->out_point = engine->media_duration;
     } else {
       g_debug ("Could not get media's duration\n");
       success = FALSE;

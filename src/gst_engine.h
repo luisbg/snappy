@@ -39,7 +39,6 @@ struct _GstEngine
 
   guint media_width, media_height;
   gint64 media_duration;
-  gint64 in_point, out_point;
   gint64 second;
 
   gchar *uri;
@@ -59,7 +58,7 @@ gboolean engine_init (GstEngine * engine, GstElement * sink);
 gboolean engine_load_uri (GstEngine * engine, gchar * uri);
 gboolean engine_open_uri (GstEngine * engine, gchar * uri);
 gboolean engine_play (GstEngine * engine);
-gboolean engine_seek (GstEngine * engine, gint64 position, gboolean current);
+gboolean engine_seek (GstEngine * engine, gint64 position);
 gboolean engine_stop (GstEngine * engine);
 gboolean engine_volume (GstEngine * engine, gdouble level);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);

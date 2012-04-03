@@ -79,7 +79,6 @@ struct _UserInterface
   guint media_width, media_height;
   guint stage_width, stage_height;
   gfloat seek_width, seek_height;
-  gfloat in_point_pos, out_point_pos;
   gfloat volume_width, volume_height;
 
   gchar *filename, *fileuri;
@@ -97,7 +96,6 @@ struct _UserInterface
   ClutterActor *control_box;
   ClutterActor *control_bg, *control_title, *control_play_toggle;
   ClutterActor *control_seek1, *control_seek2, *control_seekbar;
-  ClutterActor *in_point, *out_point;
   ClutterActor *control_pos;
   ClutterActor *volume_box;
   ClutterActor *volume_low, *volume_high;
