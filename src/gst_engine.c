@@ -273,6 +273,35 @@ is_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   return position;
 }
 
+/*  Print message tags from elements  */
+static void
+print_tag (const GstTagList * list, const gchar * tag, gpointer unused)
+{
+  gint i, count;
+
+  count = gst_tag_list_get_tag_size (list, tag);
+
+  for (i = 0; i < count; i++) {
+    gchar *str;
+
+    if (gst_tag_get_type (tag) == G_TYPE_STRING) {
+      if (!gst_tag_list_get_string_index (list, tag, i, &str))
+        g_assert_not_reached ();
+    } else {
+      str =
+          g_strdup_value_contents (gst_tag_list_get_value_index (list, tag, i));
+    }
+
+    if (i == 0) {
+      g_print ("  %15s: %s\n", gst_tag_get_nick (tag), str);
+    } else {
+      g_print ("                 : %s\n", str);
+    }
+
+    g_free (str);
+  }
+}
+
 
 /*    Remove URI from unfinished playback list   */
 gboolean
@@ -360,6 +389,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
         engine_seek (engine, 0);
 
       break;
+
     case GST_MESSAGE_ERROR:
     {
       /* Parse and share Gst Error */
@@ -378,6 +408,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
       break;
     }
+
     case GST_MESSAGE_STATE_CHANGED:
     {
       GstState old, new, pending;
@@ -405,15 +436,36 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
       break;
     }
+
     case GST_MESSAGE_STEP_DONE:
     {
       engine->prev_done = TRUE;
+      break;
     }
+
     case GST_MESSAGE_SEGMENT_DONE:
     {
       if (engine->loop)
         engine_seek (engine, 0);
+      break;
     }
+
+    case GST_MESSAGE_TAG:
+    {
+      GstTagList *tags;
+
+      gst_message_parse_tag (msg, &tags);
+      if (tags) {
+        g_print ("%s\n",
+            GST_STR_NULL (GST_ELEMENT_NAME (GST_MESSAGE_SRC (msg))));
+
+        gst_tag_list_foreach (tags, print_tag, NULL);
+        gst_tag_list_free (tags);
+        tags = NULL;
+      }
+      break;
+    }
+
     default:
       break;
   }
