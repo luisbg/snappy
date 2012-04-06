@@ -36,6 +36,7 @@ struct _GstEngine
   gboolean has_video, has_audio;
   gboolean loop;
   gboolean secret;
+  gboolean queries_blocked;
 
   guint media_width, media_height;
   gint64 media_duration;

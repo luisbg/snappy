@@ -466,6 +466,13 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       break;
     }
 
+    case GST_MESSAGE_ASYNC_DONE:
+    {
+      engine->queries_blocked = FALSE;
+
+      break;
+    }
+
     default:
       break;
   }
@@ -481,17 +488,21 @@ change_state (GstEngine * engine, gchar * state)
   if (!g_strcmp0 (state, "Playing")) {
     gst_element_set_state (engine->player, GST_STATE_PLAYING);
     engine->playing = TRUE;
+    engine->queries_blocked = FALSE;
   } else if (!g_strcmp0 (state, "Paused")) {
     gst_element_set_state (engine->player, GST_STATE_PAUSED);
     engine->playing = FALSE;
+    engine->queries_blocked = FALSE;
   } else if (!g_strcmp0 (state, "Ready")) {
     gst_element_set_state (engine->player, GST_STATE_READY);
     engine->playing = FALSE;
     engine->media_duration = -1;
+    engine->queries_blocked = TRUE;
   } else if (!g_strcmp0 (state, "Null")) {
     gst_element_set_state (engine->player, GST_STATE_NULL);
     engine->playing = FALSE;
     engine->media_duration = -1;
+    engine->queries_blocked = TRUE;
   }
 
   return TRUE;
@@ -511,6 +522,7 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->has_audio = FALSE;
   engine->loop = FALSE;
   engine->secret = FALSE;
+  engine->queries_blocked = TRUE;
 
   engine->media_width = 600;
   engine->media_height = 400;
@@ -544,6 +556,7 @@ engine_load_uri (GstEngine * engine, gchar * uri)
 
   /* Loading a new URI means we haven't started playing this URI yet */
   engine->has_started = FALSE;
+  engine->queries_blocked = TRUE;
 
   g_print ("Loading: %s\n", uri);
 
@@ -572,6 +585,7 @@ engine_play (GstEngine * engine)
   gst_element_set_state (engine->player, GST_STATE_PLAYING);
   engine->has_started = TRUE;
   engine->playing = TRUE;
+  engine->queries_blocked = FALSE;
 
   return TRUE;
 }
@@ -587,6 +601,8 @@ engine_seek (GstEngine * engine, gint64 position)
         GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
         position);
 
+  engine->queries_blocked = TRUE;
+
   return TRUE;
 }
 
@@ -597,6 +613,7 @@ engine_stop (GstEngine * engine)
 {
   gst_element_set_state (engine->player, GST_STATE_READY);
   engine->playing = FALSE;
+  engine->queries_blocked = TRUE;
 
   return TRUE;
 }
@@ -655,6 +672,8 @@ frame_stepping (GstEngine * engine, gboolean foward)
     fmt = GST_FORMAT_BUFFERS;
     gst_element_send_event (engine->player,
         gst_event_new_step (fmt, 1, 1.0, TRUE, FALSE));
+
+    engine->queries_blocked = TRUE;
   }
 
   return FALSE;
