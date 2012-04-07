@@ -729,6 +729,15 @@ query_position (GstEngine * engine)
   return position;
 }
 
+
+/*                 Set subtitle file             */
+gboolean
+set_subtitle_uri (GstEngine * engine, gchar *suburi)
+{
+  g_print ("Loading subtitles: %s\n");
+  g_object_set (G_OBJECT (engine->player), "suburi", suburi, NULL);
+}
+
 /*                  Toggle streams               */
 gboolean
 toggle_streams (GstEngine * engine, gboolean video_stream)

@@ -66,7 +66,7 @@ close_down (UserInterface * ui, GstEngine * engine)
 gboolean
 process_args (int argc, char *argv[],
     gchar * file_list[], gboolean * fullscreen, gboolean * secret,
-    gboolean * loop, GOptionContext * context)
+    gchar * suburi[], gboolean * loop, GOptionContext * context)
 {
   gboolean recent = FALSE, version = FALSE;
   guint c, index, pos = 0;
@@ -79,6 +79,8 @@ process_args (int argc, char *argv[],
         "Show recently viewed", NULL},
     {"secret", 's', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, secret,
         "Views not saved in recently viewed history", NULL},
+    {"subtitles", 't', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
+        suburi, "Use this subtitle file", NULL},
     {"version", 'v', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &version,
         "Shows snappy's version", NULL},
     {NULL}
@@ -154,6 +156,8 @@ main (int argc, char *argv[])
   guint c, index, pos = 0;
   gchar *fileuri, *uri;
   gchar *file_list[argc];
+  gchar *suburi;
+  suburi = g_malloc (100*sizeof(suburi));
   GOptionContext *context;
 
 #ifdef ENABLE_DBUS
@@ -166,8 +170,8 @@ main (int argc, char *argv[])
   context = g_option_context_new ("<media file> - Play movie files");
 
   /* Process command arguments */
-  ok = process_args (argc, argv, file_list, &fullscreen, &secret, &loop,
-      context);
+  ok = process_args (argc, argv, file_list, &fullscreen, &secret, &suburi,
+      &loop, context);
   if (!ok)
     goto quit;
 
@@ -206,6 +210,17 @@ main (int argc, char *argv[])
   /* Load engine and start interface */
   engine_load_uri (engine, uri);
   interface_start (ui, uri);
+
+  /* Load subtitle file if available */
+  if (suburi != NULL) {
+    if (gst_uri_is_valid (suburi))
+      set_subtitle_uri (engine, suburi);
+    else {
+      suburi = clean_uri (suburi);
+      suburi = g_strdup_printf ("file://%s", suburi);
+      set_subtitle_uri (engine, suburi);
+    }
+  }
 
   /* Start playing */
   change_state (engine, "Paused");
