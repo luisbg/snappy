@@ -52,16 +52,21 @@ gchar *
 clean_uri (gchar * input_arg)
 {
   GFile *gfile;
-  gchar *filepath;
+  gchar *fileuri;
 
-  gfile = g_file_new_for_commandline_arg (input_arg);
-  if (g_file_has_uri_scheme (gfile, "archive") != FALSE) {
-    g_print ("ERROR: %s isn't a file\n", input_arg);
+  if (gst_uri_is_valid (input_arg))
+    fileuri = g_strdup (input_arg);
+  else {
+    gfile = g_file_new_for_commandline_arg (input_arg);
+    if (g_file_has_uri_scheme (gfile, "archive") != FALSE) {
+      g_print ("ERROR: %s isn't a file\n", input_arg);
+    }
+
+    fileuri = g_file_get_path (gfile);
+    fileuri = g_strdup_printf ("file://%s", fileuri);
   }
 
-  filepath = g_file_get_path (gfile);
-
-  return filepath;
+  return fileuri;
 }
 
 gchar *

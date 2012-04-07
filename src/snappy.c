@@ -154,7 +154,7 @@ main (int argc, char *argv[])
   gboolean ok, fullscreen = FALSE, loop = FALSE, secret = FALSE;
   gint ret = 0;
   guint c, index, pos = 0;
-  gchar *fileuri, *uri;
+  gchar *uri;
   gchar *file_list[argc];
   gchar *suburi;
   suburi = g_malloc (100*sizeof(suburi));
@@ -200,12 +200,7 @@ main (int argc, char *argv[])
   gst_object_unref (engine->bus);
 
   /* Get uri to load */
-  if (gst_uri_is_valid (file_list[0]))
-    uri = g_strdup (file_list[0]);
-  else {
-    fileuri = clean_uri (file_list[0]);
-    uri = g_strdup_printf ("file://%s", fileuri);
-  }
+  uri = clean_uri (file_list[0]);
 
   /* Load engine and start interface */
   engine_load_uri (engine, uri);
@@ -213,13 +208,8 @@ main (int argc, char *argv[])
 
   /* Load subtitle file if available */
   if (suburi != NULL) {
-    if (gst_uri_is_valid (suburi))
-      set_subtitle_uri (engine, suburi);
-    else {
-      suburi = clean_uri (suburi);
-      suburi = g_strdup_printf ("file://%s", suburi);
-      set_subtitle_uri (engine, suburi);
-    }
+    suburi = clean_uri (suburi);
+    set_subtitle_uri (engine, suburi);
   }
 
   /* Start playing */
