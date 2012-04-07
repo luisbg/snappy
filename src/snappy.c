@@ -157,7 +157,6 @@ main (int argc, char *argv[])
   gchar *uri;
   gchar *file_list[argc];
   gchar *suburi;
-  suburi = g_malloc (100*sizeof(suburi));
   GOptionContext *context;
 
 #ifdef ENABLE_DBUS
