@@ -52,7 +52,7 @@ typedef enum
 /* -------------------- static functions --------------------- */
 
 static void
-write_key_file_to_file (GKeyFile *keyfile, const char *path)
+write_key_file_to_file (GKeyFile * keyfile, const char *path)
 {
   gchar *data;
   GError *error = NULL;
@@ -216,8 +216,7 @@ discover (GstEngine * engine, gchar * uri)
   if (engine->has_video || engine->has_audio)
     engine->media_duration = gst_discoverer_info_get_duration (info);
 
-  g_debug ("Found video %d, audio %d\n", engine->has_video,
-        engine->has_audio);
+  g_debug ("Found video %d, audio %d\n", engine->has_video, engine->has_audio);
 
   /* If it has video stream, get dimensions */
   if (engine->has_video) {
@@ -598,8 +597,8 @@ engine_seek (GstEngine * engine, gint64 position)
   GstFormat fmt = GST_FORMAT_TIME;
 
   gst_element_seek_simple (engine->player, fmt,
-        GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
-        position);
+      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
+      position);
 
   engine->queries_blocked = TRUE;
 
@@ -732,7 +731,7 @@ query_position (GstEngine * engine)
 
 /*                 Set subtitle file             */
 gboolean
-set_subtitle_uri (GstEngine * engine, gchar *suburi)
+set_subtitle_uri (GstEngine * engine, gchar * suburi)
 {
   g_print ("Loading subtitles: %s\n");
   g_object_set (G_OBJECT (engine->player), "suburi", suburi, NULL);
@@ -758,7 +757,7 @@ toggle_streams (GstEngine * engine, gboolean video_stream)
   g_object_get (G_OBJECT (engine->player), n, &streams, NULL);
   g_object_get (G_OBJECT (engine->player), c, &current, NULL);
 
-  if (current < (streams-1)) {
+  if (current < (streams - 1)) {
     current++;
   } else {
     current = 0;
@@ -780,9 +779,9 @@ toggle_subtitles (GstEngine * engine)
   sub_state = flags & (1 << 2);
 
   if (sub_state) {
-    flags &= ~(1 << 2);                         //GST_PLAY_FLAG_TEXT off
+    flags &= ~(1 << 2);         //GST_PLAY_FLAG_TEXT off
   } else {
-    flags |= (1 << 2);                          //GST_PLAY_FLAG_TEXT on
+    flags |= (1 << 2);          //GST_PLAY_FLAG_TEXT on
   }
 
   g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);

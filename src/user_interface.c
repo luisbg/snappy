@@ -104,7 +104,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         {
           clutter_main_quit ();
 
-	  handled = TRUE;
+          handled = TRUE;
           break;
         }
 
@@ -130,7 +130,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         {
           ui->engine->loop = !ui->engine->loop;
 
-	  handled = TRUE;
+          handled = TRUE;
           break;
         }
 
@@ -467,8 +467,7 @@ load_controls (UserInterface * ui)
   }
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
-      ui->control_play_toggle,
-      FALSE,                            /* expand */
+      ui->control_play_toggle, FALSE,        /* expand */
       FALSE,                            /* x-fill */
       FALSE,                            /* y-fill */
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
@@ -488,10 +487,9 @@ load_controls (UserInterface * ui)
   clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
       ui->title_length);
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
-      ui->control_title,
-      TRUE,                             /* expand */
-      FALSE,                            /* x-fill */
-      FALSE,                            /* y-fill */
+      ui->control_title, TRUE,  /* expand */
+      FALSE,                    /* x-fill */
+      FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
@@ -513,10 +511,10 @@ load_controls (UserInterface * ui)
   clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
       ui->control_seekbar);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), seek_box,
-      TRUE,                             /* expand */
-      FALSE,                            /* x-fill */
-      FALSE,                            /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
+      seek_box, TRUE,           /* expand */
+      FALSE,                    /* x-fill */
+      FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
@@ -581,10 +579,10 @@ load_controls (UserInterface * ui)
   clutter_box_pack (CLUTTER_BOX (middle_box), ui->control_pos,
       "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", TRUE, NULL);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), middle_box,
-      TRUE,                             /* expand */
-      FALSE,                            /* x-fill */
-      FALSE,                            /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
+      middle_box, TRUE,         /* expand */
+      FALSE,                    /* x-fill */
+      FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
 
@@ -599,31 +597,31 @@ load_controls (UserInterface * ui)
 
   // Controls video stream toggle
   ui->video_stream_toggle = clutter_texture_new_from_file
-    (ui->video_stream_toggle_png, &error);
+      (ui->video_stream_toggle_png, &error);
   if (!ui->video_stream_toggle && error)
     g_debug ("Clutter error: %s\n", error->message);
   if (error) {
     g_error_free (error);
     error = NULL;
   }
-  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->video_stream_toggle, "x-align",
-      CLUTTER_BOX_ALIGNMENT_START, NULL);
+  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->video_stream_toggle,
+      "x-align", CLUTTER_BOX_ALIGNMENT_START, NULL);
 
   // Controls audio stream toggle
   ui->audio_stream_toggle = clutter_texture_new_from_file
-    (ui->audio_stream_toggle_png, &error);
+      (ui->audio_stream_toggle_png, &error);
   if (!ui->audio_stream_toggle && error)
     g_debug ("Clutter error: %s\n", error->message);
   if (error) {
     g_error_free (error);
     error = NULL;
   }
-  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->audio_stream_toggle, "x-align",
-      CLUTTER_BOX_ALIGNMENT_END, NULL);
+  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->audio_stream_toggle,
+      "x-align", CLUTTER_BOX_ALIGNMENT_END, NULL);
 
   // Controls subtitle toggle
   ui->subtitle_toggle = clutter_texture_new_from_file (ui->subtitle_toggle_png,
-                                                       &error);
+      &error);
   if (!ui->subtitle_toggle && error)
     g_debug ("Clutter error: %s\n", error->message);
   if (error) {
@@ -633,17 +631,17 @@ load_controls (UserInterface * ui)
   clutter_box_pack (CLUTTER_BOX (bottom_box), ui->subtitle_toggle, "x-align",
       CLUTTER_BOX_ALIGNMENT_END, NULL);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), bottom_box,
-      TRUE,                             /* expand */
-      FALSE,                            /* x-fill */
-      FALSE,                            /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
+      bottom_box, TRUE,         /* expand */
+      FALSE,                    /* x-fill */
+      FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->info_box,
-      FALSE,                            /* expand */
-      TRUE,                             /* x-fill */
-      FALSE,                            /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
+      ui->info_box, FALSE,      /* expand */
+      TRUE,                     /* x-fill */
+      FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
@@ -969,8 +967,7 @@ update_controls_size (UserInterface * ui)
 
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
-  clutter_actor_set_size (ui->volume_high,
-      icon_size * 1.2f, icon_size); /* originally 120x100 */
+  clutter_actor_set_size (ui->volume_high, icon_size * 1.2f, icon_size);        /* originally 120x100 */
   clutter_actor_set_size (ui->subtitle_toggle, icon_size, icon_size);
   clutter_actor_set_size (ui->video_stream_toggle, icon_size, icon_size);
   clutter_actor_set_size (ui->audio_stream_toggle, icon_size, icon_size);
@@ -1088,12 +1085,11 @@ interface_start (UserInterface * ui, gchar * uri)
   clutter_stage_set_title (CLUTTER_STAGE (ui->stage), ui->filename);
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->stage_width,
-    ui->stage_height);
+      ui->stage_height);
 
   if (ui->fullscreen) {
     clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), TRUE);
   }
-
   // Controls
   load_controls (ui);
 
