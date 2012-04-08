@@ -1,8 +1,6 @@
 Common
 ------
 
-- Port to Windows and Mac OS X.
-
 - Key controls configurable through a ~/.config/ file
 
 - Display playback date of history files.
@@ -19,10 +17,10 @@ UI
 
 - Working rotated video aspect ratio for the all positions
 
+- Zoom in/out video
+
 Engine
 ------
-
-- Support subtitles
 
 - Handle playlists
 
@@ -34,6 +32,8 @@ Engine
 
 - gst-launch-esque pipeline handling
 
-- support for picture files
+- Support for picture files
 
 - buffering modes
+
+- Reverse playback direction
