@@ -66,7 +66,7 @@ close_down (UserInterface * ui, GstEngine * engine)
 gboolean
 process_args (int argc, char *argv[],
     gchar * file_list[], gboolean * fullscreen, gboolean * secret,
-    gchar * suburi[], gboolean * loop, GOptionContext * context)
+    gchar ** suburi, gboolean * loop, GOptionContext * context)
 {
   gboolean recent = FALSE, version = FALSE;
   guint c, index, pos = 0;
@@ -79,7 +79,7 @@ process_args (int argc, char *argv[],
         "Show recently viewed", NULL},
     {"secret", 's', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, secret,
         "Views not saved in recently viewed history", NULL},
-    {"subtitles", 't', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_STRING,
+    {"subtitles", 't', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_FILENAME,
         suburi, "Use this subtitle file", NULL},
     {"version", 'v', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, &version,
         "Shows snappy's version", NULL},
