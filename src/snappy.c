@@ -156,7 +156,7 @@ main (int argc, char *argv[])
   guint c, index, pos = 0;
   gchar *uri;
   gchar *file_list[argc];
-  gchar *suburi;
+  gchar *suburi = NULL;
   GOptionContext *context;
 
 #ifdef ENABLE_DBUS

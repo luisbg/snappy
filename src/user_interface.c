@@ -1105,7 +1105,8 @@ interface_start (UserInterface * ui, gchar * uri)
       G_CALLBACK (size_change), ui);
   g_signal_connect (CLUTTER_STAGE (ui->stage), "unfullscreen",
       G_CALLBACK (size_change), ui);
-  g_signal_connect (ui->stage, "event", G_CALLBACK (event_cb), ui);
+  g_signal_connect (CLUTTER_STAGE (ui->stage), "event", G_CALLBACK (event_cb),
+      ui);
 
   clutter_actor_set_anchor_point_from_gravity (CLUTTER_ACTOR (ui->texture),
       CLUTTER_GRAVITY_CENTER);
