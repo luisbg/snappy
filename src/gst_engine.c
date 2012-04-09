@@ -49,6 +49,15 @@ typedef enum
   GST_PLAY_FLAG_BUFFERING = 0x000000100
 } GstPlayFlags;
 
+// Declaration of static functions
+static void write_key_file_to_file (GKeyFile * keyfile, const char *path);
+gboolean add_uri_to_history (gchar * uri);
+gboolean add_uri_unfinished_playback (GstEngine * engine, gchar * uri,
+    gint64 position);
+gboolean discover (GstEngine * engine, gchar * uri);
+gint64 is_uri_unfinished_playback (GstEngine * engine, gchar * uri);
+gboolean remove_uri_unfinished_playback (GstEngine * engine, gchar * uri);
+
 /* -------------------- static functions --------------------- */
 
 static void
