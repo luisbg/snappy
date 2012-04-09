@@ -184,7 +184,10 @@ main (int argc, char *argv[])
 
   /* Gstreamer engine */
   engine = g_new (GstEngine, 1);
-  sink = clutter_gst_video_sink_new (CLUTTER_TEXTURE (video_texture));
+  sink = gst_element_factory_make ("cluttersink", "cluttersink");
+  g_object_set (G_OBJECT (sink), "texture", CLUTTER_TEXTURE (video_texture),
+      NULL);
+
   ok = engine_init (engine, sink);
   if (!ok)
     goto quit;
