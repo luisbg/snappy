@@ -820,8 +820,6 @@ size_change (ClutterStage * stage,
   }
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), new_width, new_height);
-  clutter_actor_set_position (CLUTTER_ACTOR (ui->texture), stage_width / 2,
-      stage_height / 2);
 
   update_controls_size (ui);
   center_controls (ui);
@@ -1101,6 +1099,10 @@ interface_start (UserInterface * ui, gchar * uri)
   // Add video texture and control UI to stage
   clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->texture,
       ui->control_box, NULL);
+  clutter_actor_add_constraint (ui->texture,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
+  clutter_actor_add_constraint (ui->texture,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.5));
 
   clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
   clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, SECOND,
@@ -1110,11 +1112,6 @@ interface_start (UserInterface * ui, gchar * uri)
       G_CALLBACK (size_change), ui);
   g_signal_connect (CLUTTER_STAGE (ui->stage), "event", G_CALLBACK (event_cb),
       ui);
-
-  clutter_actor_set_anchor_point_from_gravity (CLUTTER_ACTOR (ui->texture),
-      CLUTTER_GRAVITY_CENTER);
-  clutter_actor_set_position (CLUTTER_ACTOR (ui->texture), ui->stage_width / 2,
-      ui->stage_height / 2);
 
   center_controls (ui);
   progress_timing (ui);
