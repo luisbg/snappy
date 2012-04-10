@@ -28,7 +28,6 @@
 #include "utils.h"
 
 // Declaration of static functions
-static void center_controls (UserInterface * ui);
 static gboolean controls_timeout_cb (gpointer data);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
     UserInterface * ui);
@@ -49,25 +48,6 @@ static void update_controls_size (UserInterface * ui);
 static gboolean update_volume (UserInterface * ui, gdouble volume);
 
 /* ---------------------- static functions ----------------------- */
-
-static void
-center_controls (UserInterface * ui)
-{
-  gfloat x, y, ctl_width, ctl_height;
-
-  ctl_width = ui->stage_width * CONTROLS_WIDTH_RATIO;
-  ctl_height = ui->stage_height * CONTROLS_HEIGHT_RATIO;
-
-  if (ctl_width / ctl_height > CONTROLS_ASPECT_RATIO) {
-    ctl_width = ctl_height * CONTROLS_ASPECT_RATIO;
-  } else {
-    ctl_height = ctl_width / CONTROLS_ASPECT_RATIO;
-  }
-
-  x = (ui->stage_width - ctl_width) / 2.0f;
-  y = ui->stage_height * 2.0f / 3.0f;
-  clutter_actor_set_position (ui->control_box, x, y);
-}
 
 static gboolean
 controls_timeout_cb (gpointer data)
@@ -454,6 +434,10 @@ load_controls (UserInterface * ui)
   g_free (vid_panel_png);
   clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
       ui->control_bg);
+  clutter_actor_add_constraint (ui->control_box,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
+  clutter_actor_add_constraint (ui->control_box,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.95));
 
   // Controls play toggle
   main_box_layout = clutter_box_layout_new ();
@@ -822,7 +806,6 @@ size_change (ClutterStage * stage,
   clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), new_width, new_height);
 
   update_controls_size (ui);
-  center_controls (ui);
   progress_timing (ui);
 }
 
@@ -1113,7 +1096,6 @@ interface_start (UserInterface * ui, gchar * uri)
   g_signal_connect (CLUTTER_STAGE (ui->stage), "event", G_CALLBACK (event_cb),
       ui);
 
-  center_controls (ui);
   progress_timing (ui);
 
   ui->screensaver = screensaver_new (CLUTTER_STAGE (ui->stage));
