@@ -1072,6 +1072,7 @@ interface_start (UserInterface * ui, gchar * uri)
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->stage_width,
       ui->stage_height);
+  clutter_stage_set_user_resizable (CLUTTER_STAGE (ui->stage), TRUE);
 
   if (ui->fullscreen) {
     clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), TRUE);
