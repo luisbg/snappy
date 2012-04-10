@@ -39,7 +39,9 @@ static void progress_timing (UserInterface * ui);
 static gboolean progress_update_text (gpointer data);
 static gboolean progress_update_seekbar (gpointer data);
 gboolean rotate_video (UserInterface * ui);
-static void size_change (ClutterStage * stage, UserInterface * ui);
+static void size_change (ClutterStage * stage,
+    const ClutterActorBox * allocation, ClutterAllocationFlags flags,
+    UserInterface * ui);
 static void show_controls (UserInterface * ui, gboolean vis);
 static void toggle_fullscreen (UserInterface * ui);
 static void toggle_playing (UserInterface * ui);
@@ -128,6 +130,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         case CLUTTER_l:
         {
+          // Loop
           ui->engine->loop = !ui->engine->loop;
 
           handled = TRUE;
@@ -647,7 +650,7 @@ load_controls (UserInterface * ui)
 
   clutter_actor_lower_bottom (ui->control_bg);
 
-  size_change (CLUTTER_STAGE (ui->stage), ui);
+  size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 }
 
 static gboolean
@@ -767,11 +770,13 @@ rotate_video (UserInterface * ui)
     }
   }
 
-  size_change (CLUTTER_STAGE (ui->stage), ui);
+  size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 }
 
 static void
-size_change (ClutterStage * stage, UserInterface * ui)
+size_change (ClutterStage * stage,
+    const ClutterActorBox * allocation,
+    ClutterAllocationFlags flags, UserInterface * ui)
 {
   gfloat stage_width, stage_height;
   gfloat new_width, new_height;
@@ -1101,9 +1106,7 @@ interface_start (UserInterface * ui, gchar * uri)
   clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, SECOND,
       "opacity", 0, NULL);
 
-  g_signal_connect (CLUTTER_STAGE (ui->stage), "fullscreen",
-      G_CALLBACK (size_change), ui);
-  g_signal_connect (CLUTTER_STAGE (ui->stage), "unfullscreen",
+  g_signal_connect (CLUTTER_STAGE (ui->stage), "allocation-changed",
       G_CALLBACK (size_change), ui);
   g_signal_connect (CLUTTER_STAGE (ui->stage), "event", G_CALLBACK (event_cb),
       ui);
