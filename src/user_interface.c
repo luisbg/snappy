@@ -550,6 +550,7 @@ load_controls (UserInterface * ui)
 
   ui->vol_int_bg = clutter_rectangle_new_with_color (&control_color1);
   clutter_container_add_actor (CLUTTER_CONTAINER (vol_int_box), ui->vol_int_bg);
+  clutter_actor_set_position (ui->vol_int_bg, 0, 0);
 
   ui->vol_int = clutter_rectangle_new_with_color (&control_color1);
   clutter_container_add_actor (CLUTTER_CONTAINER (vol_int_box), ui->vol_int);
@@ -953,7 +954,6 @@ update_controls_size (UserInterface * ui)
       VOLUME_WIDTH_RATIO;
   ui->volume_height = ctl_height * MAIN_BOX_H * VOLUME_HEIGHT_RATIO;
   clutter_actor_set_size (ui->vol_int_bg, ui->volume_width, ui->volume_height);
-  clutter_actor_set_position (ui->vol_int_bg, 0, 0);
 
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
