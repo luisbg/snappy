@@ -492,15 +492,21 @@ load_controls (UserInterface * ui)
   // background box rectangle shows as the border
   ui->control_seek1 = clutter_rectangle_new_with_color (&control_color1);
   clutter_container_add_actor (CLUTTER_CONTAINER (seek_box), ui->control_seek1);
+  clutter_actor_add_constraint (ui->control_seek1,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
+  clutter_actor_add_constraint (ui->control_seek1,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0));
 
   // smaller background rectangle inside seek1 to create a border
   ui->control_seek2 = clutter_rectangle_new_with_color (&control_color2);
   clutter_container_add_actor (CLUTTER_CONTAINER (seek_box), ui->control_seek2);
+  clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
 
   // progress rectangle
   ui->control_seekbar = clutter_rectangle_new_with_color (&control_color1);
   clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
       ui->control_seekbar);
+  clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
       seek_box, TRUE,           /* expand */
@@ -932,13 +938,10 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_size (ui->control_seek1,
       ui->seek_width + 2.0f * SEEK_BORDER,
       ui->seek_height + 2.0f * SEEK_BORDER);
-  clutter_actor_set_position (ui->control_seek1, 0, 0);
 
   clutter_actor_set_size (ui->control_seek2, ui->seek_width, ui->seek_height);
-  clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
 
   progress_update_seekbar (ui);
-  clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
   font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_height * POS_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_pos), font_name);
