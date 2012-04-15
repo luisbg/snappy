@@ -461,6 +461,10 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
   clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
       ui->main_box);
+  clutter_actor_add_constraint (ui->main_box,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.03));
+  clutter_actor_add_constraint (ui->main_box,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.03));
   g_assert (ui->control_bg && ui->control_play_toggle);
 
   // Controls title
@@ -909,9 +913,6 @@ update_controls_size (UserInterface * ui)
       ctl_height + (ctl_height / BG_H) * SHADOW_BOTTOM);
   clutter_actor_set_size (ui->main_box, ctl_width * MAIN_BOX_W,
       ctl_height * MAIN_BOX_H);
-  clutter_actor_set_position (ui->main_box,
-      ctl_width * (1.0f - MAIN_BOX_W) / 2.0f,
-      ctl_height * (1.0f - MAIN_BOX_H) / 2.0f);
 
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
