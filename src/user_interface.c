@@ -430,6 +430,10 @@ load_controls (UserInterface * ui)
     g_error_free (error);
     error = NULL;
   }
+  clutter_actor_add_constraint (ui->control_bg,
+      clutter_bind_constraint_new (ui->control_box, CLUTTER_BIND_WIDTH, 0));
+  clutter_actor_add_constraint (ui->control_bg,
+      clutter_bind_constraint_new (ui->control_box, CLUTTER_BIND_HEIGHT, 0));
 
   g_free (vid_panel_png);
   clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
@@ -915,11 +919,6 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_size (ui->control_box,
       ctl_width + (ctl_width / BG_W) * SHADOW_RIGHT,
       ctl_height + (ctl_height / BG_H) * SHADOW_BOTTOM);
-  clutter_actor_set_size (ui->control_bg,
-      ctl_width + (ctl_width / BG_W) * SHADOW_RIGHT,
-      ctl_height + (ctl_height / BG_H) * SHADOW_BOTTOM);
-  clutter_actor_set_size (ui->main_box, ctl_width * MAIN_BOX_W,
-      ctl_height * MAIN_BOX_H);
 
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
