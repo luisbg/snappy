@@ -527,7 +527,6 @@ load_controls (UserInterface * ui)
   volume_box_layout = clutter_box_layout_new ();
   clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (volume_box_layout),
       FALSE);
-  clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (volume_box_layout), 0);
   ui->volume_box = clutter_box_new (volume_box_layout);
 
   clutter_box_pack (CLUTTER_BOX (middle_box), ui->volume_box,
@@ -643,7 +642,7 @@ load_controls (UserInterface * ui)
       TRUE,                     /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
-      CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
+      CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
   clutter_actor_lower_bottom (ui->control_bg);
 
@@ -915,13 +914,13 @@ update_controls_size (UserInterface * ui)
   }
 
   clutter_actor_set_size (ui->control_box,
-      ctl_width + (ctl_width / BG_W) * SHADOW_RIGHT,
-      ctl_height + (ctl_height / BG_H) * SHADOW_BOTTOM);
+      ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT),
+      ctl_height + ((ctl_height / BG_H) * SHADOW_BOTTOM));
 
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
-  clutter_actor_set_size (ui->info_box, ctl_width * MAIN_BOX_W - icon_size,
-      ctl_height * MAIN_BOX_H * MAIN_BOX_H);
+  clutter_actor_set_size (ui->info_box, (ctl_width * MAIN_BOX_W - icon_size),
+      ctl_height * MAIN_BOX_H);
 
   font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_width * TITLE_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
