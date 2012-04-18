@@ -441,11 +441,19 @@ load_controls (UserInterface * ui)
   clutter_actor_add_constraint (ui->control_box,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.95));
 
-  // Controls play toggle
+  // Main Box
   main_box_layout = clutter_box_layout_new ();
   clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (main_box_layout), FALSE);
   ui->main_box = clutter_box_new (main_box_layout);
 
+  clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
+      ui->main_box);
+  clutter_actor_add_constraint (ui->main_box,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.03));
+  clutter_actor_add_constraint (ui->main_box,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.03));
+
+  // Controls play toggle
   ui->control_play_toggle =
       clutter_texture_new_from_file (ui->pause_png, &error);
   if (!ui->control_play_toggle && error)
@@ -454,6 +462,7 @@ load_controls (UserInterface * ui)
     g_error_free (error);
     error = NULL;
   }
+  g_assert (ui->control_bg && ui->control_play_toggle);
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
       ui->control_play_toggle, FALSE,        /* expand */
@@ -461,13 +470,6 @@ load_controls (UserInterface * ui)
       FALSE,                            /* y-fill */
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
-  clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
-      ui->main_box);
-  clutter_actor_add_constraint (ui->main_box,
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.03));
-  clutter_actor_add_constraint (ui->main_box,
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.03));
-  g_assert (ui->control_bg && ui->control_play_toggle);
 
   // Controls title
   info_box_layout = clutter_box_layout_new ();
@@ -641,7 +643,7 @@ load_controls (UserInterface * ui)
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
       ui->info_box, FALSE,      /* expand */
-      TRUE,                     /* x-fill */
+      FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
