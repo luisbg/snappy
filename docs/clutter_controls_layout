@@ -12,11 +12,9 @@ ui->control_box (fixed alignment bin)
 			ui->control_title
 			seek_box (fixed alignment bin)
 			[
-				ui->in_point
 				ui->control_seek1
 				ui->control_seek2
 				ui->control_seekbar
-				ui->out_point
 			]
 
 			middle_box (horizontal alignment box)
