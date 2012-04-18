@@ -514,7 +514,7 @@ load_controls (UserInterface * ui)
       seek_box, TRUE,           /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
+      CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
   // Controls middle box
@@ -527,10 +527,11 @@ load_controls (UserInterface * ui)
   volume_box_layout = clutter_box_layout_new ();
   clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (volume_box_layout),
       FALSE);
+  clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (volume_box_layout), 5);
   ui->volume_box = clutter_box_new (volume_box_layout);
 
   clutter_box_pack (CLUTTER_BOX (middle_box), ui->volume_box,
-      "x-align", CLUTTER_BOX_ALIGNMENT_START, "expand", TRUE, NULL);
+      "x-align", CLUTTER_BOX_ALIGNMENT_START, "expand", FALSE, NULL);
 
   // Controls volume low
   ui->volume_low = clutter_texture_new_from_file (ui->volume_low_png, &error);
@@ -576,19 +577,20 @@ load_controls (UserInterface * ui)
   ui->control_pos = clutter_text_new_full ("Sans 22px", duration_str,
       &control_color1);
   clutter_box_pack (CLUTTER_BOX (middle_box), ui->control_pos,
-      "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", TRUE, NULL);
+      "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", FALSE, NULL);
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
       middle_box, TRUE,         /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
-      CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
+      CLUTTER_BOX_ALIGNMENT_END,     /* x-align */
+      CLUTTER_BOX_ALIGNMENT_END);    /* y-align */
 
   // Controls bottom box
   bottom_box_layout = clutter_box_layout_new ();
   clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (bottom_box_layout),
       FALSE);
+  clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (bottom_box_layout), 5);
   bottom_box = clutter_box_new (bottom_box_layout);
 
   clutter_box_pack (CLUTTER_BOX (middle_box), ui->volume_box,
@@ -926,7 +928,7 @@ update_controls_size (UserInterface * ui)
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
   text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_title));
 
-  ui->seek_width =
+  ui->seek_width = 12 +                         // accomodate volume_box spacing
       (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO -
       2.0f * SEEK_BORDER;
   ui->seek_height =
