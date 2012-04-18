@@ -431,9 +431,7 @@ load_controls (UserInterface * ui)
     error = NULL;
   }
   clutter_actor_add_constraint (ui->control_bg,
-      clutter_bind_constraint_new (ui->control_box, CLUTTER_BIND_WIDTH, 0));
-  clutter_actor_add_constraint (ui->control_bg,
-      clutter_bind_constraint_new (ui->control_box, CLUTTER_BIND_HEIGHT, 0));
+      clutter_bind_constraint_new (ui->control_box, CLUTTER_BIND_SIZE, 0));
 
   g_free (vid_panel_png);
   clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
