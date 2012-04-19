@@ -533,7 +533,7 @@ load_controls (UserInterface * ui)
   ui->volume_box = clutter_box_new (volume_box_layout);
 
   clutter_box_pack (CLUTTER_BOX (middle_box), ui->volume_box,
-      "x-align", CLUTTER_BOX_ALIGNMENT_START, "expand", FALSE, NULL);
+      "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", FALSE, NULL);
 
   // Controls volume low
   ui->volume_low = clutter_texture_new_from_file (ui->volume_low_png, &error);
@@ -594,9 +594,6 @@ load_controls (UserInterface * ui)
       FALSE);
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (bottom_box_layout), 5);
   bottom_box = clutter_box_new (bottom_box_layout);
-
-  clutter_box_pack (CLUTTER_BOX (middle_box), ui->volume_box,
-      "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", FALSE, NULL);
 
   // Controls video stream toggle
   ui->video_stream_toggle = clutter_texture_new_from_file
