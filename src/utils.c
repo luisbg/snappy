@@ -63,7 +63,12 @@ clean_uri (gchar * input_arg)
     }
 
     fileuri = g_file_get_path (gfile);
-    fileuri = g_strdup_printf ("file://%s", fileuri);
+
+    if (g_str_has_suffix (fileuri, ".iso")) {
+      fileuri = g_strdup_printf ("dvd://%s", fileuri);
+    } else {
+      fileuri = g_strdup_printf ("file://%s", fileuri);
+    }
   }
 
   return fileuri;

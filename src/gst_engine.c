@@ -281,6 +281,7 @@ is_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   return position;
 }
 
+
 /*  Print message tags from elements  */
 static void
 print_tag (const GstTagList * list, const gchar * tag, gpointer unused)
@@ -560,15 +561,15 @@ gboolean
 engine_load_uri (GstEngine * engine, gchar * uri)
 {
   engine->uri = uri;
-  g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
 
   /* Loading a new URI means we haven't started playing this URI yet */
   engine->has_started = FALSE;
   engine->queries_blocked = TRUE;
 
-  g_print ("Loading: %s\n", uri);
-
   discover (engine, uri);
+
+  g_print ("Loading: %s\n", uri);
+  g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
 
   return TRUE;
 }
