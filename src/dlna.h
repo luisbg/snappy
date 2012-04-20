@@ -36,20 +36,10 @@ G_BEGIN_DECLS
 #define MPRIS_PLAYER_INTERFACE "org.mpris.MediaPlayer2.Player"
 #define MPRIS_TRACKLIST_INTERFACE "org.mpris.MediaPlayer2.TrackList"
 #define MPRIS_PLAYLISTS_INTERFACE "org.mpris.MediaPlayer2.Playlists"
-#define SNAPPY_TYPE_MP              (snappy_mp_get_type ())
-#define SNAPPY_MP(obj)              (G_TYPE_CHECK_INSTANCE_CAST ((obj), SNAPPY_TYPE_MP, SnappyMP))
-#define SNAPPY_IS_MP(obj)           (G_TYPE_CHECK_INSTANCE_TYPE ((obj), SNAPPY_TYPE_MP))
-#define SNAPPY_MP_CLASS(klass)      (G_TYPE_CHECK_CLASS_CAST ((klass), SNAPPY_TYPE_MP, SnappyMPClass))
-#define SNAPPY_IS_MP_CLASS(klass)   (G_TYPE_CHECK_CLASS_TYPE ((klass), SNAPPY_TYPE_MP))
-#define SNAPPY_MP_GET_CLASS(obj)    (G_TYPE_INSTANCE_GET_CLASS ((obj), SNAPPY_TYPE_MP, SnappyMPClass))
-/* The object we want to export */
-typedef struct _SnappyMP SnappyMP;
-typedef struct _SnappyMPClass SnappyMPClass;
 
+typedef struct _SnappyMP SnappyMP;
 struct _SnappyMP
 {
-  GObject parent_instance;
-
   gchar *name;
 
   GDBusConnection *connection;
@@ -73,14 +63,6 @@ struct _SnappyMP
   GstEngine *engine;
   UserInterface *ui;
 };
-
-struct _SnappyMPClass
-{
-  GObjectClass parent_class;
-};
-
-/* used by SNAPPY_TYPE_MP */
-GType snappy_mp_get_type ();
 
 enum
 {

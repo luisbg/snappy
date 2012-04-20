@@ -145,80 +145,11 @@ static const GDBusInterfaceVTable root_vtable = {
 
 static GDBusNodeInfo *introspection_data = NULL;
 
-G_DEFINE_TYPE (SnappyMP, my_object, G_TYPE_OBJECT);
-
-static void
-my_object_init (SnappyMP * object)
-{
-  // g_print ("my_object_init\n");
-
-  object->name = "snappy";
-}
-
-static void
-my_object_finalize (GObject * object)
-{
-  SnappyMP *myobj = (SnappyMP *) object;
-
-  g_free (myobj->name);
-
-  G_OBJECT_CLASS (my_object_parent_class)->finalize (object);
-}
-
-static void
-my_object_get_property (GObject * object,
-    guint prop_id, GValue * value, GParamSpec * pspec)
-{
-  SnappyMP *myobj = (SnappyMP *) object;
-
-  switch (prop_id) {
-    case PROP_NAME:
-      g_value_set_string (value, myobj->name);
-      break;
-
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-  }
-}
-
-static void
-my_object_set_property (GObject * object,
-    guint prop_id, const GValue * value, GParamSpec * pspec)
-{
-  SnappyMP *myobj = (SnappyMP *) object;
-
-  switch (prop_id) {
-    case PROP_NAME:
-      g_free (myobj->name);
-      myobj->name = g_value_dup_string (value);
-      break;
-
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-  }
-}
-
-static void
-my_object_class_init (SnappyMPClass * class)
-{
-  GObjectClass *gobject_class = G_OBJECT_CLASS (class);
-
-  gobject_class->finalize = my_object_finalize;
-  gobject_class->set_property = my_object_set_property;
-  gobject_class->get_property = my_object_get_property;
-
-  g_object_class_install_property (gobject_class,
-      PROP_NAME,
-      g_param_spec_string ("name", "Name", "Name", NULL, G_PARAM_READWRITE));
-}
-
 void
 my_object_change_uri (SnappyMP * myobj, gchar * uri)
 {
   if (myobj != NULL)
     myobj->uri = uri;
-
-  g_object_set (G_OBJECT (myobj), "uri", uri, NULL);
 
   engine_open_uri (myobj->engine, uri);
   interface_load_uri (myobj->ui, uri);
@@ -319,8 +250,6 @@ handle_get_property (GDBusConnection * connection,
   ret = NULL;
   if (g_strcmp0 (property_name, "Name") == 0) {
     ret = g_variant_new_string (myobj->name ? myobj->name : "snappy");
-    //ret = g_variant_new_string ("snappy");
-
   } else if (g_strcmp0 (property_name, "PlaybackStatus") == 0) {
     ret = g_variant_new_string ("Paused");
   } else if (g_strcmp0 (property_name, "LoopStatus") == 0) {
@@ -387,7 +316,8 @@ handle_set_property (GDBusConnection * connection,
   SnappyMP *myobj = user_data;
 
   if (g_strcmp0 (property_name, "Name") == 0) {
-    g_object_set (myobj, "name", g_variant_get_string (value, NULL), NULL);
+    if (value != NULL)
+      myobj->name = g_strdup (g_variant_get_string (value, NULL));
 
   } else if (g_strcmp0 (property_name, "Volume") == 0) {
     gdouble level;
@@ -480,13 +410,11 @@ get_root_property (GDBusConnection * connection,
 }
 
 static void
-send_property_change (GObject * obj,
+send_property_change (SnappyMP * myobj,
     GParamSpec * pspec, GDBusConnection * connection)
 {
-
   GVariantBuilder *builder;
   GVariantBuilder *invalidated_builder;
-  SnappyMP *myobj = (SnappyMP *) obj;
 
   builder = g_variant_builder_new (G_VARIANT_TYPE_ARRAY);
   invalidated_builder = g_variant_builder_new (G_VARIANT_TYPE ("as"));
@@ -560,10 +488,10 @@ load_dlna (SnappyMP * mp)
       G_BUS_NAME_OWNER_FLAGS_NONE,
       NULL,
       (GBusNameAcquiredCallback) on_name_acquired,
-      (GBusNameLostCallback) on_name_lost, g_object_ref (mp), g_object_unref);
+      (GBusNameLostCallback) on_name_lost, mp, NULL);
   g_assert (mp->owner_id > 0);
 
-  mp->name = "snappy";
+  mp->name = g_strdup ("snappy");
 
   return TRUE;
 }
@@ -572,10 +500,8 @@ gboolean
 close_dlna (SnappyMP * mp)
 {
   g_bus_unown_name (mp->owner_id);
-
   g_dbus_node_info_unref (introspection_data);
-
-  g_object_unref (mp);
+  g_free (mp->name);
 
   return TRUE;
 }
