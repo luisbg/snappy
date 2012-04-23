@@ -364,24 +364,24 @@ static void
 load_controls (UserInterface * ui)
 {
   // Check icon files exist
-  gchar *vid_panel_png;
+  gchar *vid_panel_png  = NULL;
   gchar *icon_files[8];
-  gchar *duration_str;
+  gchar *duration_str  = NULL;
   gint c;
   ClutterColor control_color1 = { 0x12, 0x12, 0x12, 0xff };
   ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
-  ClutterLayoutManager *controls_layout;
-  ClutterLayoutManager *main_box_layout;
-  ClutterLayoutManager *info_box_layout;
-  ClutterLayoutManager *middle_box_layout;
-  ClutterLayoutManager *bottom_box_layout;
-  ClutterLayoutManager *volume_box_layout;
-  ClutterLayoutManager *seek_box_layout;
-  ClutterLayoutManager *vol_int_box_layout;
-  ClutterActor *seek_box;
-  ClutterActor *middle_box;
-  ClutterActor *bottom_box;
-  ClutterActor *vol_int_box;
+  ClutterLayoutManager *controls_layout = NULL;
+  ClutterLayoutManager *main_box_layout = NULL;
+  ClutterLayoutManager *info_box_layout = NULL;
+  ClutterLayoutManager *middle_box_layout = NULL;
+  ClutterLayoutManager *bottom_box_layout = NULL;
+  ClutterLayoutManager *volume_box_layout = NULL;
+  ClutterLayoutManager *seek_box_layout = NULL;
+  ClutterLayoutManager *vol_int_box_layout = NULL;
+  ClutterActor *seek_box = NULL;
+  ClutterActor *middle_box = NULL;
+  ClutterActor *bottom_box = NULL;
+  ClutterActor *vol_int_box = NULL;
   GError *error = NULL;
 
   vid_panel_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR, "/vid-panel.png");
@@ -1078,12 +1078,15 @@ interface_start (UserInterface * ui, gchar * uri)
   if (ui->fullscreen) {
     clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), TRUE);
   }
+
   // Controls
   load_controls (ui);
 
   // Add video texture and control UI to stage
-  clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->texture,
-      ui->control_box, NULL);
+  if (!ui->hide) {
+    clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->control_box,NULL);
+  }
+  clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->texture, NULL);
   clutter_actor_add_constraint (ui->texture,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
   clutter_actor_add_constraint (ui->texture,
