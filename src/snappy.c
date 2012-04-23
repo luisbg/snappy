@@ -178,7 +178,7 @@ main (int argc, char *argv[])
 
   /* Process command arguments */
   ok = process_args (argc, argv, file_list, &blind, &fullscreen, &hide, &loop,
-    &secret, &suburi, &tags, context);
+      &secret, &suburi, &tags, context);
   if (!ok)
     goto quit;
 

@@ -364,9 +364,9 @@ static void
 load_controls (UserInterface * ui)
 {
   // Check icon files exist
-  gchar *vid_panel_png  = NULL;
+  gchar *vid_panel_png = NULL;
   gchar *icon_files[8];
-  gchar *duration_str  = NULL;
+  gchar *duration_str = NULL;
   gint c;
   ClutterColor control_color1 = { 0x12, 0x12, 0x12, 0xff };
   ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
@@ -927,7 +927,7 @@ update_controls_size (UserInterface * ui)
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
   text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_title));
 
-  ui->seek_width = 12 +                         // accomodate volume_box spacing
+  ui->seek_width = 12 +         // accomodate volume_box spacing
       (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO -
       2.0f * SEEK_BORDER;
   ui->seek_height =
@@ -1084,7 +1084,8 @@ interface_start (UserInterface * ui, gchar * uri)
 
   // Add video texture and control UI to stage
   if (!ui->hide) {
-    clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->control_box,NULL);
+    clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->control_box,
+        NULL);
   }
   clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->texture, NULL);
   clutter_actor_add_constraint (ui->texture,
