@@ -9,7 +9,7 @@ UI
 --
 
 - ncurses based interface, for entirely command line base control.
-  - example use case: controlled through ssh
+  - example use case: controlled through ssh or in blind mode
 
 - Single playback or loop mode button
 
@@ -19,8 +19,12 @@ UI
 
 - Zoom in/out video
 
+- Don't load controls in memory in blind or hidden mode
+
 Engine
 ------
+
+- DVD playback
 
 - Handle playlists
 
@@ -37,3 +41,5 @@ Engine
 - buffering modes
 
 - Reverse playback direction
+
+- Less verbose print tags
