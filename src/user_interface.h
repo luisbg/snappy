@@ -72,7 +72,7 @@ typedef struct _UserInterface UserInterface;
 struct _UserInterface
 {
   gboolean controls_showing, keep_showing_controls;
-  gboolean fullscreen, hide, penalty_box_active, tags;
+  gboolean blind, fullscreen, hide, penalty_box_active, tags;
   gboolean rotated;
 
   gint title_length, controls_timeout, progress_id;

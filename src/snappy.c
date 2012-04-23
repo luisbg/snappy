@@ -65,13 +65,15 @@ close_down (UserInterface * ui, GstEngine * engine)
 /*           Process command arguments           */
 gboolean
 process_args (int argc, char *argv[],
-    gchar * file_list[], gboolean * fullscreen, gboolean *hide,
-    gboolean * loop, gboolean * secret, gchar ** suburi, gboolean * tags,
-    GOptionContext * context)
+    gchar * file_list[], gboolean * blind, gboolean * fullscreen,
+    gboolean * hide, gboolean * loop, gboolean * secret, gchar ** suburi,
+    gboolean * tags, GOptionContext * context)
 {
   gboolean recent = FALSE, version = FALSE;
   guint c, index, pos = 0;
   GOptionEntry entries[] = {
+    {"blind", 'b', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, blind,
+        "Blind mode", NULL},
     {"fullscreen", 'f', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, fullscreen,
         "Fullscreen mode", NULL},
     {"hide-controls", 'h', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, hide,
@@ -156,7 +158,7 @@ main (int argc, char *argv[])
   ClutterActor *video_texture;
   GstElement *sink;
 
-  gboolean ok, fullscreen = FALSE, hide = FALSE, loop = FALSE;
+  gboolean ok, blind = FALSE, fullscreen = FALSE, hide = FALSE, loop = FALSE;
   gboolean secret = FALSE, tags = FALSE;
   gint ret = 0;
   guint c, index, pos = 0;
@@ -175,13 +177,14 @@ main (int argc, char *argv[])
   context = g_option_context_new ("<media file> - Play movie files");
 
   /* Process command arguments */
-  ok = process_args (argc, argv, file_list, &fullscreen, &hide, &loop, &secret,
-    &suburi, &tags, context);
+  ok = process_args (argc, argv, file_list, &blind, &fullscreen, &hide, &loop,
+    &secret, &suburi, &tags, context);
   if (!ok)
     goto quit;
 
   /* User Interface */
   ui = g_new (UserInterface, 1);
+  ui->blind = blind;
   ui->fullscreen = fullscreen;
   ui->hide = hide;
   ui->tags = tags;

@@ -1108,7 +1108,8 @@ interface_start (UserInterface * ui, gchar * uri)
 
   g_timeout_add (SECOND, progress_update_text, ui);
 
-  clutter_actor_show (ui->stage);
+  if (!ui->blind)
+    clutter_actor_show (ui->stage);
 }
 
 gboolean
