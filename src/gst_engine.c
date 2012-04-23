@@ -463,14 +463,16 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     {
       GstTagList *tags;
 
-      gst_message_parse_tag (msg, &tags);
-      if (tags) {
-        g_print ("%s\n",
-            GST_STR_NULL (GST_ELEMENT_NAME (GST_MESSAGE_SRC (msg))));
+      if (ui->tags) {
+        gst_message_parse_tag (msg, &tags);
+        if (tags) {
+          g_print ("%s\n",
+              GST_STR_NULL (GST_ELEMENT_NAME (GST_MESSAGE_SRC (msg))));
 
-        gst_tag_list_foreach (tags, print_tag, NULL);
-        gst_tag_list_free (tags);
-        tags = NULL;
+          gst_tag_list_foreach (tags, print_tag, NULL);
+          gst_tag_list_free (tags);
+          tags = NULL;
+        }
       }
       break;
     }
