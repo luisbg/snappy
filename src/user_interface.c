@@ -1083,11 +1083,11 @@ interface_start (UserInterface * ui, gchar * uri)
   load_controls (ui);
 
   // Add video texture and control UI to stage
+  clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->texture, NULL);
   if (!ui->hide) {
     clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->control_box,
         NULL);
   }
-  clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->texture, NULL);
   clutter_actor_add_constraint (ui->texture,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
   clutter_actor_add_constraint (ui->texture,
