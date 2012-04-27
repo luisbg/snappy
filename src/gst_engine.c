@@ -63,8 +63,12 @@ gboolean remove_uri_unfinished_playback (GstEngine * engine, gchar * uri);
 static void
 write_key_file_to_file (GKeyFile * keyfile, const char *path)
 {
-  gchar *data;
+  gchar *data, *dir;
   GError *error = NULL;
+
+  dir = g_path_get_dirname (path);
+  g_mkdir_with_parents (dir, S_IRUSR | S_IWUSR | S_IXUSR);
+  g_free (dir);
 
   data = g_key_file_to_data (keyfile, NULL, NULL);
   g_file_set_contents (path, data, strlen (data), &error);
