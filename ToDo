@@ -43,3 +43,5 @@ Engine
 - Reverse playback direction
 
 - Less verbose print tags
+
+- Add videobalance (hue/saturation/contrast/brightness)
