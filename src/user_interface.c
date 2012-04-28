@@ -254,12 +254,19 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         case CLUTTER_numbersign:
         case CLUTTER_underscore:
+        case CLUTTER_j:
         {
-          // cycle through available audio/video streams
-          gboolean video_stream;
+          // cycle through available audio/text/video streams
+          guint streamid;
 
-          video_stream = (keyval == CLUTTER_underscore);
-          toggle_streams (ui->engine, video_stream);
+          if (keyval == CLUTTER_numbersign)
+            streamid = STREAM_AUDIO;
+          else if (keyval == CLUTTER_j)
+            streamid = STREAM_TEXT;
+          else if (keyval == CLUTTER_underscore)
+            streamid = STREAM_VIDEO;
+
+          toggle_streams (ui->engine, streamid);
 
           handled = TRUE;
           break;
@@ -332,14 +339,14 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
             show_controls (ui, FALSE);
           }
 
+        } else if (actor == ui->audio_stream_toggle) {
+          toggle_streams (ui->engine, STREAM_AUDIO);
+
         } else if (actor == ui->subtitle_toggle) {
           toggle_subtitles (ui->engine);
 
         } else if (actor == ui->video_stream_toggle) {
-          toggle_streams (ui->engine, TRUE);
-
-        } else if (actor == ui->audio_stream_toggle) {
-          toggle_streams (ui->engine, FALSE);
+          toggle_streams (ui->engine, STREAM_VIDEO);
         }
       }
 

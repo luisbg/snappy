@@ -67,6 +67,13 @@
 
 G_BEGIN_DECLS
 
+enum
+{
+  STREAM_AUDIO,
+  STREAM_TEXT,
+  STREAM_VIDEO
+};
+
 typedef struct _UserInterface UserInterface;
 
 struct _UserInterface
