@@ -394,6 +394,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
   switch (GST_MESSAGE_TYPE (msg)) {
     case GST_MESSAGE_EOS:
+    {
       g_debug ("End-of-stream\n");
       /* When URI is finished remove from unfinished list */
       remove_uri_unfinished_playback (engine, engine->uri);
@@ -402,6 +403,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
         engine_seek (engine, 0);
 
       break;
+    }
 
     case GST_MESSAGE_ERROR:
     {
@@ -482,11 +484,8 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     }
 
     case GST_MESSAGE_ASYNC_DONE:
-    {
       engine->queries_blocked = FALSE;
-
       break;
-    }
 
     default:
       break;
