@@ -266,7 +266,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           else if (keyval == CLUTTER_underscore)
             streamid = STREAM_VIDEO;
 
-          toggle_streams (ui->engine, streamid);
+          cycle_streams (ui->engine, streamid);
 
           handled = TRUE;
           break;
@@ -340,13 +340,13 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           }
 
         } else if (actor == ui->audio_stream_toggle) {
-          toggle_streams (ui->engine, STREAM_AUDIO);
+          cycle_streams (ui->engine, STREAM_AUDIO);
 
         } else if (actor == ui->subtitle_toggle) {
           toggle_subtitles (ui->engine);
 
         } else if (actor == ui->video_stream_toggle) {
-          toggle_streams (ui->engine, STREAM_VIDEO);
+          cycle_streams (ui->engine, STREAM_VIDEO);
         }
       }
 

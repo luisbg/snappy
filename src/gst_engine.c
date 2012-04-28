@@ -524,6 +524,43 @@ change_state (GstEngine * engine, gchar * state)
 }
 
 
+/*               Cycle through streams           */
+gboolean
+cycle_streams (GstEngine * engine, guint streamid)
+{
+  gboolean last_stream = FALSE;
+  gint current;
+  gint streams;
+  gchar *n;
+  gchar *c;
+
+  if (streamid == STREAM_AUDIO) {
+    n = "n-audio";
+    c = "current-audio";
+   } else if (streamid == STREAM_TEXT) {
+    n = "n-text";
+    c = "current-text";
+  } else if (streamid == STREAM_VIDEO) {
+    n = "n-video";
+    c = "current-video";
+  }
+
+  g_object_get (G_OBJECT (engine->player), n, &streams, NULL);
+  g_object_get (G_OBJECT (engine->player), c, &current, NULL);
+
+  if (current < (streams - 1)) {
+    current++;
+  } else {
+    current = 0;
+    last_stream = TRUE;
+  }
+
+  g_object_set (G_OBJECT (engine->player), c, current, NULL);
+
+  return TRUE;
+}
+
+
 /*            Init GstEngine variables           */
 gboolean
 engine_init (GstEngine * engine, GstElement * sink)
@@ -753,41 +790,6 @@ set_subtitle_uri (GstEngine * engine, gchar * suburi)
   g_object_set (G_OBJECT (engine->player), "suburi", suburi, NULL);
 }
 
-/*                  Toggle streams               */
-gboolean
-toggle_streams (GstEngine * engine, guint streamid)
-{
-  gboolean last_stream = FALSE;
-  gint current;
-  gint streams;
-  gchar *n;
-  gchar *c;
-
-  if (streamid == STREAM_AUDIO) {
-    n = "n-audio";
-    c = "current-audio";
-   } else if (streamid == STREAM_TEXT) {
-    n = "n-text";
-    c = "current-text";
-  } else if (streamid == STREAM_VIDEO) {
-    n = "n-video";
-    c = "current-video";
-  }
-
-  g_object_get (G_OBJECT (engine->player), n, &streams, NULL);
-  g_object_get (G_OBJECT (engine->player), c, &current, NULL);
-
-  if (current < (streams - 1)) {
-    current++;
-  } else {
-    current = 0;
-    last_stream = TRUE;
-  }
-
-  g_object_set (G_OBJECT (engine->player), c, current, NULL);
-
-  return TRUE;
-}
 
 /*               Toggle subtitles                */
 gboolean
@@ -800,7 +802,7 @@ toggle_subtitles (GstEngine * engine)
   sub_state = flags & (1 << 2);
 
   if (sub_state) {        // If subtitles on, cycle streams and if last turn off
-    if (toggle_streams (engine, STREAM_TEXT)) {
+    if (cycle_streams (engine, STREAM_TEXT)) {
       flags &= ~(1 << 2);
       g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
     }
@@ -812,6 +814,7 @@ toggle_subtitles (GstEngine * engine)
 
   return TRUE;
 }
+
 
 /*          Update duration of URI streams       */
 gboolean
