@@ -534,15 +534,19 @@ cycle_streams (GstEngine * engine, guint streamid)
   gchar *n;
   gchar *c;
 
-  if (streamid == STREAM_AUDIO) {
-    n = "n-audio";
-    c = "current-audio";
-   } else if (streamid == STREAM_TEXT) {
-    n = "n-text";
-    c = "current-text";
-  } else if (streamid == STREAM_VIDEO) {
-    n = "n-video";
-    c = "current-video";
+  switch (streamid) {
+    case STREAM_AUDIO:
+      n = "n-audio";
+      c = "current-audio";
+      break;
+    case STREAM_TEXT:
+      n = "n-text";
+      c = "current-text";
+      break;
+    case STREAM_VIDEO:
+      n = "n-video";
+      c = "current-video";
+      break;
   }
 
   g_object_get (G_OBJECT (engine->player), n, &streams, NULL);
@@ -801,13 +805,13 @@ toggle_subtitles (GstEngine * engine)
   g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
   sub_state = flags & (1 << 2);
 
-  if (sub_state) {        // If subtitles on, cycle streams and if last turn off
+  if (sub_state) {              // If subtitles on, cycle streams and if last turn off
     if (cycle_streams (engine, STREAM_TEXT)) {
       flags &= ~(1 << 2);
       g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
     }
 
-  } else {                // If subtitles off, turn them on
+  } else {                      // If subtitles off, turn them on
     flags |= (1 << 2);
     g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
   }
