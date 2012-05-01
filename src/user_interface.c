@@ -74,11 +74,6 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
     {
       /* Clutter key codes based on */
       /* http://cgit.freedesktop.org/xorg/proto/x11proto/plain/keysymdef.h */
-
-      ClutterVertex center = { 0, };
-      ClutterAnimation *animation = NULL;
-
-      center.x - clutter_actor_get_width (ui->texture) / 2;
       guint keyval = clutter_event_get_key_symbol (event);
       switch (keyval) {
         case CLUTTER_q:
