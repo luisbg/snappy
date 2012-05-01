@@ -755,12 +755,6 @@ rotate_video (UserInterface * ui)
   clutter_actor_set_z_rotation_from_gravity (ui->texture, angle,
       CLUTTER_GRAVITY_CENTER);
 
-  if (angle == 90 || angle == 270) {
-    ui->rotated = TRUE;
-  } else {
-    ui->rotated = FALSE;
-  }
-
   size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 }
 
@@ -1052,8 +1046,6 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->progress_id = -1;
   ui->title_length = TITLE_LENGTH;
   ui->duration_str = position_ns_to_str (ui->engine->media_duration);
-
-  ui->rotated = FALSE;
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
   clutter_stage_set_minimum_size (CLUTTER_STAGE (ui->stage),
