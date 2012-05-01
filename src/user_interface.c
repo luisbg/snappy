@@ -760,6 +760,8 @@ rotate_video (UserInterface * ui)
   } else {
     ui->rotated = FALSE;
   }
+
+  size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 }
 
 static void
@@ -787,12 +789,7 @@ size_change (ClutterStage * stage,
   new_height = stage_height;
 
   if (media_height > 0.0f && media_width > 0.0f) {
-    /* if we're rotated, the media_width and media_height are swapped */
-    if (ui->rotated) {
-      media_ar = media_height / media_width;
-    } else {
-      media_ar = media_width / media_height;
-    }
+    media_ar = media_width / media_height;
 
     /* calculate new width and height
      * note: when we're done, new_width/new_height should equal media_ar */
