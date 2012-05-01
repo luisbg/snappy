@@ -757,25 +757,14 @@ rotate_video (UserInterface * ui)
   angle += 90;
   if (angle == 360)
     angle = 0;
-  clutter_actor_set_rotation (ui->texture, CLUTTER_Z_AXIS, angle, 0, 0, 0);
+  clutter_actor_set_z_rotation_from_gravity (ui->texture, angle,
+      CLUTTER_GRAVITY_CENTER);
 
   if (angle == 90 || angle == 270) {
     ui->rotated = TRUE;
-
-    if (!ui->fullscreen) {
-      clutter_actor_set_width (ui->stage, ui->media_height);
-      clutter_actor_set_height (ui->stage, ui->media_width);
-    }
   } else {
     ui->rotated = FALSE;
-
-    if (!ui->fullscreen) {
-      clutter_actor_set_width (ui->stage, ui->media_width);
-      clutter_actor_set_height (ui->stage, ui->media_height);
-    }
   }
-
-  size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 }
 
 static void
