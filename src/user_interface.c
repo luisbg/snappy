@@ -691,9 +691,9 @@ progress_timing (UserInterface * ui)
   if (ui->progress_id != -1)
     g_source_remove (ui->progress_id);
 
-  duration_ns = ui->engine->media_duration / MILISEC;
+  duration_ns = ui->engine->media_duration / GST_MSECOND;
   if (duration_ns > 0) {
-    timeout_ms = duration_ns / ui->seek_width;
+    timeout_ms = MAX (250, duration_ns / ui->seek_width);
     ui->progress_id = g_timeout_add (timeout_ms, progress_update_seekbar, ui);
   }
 }

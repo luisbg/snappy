@@ -59,7 +59,6 @@
 
 #define SECOND 1000
 #define NANOSEC 1000000000
-#define MILISEC 1000000
 #define SEC_IN_HOUR 3600
 #define SEC_IN_MIN 60
 
