@@ -55,20 +55,20 @@ gboolean add_uri_unfinished (GstEngine * engine);
 gboolean at_the_eos (GstEngine * engine);
 gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
 gboolean change_state (GstEngine * engine, gchar * state);
-gboolean cycle_streams (GstEngine * engine, guint streamid);
+void cycle_streams (GstEngine * engine, guint streamid);
 gboolean engine_init (GstEngine * engine, GstElement * sink);
-gboolean engine_load_uri (GstEngine * engine, gchar * uri);
-gboolean engine_open_uri (GstEngine * engine, gchar * uri);
+void engine_load_uri (GstEngine * engine, gchar * uri);
+void engine_open_uri (GstEngine * engine, gchar * uri);
 gboolean engine_play (GstEngine * engine);
 gboolean engine_seek (GstEngine * engine, gint64 position);
 gboolean engine_stop (GstEngine * engine);
-gboolean engine_volume (GstEngine * engine, gdouble level);
+void engine_volume (GstEngine * engine, gdouble level);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);
 gchar **get_recently_viewed ();
 GstState get_state (GstEngine * engine);
 gint64 query_position (GstEngine * engine);
-gboolean set_subtitle_uri (GstEngine * engine, gchar *suburi);
-gboolean toggle_subtitles (GstEngine * engine);
+void set_subtitle_uri (GstEngine * engine, gchar *suburi);
+void toggle_subtitles (GstEngine * engine);
 gboolean update_media_duration (GstEngine * engine);
 
 G_END_DECLS

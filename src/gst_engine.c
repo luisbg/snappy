@@ -56,7 +56,9 @@ gboolean add_uri_unfinished_playback (GstEngine * engine, gchar * uri,
     gint64 position);
 gboolean discover (GstEngine * engine, gchar * uri);
 gint64 is_uri_unfinished_playback (GstEngine * engine, gchar * uri);
-gboolean remove_uri_unfinished_playback (GstEngine * engine, gchar * uri);
+static void print_tag (const GstTagList * list, const gchar * tag,
+    gpointer unused);
+void remove_uri_unfinished_playback (GstEngine * engine, gchar * uri);
 
 /* -------------------- static functions --------------------- */
 
@@ -317,7 +319,7 @@ print_tag (const GstTagList * list, const gchar * tag, gpointer unused)
 
 
 /*    Remove URI from unfinished playback list   */
-gboolean
+void
 remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 {
   guint hash_key;
@@ -351,7 +353,7 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   g_free (data);
   g_free (path);
 
-  return TRUE;
+  return;
 }
 
 /* -------------------- non-static functions --------------------- */
@@ -361,12 +363,13 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 gboolean
 add_uri_unfinished (GstEngine * engine)
 {
+  gboolean ret;
   gint64 position;
 
   position = query_position (engine);
-  add_uri_unfinished_playback (engine, engine->uri, position);
+  ret = add_uri_unfinished_playback (engine, engine->uri, position);
 
-  return TRUE;
+  return ret;
 }
 
 
@@ -499,32 +502,38 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 gboolean
 change_state (GstEngine * engine, gchar * state)
 {
+  gboolean ok = TRUE;
+  GstStateChangeReturn change;
+
   if (!g_strcmp0 (state, "Playing")) {
-    gst_element_set_state (engine->player, GST_STATE_PLAYING);
+    change = gst_element_set_state (engine->player, GST_STATE_PLAYING);
     engine->playing = TRUE;
     engine->queries_blocked = FALSE;
   } else if (!g_strcmp0 (state, "Paused")) {
-    gst_element_set_state (engine->player, GST_STATE_PAUSED);
+    change = gst_element_set_state (engine->player, GST_STATE_PAUSED);
     engine->playing = FALSE;
     engine->queries_blocked = FALSE;
   } else if (!g_strcmp0 (state, "Ready")) {
-    gst_element_set_state (engine->player, GST_STATE_READY);
+    change = gst_element_set_state (engine->player, GST_STATE_READY);
     engine->playing = FALSE;
     engine->media_duration = -1;
     engine->queries_blocked = TRUE;
   } else if (!g_strcmp0 (state, "Null")) {
-    gst_element_set_state (engine->player, GST_STATE_NULL);
+    change = gst_element_set_state (engine->player, GST_STATE_NULL);
     engine->playing = FALSE;
     engine->media_duration = -1;
     engine->queries_blocked = TRUE;
   }
 
-  return TRUE;
+  if (change == GST_STATE_CHANGE_FAILURE)
+    ok = FALSE;
+
+  return ok;
 }
 
 
 /*               Cycle through streams           */
-gboolean
+void
 cycle_streams (GstEngine * engine, guint streamid)
 {
   gboolean last_stream = FALSE;
@@ -560,7 +569,7 @@ cycle_streams (GstEngine * engine, guint streamid)
 
   g_object_set (G_OBJECT (engine->player), c, current, NULL);
 
-  return TRUE;
+  return;
 }
 
 
@@ -603,7 +612,7 @@ engine_init (GstEngine * engine, GstElement * sink)
 
 
 /*               Load URI to engine              */
-gboolean
+void
 engine_load_uri (GstEngine * engine, gchar * uri)
 {
   engine->uri = uri;
@@ -617,19 +626,19 @@ engine_load_uri (GstEngine * engine, gchar * uri)
   g_print ("Loading: %s\n", uri);
   g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
 
-  return TRUE;
+  return;
 }
 
 
 /*               Open Uri in engine              */
-gboolean
+void
 engine_open_uri (GstEngine * engine, gchar * uri)
 {
   /* Need to set back to Ready state so Playbin2 loads uri */
   gst_element_set_state (engine->player, GST_STATE_READY);
   g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
 
-  return TRUE;
+  return;
 }
 
 
@@ -637,12 +646,18 @@ engine_open_uri (GstEngine * engine, gchar * uri)
 gboolean
 engine_play (GstEngine * engine)
 {
-  gst_element_set_state (engine->player, GST_STATE_PLAYING);
+  gboolean ok = TRUE;
+  GstStateChangeReturn change;
+
+  change = gst_element_set_state (engine->player, GST_STATE_PLAYING);
   engine->has_started = TRUE;
   engine->playing = TRUE;
   engine->queries_blocked = FALSE;
 
-  return TRUE;
+  if (change == GST_STATE_CHANGE_FAILURE)
+    ok = FALSE;
+
+  return ok;
 }
 
 
@@ -650,15 +665,16 @@ engine_play (GstEngine * engine)
 gboolean
 engine_seek (GstEngine * engine, gint64 position)
 {
+  gboolean ok;
   GstFormat fmt = GST_FORMAT_TIME;
 
-  gst_element_seek_simple (engine->player, fmt,
+  ok = gst_element_seek_simple (engine->player, fmt,
       GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE,
       position);
 
   engine->queries_blocked = TRUE;
 
-  return TRUE;
+  return ok;
 }
 
 
@@ -666,21 +682,27 @@ engine_seek (GstEngine * engine, gint64 position)
 gboolean
 engine_stop (GstEngine * engine)
 {
-  gst_element_set_state (engine->player, GST_STATE_READY);
+  gboolean ok = TRUE;
+  GstStateChangeReturn change;
+
+  change = gst_element_set_state (engine->player, GST_STATE_READY);
   engine->playing = FALSE;
   engine->queries_blocked = TRUE;
 
-  return TRUE;
+  if (change == GST_STATE_CHANGE_FAILURE)
+    ok = FALSE;
+
+  return ok;
 }
 
 
 /*                   Set volume                  */
-gboolean
+void
 engine_volume (GstEngine * engine, gdouble level)
 {
   g_object_set (G_OBJECT (engine->player), "volume", level, NULL);
 
-  return TRUE;
+  return;
 }
 
 
@@ -731,7 +753,7 @@ frame_stepping (GstEngine * engine, gboolean foward)
     engine->queries_blocked = TRUE;
   }
 
-  return FALSE;
+  return ok;
 }
 
 
@@ -777,25 +799,32 @@ get_state (GstEngine * engine)
 gint64
 query_position (GstEngine * engine)
 {
+  gboolean ok;
   gint64 position;
   GstFormat fmt = GST_FORMAT_TIME;
 
-  gst_element_query_position (engine->player, &fmt, &position);
+  ok = gst_element_query_position (engine->player, &fmt, &position);
+
+  if (!ok)
+    position = 0;
+
   return position;
 }
 
 
 /*                 Set subtitle file             */
-gboolean
+void
 set_subtitle_uri (GstEngine * engine, gchar * suburi)
 {
   g_print ("Loading subtitles: %s\n");
   g_object_set (G_OBJECT (engine->player), "suburi", suburi, NULL);
+
+  return;
 }
 
 
 /*               Toggle subtitles                */
-gboolean
+void
 toggle_subtitles (GstEngine * engine)
 {
   gint flags;
@@ -805,17 +834,16 @@ toggle_subtitles (GstEngine * engine)
   sub_state = flags & (1 << 2);
 
   if (sub_state) {              // If subtitles on, cycle streams and if last turn off
-    if (cycle_streams (engine, STREAM_TEXT)) {
-      flags &= ~(1 << 2);
-      g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
-    }
+    cycle_streams (engine, STREAM_TEXT);
+    flags &= ~(1 << 2);
+    g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
 
   } else {                      // If subtitles off, turn them on
     flags |= (1 << 2);
     g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
   }
 
-  return TRUE;
+  return;
 }
 
 
