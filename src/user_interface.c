@@ -756,6 +756,8 @@ rotate_video (UserInterface * ui)
       CLUTTER_GRAVITY_CENTER);
 
   size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
+
+  return TRUE;
 }
 
 static void
@@ -1015,6 +1017,8 @@ interface_load_uri (UserInterface * ui, gchar * uri)
     clutter_stage_set_title (CLUTTER_STAGE (ui->stage), ui->filename);
     clutter_text_set_text (CLUTTER_TEXT (ui->control_title), ui->filename);
   }
+
+  return TRUE;
 }
 
 void
@@ -1100,4 +1104,6 @@ interface_update_controls (UserInterface * ui)
   progress_update_text (ui);
   progress_update_seekbar (ui);
   update_volume (ui, -1);
+
+  return TRUE;
 }
