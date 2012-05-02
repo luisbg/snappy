@@ -673,7 +673,7 @@ position_ns_to_str (gint64 nanoseconds)
   gint64 seconds;
   gint hours, minutes;
 
-  seconds = nanoseconds / NANOSEC;
+  seconds = nanoseconds / GST_SECOND;
   hours = seconds / SEC_IN_HOUR;
   seconds = seconds - (hours * SEC_IN_HOUR);
   minutes = seconds / SEC_IN_MIN;
@@ -1075,7 +1075,7 @@ interface_start (UserInterface * ui, gchar * uri)
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.5));
 
   clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
-  clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, SECOND,
+  clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, GST_USECOND,
       "opacity", 0, NULL);
 
   g_signal_connect (CLUTTER_STAGE (ui->stage), "allocation-changed",
@@ -1088,7 +1088,7 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->screensaver = screensaver_new (CLUTTER_STAGE (ui->stage));
   screensaver_enable (ui->screensaver, FALSE);
 
-  g_timeout_add (SECOND, progress_update_text, ui);
+  g_timeout_add (GST_USECOND, progress_update_text, ui);
 
   if (!ui->blind)
     clutter_actor_show (ui->stage);

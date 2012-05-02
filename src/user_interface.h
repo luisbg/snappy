@@ -57,8 +57,6 @@
 
 #define TITLE_LENGTH 40
 
-#define SECOND 1000
-#define NANOSEC 1000000000
 #define SEC_IN_HOUR 3600
 #define SEC_IN_MIN 60
 
