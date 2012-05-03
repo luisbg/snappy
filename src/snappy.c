@@ -104,7 +104,7 @@ process_args (int argc, char *argv[],
   if (!g_option_context_parse (context, &argc, &argv, &err)) {
     g_print ("Error initializing: %s\n", err->message);
     g_error_free (err);
-    goto quit;
+    return NULL;
   }
 
   /* Recently viewed uris */
@@ -122,19 +122,19 @@ process_args (int argc, char *argv[],
         g_print ("%d: %s \n", c + 1, recent[c]);
     }
 
-    goto quit;
+    return NULL;
   }
 
   /* Show snappy's version */
   if (version) {
     g_print ("snappy version %s\n", VERSION);
-    goto quit;
+    return NULL;
   }
 
   /* Check that at least one URI has been introduced */
   if (argc < 2) {
     g_print ("%s", g_option_context_get_help (context, TRUE, NULL));
-    goto quit;
+    return NULL;
   }
 
   /* Save uris in the file glist */
@@ -145,9 +145,6 @@ process_args (int argc, char *argv[],
   }
 
   return file_list;
-
-quit:
-  return NULL;
 }
 
 
@@ -181,6 +178,8 @@ main (int argc, char *argv[])
   /* Process command arguments */
   file_list = process_args (argc, argv, &blind, &fullscreen, &hide,
       &loop, &secret, &suburi, &tags, context);
+  if (file_list == NULL)
+    goto quit;
 
   /* User Interface */
   ui = g_new (UserInterface, 1);
