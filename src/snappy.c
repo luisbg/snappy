@@ -71,7 +71,7 @@ process_args (int argc, char *argv[],
 {
   gboolean recent = FALSE, version = FALSE;
   guint c, index, pos = 0;
-  GList * file_list = NULL;
+  GList * uri_list = NULL;
 
   GOptionEntry entries[] = {
     {"blind", 'b', G_OPTION_FLAG_IN_MAIN, G_OPTION_ARG_NONE, blind,
@@ -135,8 +135,8 @@ process_args (int argc, char *argv[],
   if (argc > 1) {
     /* Save uris in the file glist */
     for (index = 1; index < argc; index++) {
-      file_list = g_list_append (file_list, argv[index]);
       g_debug ("Adding file: %s\n", argv[index]);
+      uri_list = g_list_append (uri_list, clean_uri (argv[index]));
       pos++;
     }
   } else {
@@ -144,7 +144,7 @@ process_args (int argc, char *argv[],
     g_print ("%s", g_option_context_get_help (context, TRUE, NULL));
   }
 
-  return file_list;
+  return uri_list;
 }
 
 
@@ -163,7 +163,7 @@ main (int argc, char *argv[])
   guint c, index, pos = 0;
   gchar *uri;
   gchar *suburi = NULL;
-  GList *file_list;
+  GList *uri_list;
   GOptionContext *context;
 
 #ifdef ENABLE_DBUS
@@ -176,13 +176,14 @@ main (int argc, char *argv[])
   context = g_option_context_new ("<media file> - Play movie files");
 
   /* Process command arguments */
-  file_list = process_args (argc, argv, &blind, &fullscreen, &hide,
+  uri_list = process_args (argc, argv, &blind, &fullscreen, &hide,
       &loop, &secret, &suburi, &tags, context);
-  if (file_list == NULL)
+  if (uri_list == NULL)
     goto quit;
 
   /* User Interface */
   ui = g_new (UserInterface, 1);
+  ui->uri_list = uri_list;
   ui->blind = blind;
   ui->fullscreen = fullscreen;
   ui->hide = hide;
@@ -212,7 +213,7 @@ main (int argc, char *argv[])
   gst_object_unref (engine->bus);
 
   /* Get uri to load */
-  uri = clean_uri (g_list_first (file_list)->data);
+  uri = g_list_first (uri_list)->data;
 
   /* Load engine and start interface */
   engine_load_uri (engine, uri);
@@ -246,7 +247,7 @@ main (int argc, char *argv[])
 #endif
 
 quit:
-  g_list_free (file_list);
+  g_list_free (uri_list);
   g_option_context_free (context);
 
   return ret;
