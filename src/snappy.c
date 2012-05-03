@@ -65,7 +65,7 @@ close_down (UserInterface * ui, GstEngine * engine)
 /*           Process command arguments           */
 gboolean
 process_args (int argc, char *argv[],
-    gchar * file_list[], gboolean * blind, gboolean * fullscreen,
+    GList ** file_list, gboolean * blind, gboolean * fullscreen,
     gboolean * hide, gboolean * loop, gboolean * secret, gchar ** suburi,
     gboolean * tags, GOptionContext * context)
 {
@@ -135,10 +135,10 @@ process_args (int argc, char *argv[],
     goto quit;
   }
 
-  /* Save uris in the file_list array */
+  /* Save uris in the file glist */
   for (index = 1; index < argc; index++) {
-    file_list[pos] = argv[index];
-    g_debug ("Adding file: %s\n", file_list[pos]);
+    *file_list = g_list_append (*file_list, argv[index]);
+    g_debug ("Adding file: %s\n", argv[index]);
     pos++;
   }
 
@@ -163,8 +163,8 @@ main (int argc, char *argv[])
   gint ret = 0;
   guint c, index, pos = 0;
   gchar *uri;
-  gchar *file_list[argc];
   gchar *suburi = NULL;
+  GList *file_list = NULL;
   GOptionContext *context;
 
 #ifdef ENABLE_DBUS
@@ -177,7 +177,7 @@ main (int argc, char *argv[])
   context = g_option_context_new ("<media file> - Play movie files");
 
   /* Process command arguments */
-  ok = process_args (argc, argv, file_list, &blind, &fullscreen, &hide, &loop,
+  ok = process_args (argc, argv, &file_list, &blind, &fullscreen, &hide, &loop,
       &secret, &suburi, &tags, context);
   if (!ok)
     goto quit;
@@ -213,7 +213,7 @@ main (int argc, char *argv[])
   gst_object_unref (engine->bus);
 
   /* Get uri to load */
-  uri = clean_uri (file_list[0]);
+  uri = clean_uri (g_list_first (file_list)->data);
 
   /* Load engine and start interface */
   engine_load_uri (engine, uri);
@@ -247,6 +247,7 @@ main (int argc, char *argv[])
 #endif
 
 quit:
+  g_list_free (file_list);
   g_option_context_free (context);
 
   return ret;
