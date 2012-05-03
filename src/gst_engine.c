@@ -402,8 +402,11 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       /* When URI is finished remove from unfinished list */
       remove_uri_unfinished_playback (engine, engine->uri);
 
-      if (engine->loop)
+      if (engine->loop) {
         engine_seek (engine, 0);
+      } else {
+        interface_play_next (ui);
+      }
 
       break;
     }
@@ -637,7 +640,7 @@ engine_open_uri (GstEngine * engine, gchar * uri)
   /* Need to set back to Ready state so Playbin2 loads uri */
   engine->uri = uri;
 
-  g_print ("Open uri: %s\n", next_uri);
+  g_print ("Open uri: %s\n", uri);
   gst_element_set_state (engine->player, GST_STATE_READY);
   g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
 
