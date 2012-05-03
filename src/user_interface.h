@@ -92,6 +92,8 @@ struct _UserInterface
   gchar *video_stream_toggle_png, *audio_stream_toggle_png;
   gchar *duration_str;
 
+  GList *uri_list;
+
   ClutterColor stage_color, control_color1, control_color2;
 
   ClutterActor *stage;
@@ -115,6 +117,7 @@ struct _UserInterface
 // Declaration of non-static functions
 void interface_init (UserInterface * ui);
 gboolean interface_load_uri (UserInterface * ui, gchar * uri);
+void interface_play_next (UserInterface * ui);
 void interface_start (UserInterface * ui, gchar * uri);
 gboolean interface_update_controls (UserInterface * ui);
 

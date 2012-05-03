@@ -267,6 +267,13 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           break;
         }
 
+        case CLUTTER_greater:
+        {
+          interface_play_next (ui);
+
+          break;
+        }
+
         default:
         {
           handled = FALSE;
@@ -1019,6 +1026,21 @@ interface_load_uri (UserInterface * ui, gchar * uri)
   }
 
   return TRUE;
+}
+
+void
+interface_play_next (UserInterface * ui)
+{
+  GList * next;
+  gchar * next_uri;
+
+  next = g_list_find (ui->uri_list, ui->engine->uri);
+  next = g_list_next (next);
+  next_uri = next->data;
+
+  engine_open_uri (ui->engine, next_uri);
+  interface_load_uri (ui, next_uri);
+  engine_play (ui->engine);
 }
 
 void
