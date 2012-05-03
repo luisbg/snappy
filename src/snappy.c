@@ -132,16 +132,16 @@ process_args (int argc, char *argv[],
   }
 
   /* Check that at least one URI has been introduced */
-  if (argc < 2) {
+  if (argc > 1) {
+    /* Save uris in the file glist */
+    for (index = 1; index < argc; index++) {
+      file_list = g_list_append (file_list, argv[index]);
+      g_debug ("Adding file: %s\n", argv[index]);
+      pos++;
+    }
+  } else {
+    /* If no files passed by user display help */
     g_print ("%s", g_option_context_get_help (context, TRUE, NULL));
-    return NULL;
-  }
-
-  /* Save uris in the file glist */
-  for (index = 1; index < argc; index++) {
-    file_list = g_list_append (file_list, argv[index]);
-    g_debug ("Adding file: %s\n", argv[index]);
-    pos++;
   }
 
   return file_list;
