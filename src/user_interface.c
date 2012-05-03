@@ -434,7 +434,7 @@ load_controls (UserInterface * ui)
   // Controls background
   ui->control_bg = clutter_texture_new_from_file (vid_panel_png, &error);
   if (!ui->control_bg && error)
-    g_debug ("Clutter error: %s\n", error->message);
+    g_debug ("Clutter error: %s", error->message);
   if (error) {
     g_error_free (error);
     error = NULL;
@@ -466,7 +466,7 @@ load_controls (UserInterface * ui)
   ui->control_play_toggle =
       clutter_texture_new_from_file (ui->pause_png, &error);
   if (!ui->control_play_toggle && error)
-    g_debug ("Clutter error: %s\n", error->message);
+    g_debug ("Clutter error: %s", error->message);
   if (error) {
     g_error_free (error);
     error = NULL;
@@ -547,7 +547,7 @@ load_controls (UserInterface * ui)
   // Controls volume low
   ui->volume_low = clutter_texture_new_from_file (ui->volume_low_png, &error);
   if (!ui->volume_low && error)
-    g_debug ("Clutter error: %s\n", error->message);
+    g_debug ("Clutter error: %s", error->message);
   if (error) {
     g_error_free (error);
     error = NULL;
@@ -575,7 +575,7 @@ load_controls (UserInterface * ui)
   // Controls volume high
   ui->volume_high = clutter_texture_new_from_file (ui->volume_high_png, &error);
   if (!ui->volume_high && error)
-    g_debug ("Clutter error: %s\n", error->message);
+    g_debug ("Clutter error: %s", error->message);
   if (error) {
     g_error_free (error);
     error = NULL;
@@ -608,7 +608,7 @@ load_controls (UserInterface * ui)
   ui->video_stream_toggle = clutter_texture_new_from_file
       (ui->video_stream_toggle_png, &error);
   if (!ui->video_stream_toggle && error)
-    g_debug ("Clutter error: %s\n", error->message);
+    g_debug ("Clutter error: %s", error->message);
   if (error) {
     g_error_free (error);
     error = NULL;
@@ -620,7 +620,7 @@ load_controls (UserInterface * ui)
   ui->audio_stream_toggle = clutter_texture_new_from_file
       (ui->audio_stream_toggle_png, &error);
   if (!ui->audio_stream_toggle && error)
-    g_debug ("Clutter error: %s\n", error->message);
+    g_debug ("Clutter error: %s", error->message);
   if (error) {
     g_error_free (error);
     error = NULL;
@@ -632,7 +632,7 @@ load_controls (UserInterface * ui)
   ui->subtitle_toggle = clutter_texture_new_from_file (ui->subtitle_toggle_png,
       &error);
   if (!ui->subtitle_toggle && error)
-    g_debug ("Clutter error: %s\n", error->message);
+    g_debug ("Clutter error: %s", error->message);
   if (error) {
     g_error_free (error);
     error = NULL;
@@ -804,7 +804,7 @@ size_change (ClutterStage * stage,
       new_width = stage_height * media_ar;
     }
   } else {
-    g_debug ("Warning: not considering texture dimensions %fx%f\n", media_width,
+    g_debug ("Warning: not considering texture dimensions %fx%f", media_width,
         media_height);
   }
 

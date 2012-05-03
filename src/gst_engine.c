@@ -231,7 +231,7 @@ discover (GstEngine * engine, gchar * uri)
   if (engine->has_video || engine->has_audio)
     engine->media_duration = gst_discoverer_info_get_duration (info);
 
-  g_debug ("Found video %d, audio %d\n", engine->has_video, engine->has_audio);
+  g_debug ("Found video %d, audio %d", engine->has_video, engine->has_audio);
 
   /* If it has video stream, get dimensions */
   if (engine->has_video) {
@@ -398,7 +398,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
   switch (GST_MESSAGE_TYPE (msg)) {
     case GST_MESSAGE_EOS:
     {
-      g_debug ("End-of-stream\n");
+      g_debug ("End-of-stream");
       /* When URI is finished remove from unfinished list */
       remove_uri_unfinished_playback (engine, engine->uri);
 
@@ -416,11 +416,11 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
       gst_message_parse_error (msg, &err, &debug);
 
-      g_debug ("Error: %s\n", err->message);
+      g_debug ("Error: %s", err->message);
       g_error_free (err);
 
       if (debug) {
-        g_debug ("Debug details: %s\n", debug);
+        g_debug ("Debug details: %s", debug);
         g_free (debug);
       }
 
@@ -862,7 +862,7 @@ update_media_duration (GstEngine * engine)
     if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {
       success = TRUE;
     } else {
-      g_debug ("Could not get media's duration\n");
+      g_debug ("Could not get media's duration");
       success = FALSE;
     }
   }
