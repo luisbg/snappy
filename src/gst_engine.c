@@ -59,6 +59,7 @@ gint64 is_uri_unfinished_playback (GstEngine * engine, gchar * uri);
 static void print_tag (const GstTagList * list, const gchar * tag,
     gpointer unused);
 void remove_uri_unfinished_playback (GstEngine * engine, gchar * uri);
+void stream_done (GstEngine * engine, UserInterface *ui);
 
 /* -------------------- static functions --------------------- */
 
@@ -356,6 +357,19 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   return;
 }
 
+/*    When Stream or segment is done play next or loop     */
+void stream_done (GstEngine * engine, UserInterface *ui)
+{
+      /* When URI is done or looping remove from unfinished list */
+      remove_uri_unfinished_playback (engine, engine->uri);
+
+      if (engine->loop) {
+        engine_seek (engine, 0, TRUE);
+      } else {
+        interface_play_next (ui);
+      }
+}
+
 /* -------------------- non-static functions --------------------- */
 
 
@@ -399,14 +413,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     case GST_MESSAGE_EOS:
     {
       g_debug ("End-of-stream");
-      /* When URI is finished remove from unfinished list */
-      remove_uri_unfinished_playback (engine, engine->uri);
-
-      if (engine->loop) {
-        engine_seek (engine, 0, TRUE);
-      } else {
-        interface_play_next (ui);
-      }
+      stream_done (engine, ui);
 
       break;
     }
@@ -466,8 +473,9 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
     case GST_MESSAGE_SEGMENT_DONE:
     {
-      if (engine->loop)
-        engine_seek (engine, 0, TRUE);
+      g_debug ("Segment-done");
+      stream_done (engine, ui);
+
       break;
     }
 
