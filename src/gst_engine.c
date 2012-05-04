@@ -410,33 +410,6 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
   GstEngine *engine = ui->engine;
 
   switch (GST_MESSAGE_TYPE (msg)) {
-    case GST_MESSAGE_EOS:
-    {
-      g_debug ("End-of-stream");
-      stream_done (engine, ui);
-
-      break;
-    }
-
-    case GST_MESSAGE_ERROR:
-    {
-      /* Parse and share Gst Error */
-      gchar *debug = NULL;
-      GError *err = NULL;
-
-      gst_message_parse_error (msg, &err, &debug);
-
-      g_debug ("Error: %s", err->message);
-      g_error_free (err);
-
-      if (debug) {
-        g_debug ("Debug details: %s", debug);
-        g_free (debug);
-      }
-
-      break;
-    }
-
     case GST_MESSAGE_STATE_CHANGED:
     {
       GstState old, new, pending;
@@ -465,20 +438,6 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       break;
     }
 
-    case GST_MESSAGE_STEP_DONE:
-    {
-      engine->prev_done = TRUE;
-      break;
-    }
-
-    case GST_MESSAGE_SEGMENT_DONE:
-    {
-      g_debug ("Segment-done");
-      stream_done (engine, ui);
-
-      break;
-    }
-
     case GST_MESSAGE_TAG:
     {
       GstTagList *tags;
@@ -497,9 +456,50 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       break;
     }
 
+    case GST_MESSAGE_EOS:
+    {
+      g_debug ("End-of-stream");
+      stream_done (engine, ui);
+
+      break;
+    }
+
+    case GST_MESSAGE_SEGMENT_DONE:
+    {
+      g_debug ("Segment-done");
+      stream_done (engine, ui);
+
+      break;
+    }
+
+    case GST_MESSAGE_STEP_DONE:
+    {
+      engine->prev_done = TRUE;
+      break;
+    }
+
     case GST_MESSAGE_ASYNC_DONE:
       engine->queries_blocked = FALSE;
       break;
+
+    case GST_MESSAGE_ERROR:
+    {
+      /* Parse and share Gst Error */
+      gchar *debug = NULL;
+      GError *err = NULL;
+
+      gst_message_parse_error (msg, &err, &debug);
+
+      g_debug ("Error: %s", err->message);
+      g_error_free (err);
+
+      if (debug) {
+        g_debug ("Debug details: %s", debug);
+        g_free (debug);
+      }
+
+      break;
+    }
 
     default:
       break;
