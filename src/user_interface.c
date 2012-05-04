@@ -269,13 +269,13 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         case CLUTTER_less:
         {
-          interface_play_prev (ui);
+          interface_play_next_or_prev (ui, FALSE);
           break;
         }
 
         case CLUTTER_greater:
         {
-          interface_play_next (ui);
+          interface_play_next_or_prev (ui, TRUE);
           break;
         }
 
@@ -1049,41 +1049,25 @@ interface_load_uri (UserInterface * ui, gchar * uri)
 }
 
 void
-interface_play_next (UserInterface * ui)
+interface_play_next_or_prev (UserInterface *ui, gboolean next)
 {
-  GList * next;
-  gchar * next_uri;
+  GList * element;
+  gchar * uri;
 
-  next = g_list_find (ui->uri_list, ui->engine->uri);
-  next = g_list_next (next);
-  if (next != NULL) {
-    next_uri = next->data;
+  element = g_list_find (ui->uri_list, ui->engine->uri);
+  if (next)
+    element = g_list_next (element);
+  else
+    element = g_list_previous (element);
 
-    engine_open_uri (ui->engine, next_uri);
-    interface_load_uri (ui, next_uri);
+  if (element != NULL) {
+    uri = element->data;
+
+    engine_open_uri (ui->engine, uri);
+    interface_load_uri (ui, uri);
     engine_play (ui->engine);
   }
 }
-
-void
-interface_play_prev (UserInterface * ui)
-{
-  GList * prev;
-  gchar * prev_uri;
-
-  prev = g_list_find (ui->uri_list, ui->engine->uri);
-  g_print ("1. prev = %s", prev->data);
-  prev = g_list_previous (prev);
-  g_print ("2. prev = %s", prev->data);
-  if (prev != NULL) {
-    prev_uri = prev->data;
-
-    engine_open_uri (ui->engine, prev_uri);
-    interface_load_uri (ui, prev_uri);
-    engine_play (ui->engine);
-  }
-}
-
 
 void
 interface_start (UserInterface * ui, gchar * uri)

@@ -366,7 +366,7 @@ void stream_done (GstEngine * engine, UserInterface *ui)
       if (engine->loop) {
         engine_seek (engine, 0, TRUE);
       } else {
-        interface_play_next (ui);
+        interface_play_next_or_prev (ui, TRUE);
       }
 }
 
