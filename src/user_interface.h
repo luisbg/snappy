@@ -118,6 +118,7 @@ struct _UserInterface
 void interface_init (UserInterface * ui);
 gboolean interface_load_uri (UserInterface * ui, gchar * uri);
 void interface_play_next (UserInterface * ui);
+void interface_play_prev (UserInterface * ui);
 void interface_start (UserInterface * ui, gchar * uri);
 gboolean interface_update_controls (UserInterface * ui);
 

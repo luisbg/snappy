@@ -17,6 +17,7 @@ right      - seek 10 seconds foward
 9          - turn volume up
 0          - turn volume down
 
+<          - play previous
 >          - play next
 
 c          - show/hide visual controls

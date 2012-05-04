@@ -267,10 +267,15 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           break;
         }
 
+        case CLUTTER_less:
+        {
+          interface_play_prev (ui);
+          break;
+        }
+
         case CLUTTER_greater:
         {
           interface_play_next (ui);
-
           break;
         }
 
@@ -1059,6 +1064,26 @@ interface_play_next (UserInterface * ui)
     engine_play (ui->engine);
   }
 }
+
+void
+interface_play_prev (UserInterface * ui)
+{
+  GList * prev;
+  gchar * prev_uri;
+
+  prev = g_list_find (ui->uri_list, ui->engine->uri);
+  g_print ("1. prev = %s", prev->data);
+  prev = g_list_previous (prev);
+  g_print ("2. prev = %s", prev->data);
+  if (prev != NULL) {
+    prev_uri = prev->data;
+
+    engine_open_uri (ui->engine, prev_uri);
+    interface_load_uri (ui, prev_uri);
+    engine_play (ui->engine);
+  }
+}
+
 
 void
 interface_start (UserInterface * ui, gchar * uri)
