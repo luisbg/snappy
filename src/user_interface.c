@@ -1025,6 +1025,14 @@ interface_load_uri (UserInterface * ui, gchar * uri)
     clutter_text_set_text (CLUTTER_TEXT (ui->control_title), ui->filename);
   }
 
+  ui->duration_str = position_ns_to_str (ui->engine->media_duration);
+  ui->media_width = ui->engine->media_width;
+  ui->media_height = ui->engine->media_height;
+
+  clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), ui->media_width,
+      ui->media_height);
+  size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
+
   return TRUE;
 }
 

@@ -652,6 +652,8 @@ engine_open_uri (GstEngine * engine, gchar * uri)
   gst_element_set_state (engine->player, GST_STATE_READY);
   g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
 
+  discover (engine, uri);
+
   return;
 }
 
