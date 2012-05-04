@@ -482,6 +482,14 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       engine->queries_blocked = FALSE;
       break;
 
+    case GST_MESSAGE_DURATION:
+    {
+      g_debug ("Gst message duration\n");
+      update_media_duration (engine);
+
+      break;
+    }
+
     case GST_MESSAGE_ERROR:
     {
       /* Parse and share Gst Error */
