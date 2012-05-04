@@ -1037,6 +1037,9 @@ interface_load_uri (UserInterface * ui, gchar * uri)
     clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->media_width,
         ui->media_height);
 
+  if (!ui->penalty_box_active)
+    show_controls (ui, TRUE);
+
   return TRUE;
 }
 
