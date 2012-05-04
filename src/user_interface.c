@@ -1051,11 +1051,13 @@ interface_play_next (UserInterface * ui)
 
   next = g_list_find (ui->uri_list, ui->engine->uri);
   next = g_list_next (next);
-  next_uri = next->data;
+  if (next != NULL) {
+    next_uri = next->data;
 
-  engine_open_uri (ui->engine, next_uri);
-  interface_load_uri (ui, next_uri);
-  engine_play (ui->engine);
+    engine_open_uri (ui->engine, next_uri);
+    interface_load_uri (ui, next_uri);
+    engine_play (ui->engine);
+  }
 }
 
 void
