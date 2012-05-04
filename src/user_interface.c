@@ -1033,6 +1033,10 @@ interface_load_uri (UserInterface * ui, gchar * uri)
       ui->media_height);
   size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 
+  if (!ui->fullscreen)
+    clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->media_width,
+        ui->media_height);
+
   return TRUE;
 }
 
@@ -1065,8 +1069,8 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->media_width = ui->engine->media_width;
   ui->media_height = ui->engine->media_height;
 
-  ui->stage_width = ui->engine->media_width;
-  ui->stage_height = ui->engine->media_height;
+  ui->stage_width = ui->media_width;
+  ui->stage_height = ui->media_height;
   ui->stage = clutter_stage_get_default ();
 
   ui->controls_showing = FALSE;
@@ -1082,8 +1086,8 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->duration_str = position_ns_to_str (ui->engine->media_duration);
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
-  clutter_stage_set_minimum_size (CLUTTER_STAGE (ui->stage),
-      ui->stage_width, ui->stage_height);
+  clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->media_width,
+                          ui->media_height);
   clutter_stage_set_title (CLUTTER_STAGE (ui->stage), ui->filename);
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->stage_width,
