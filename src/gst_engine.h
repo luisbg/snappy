@@ -60,7 +60,7 @@ gboolean engine_init (GstEngine * engine, GstElement * sink);
 void engine_load_uri (GstEngine * engine, gchar * uri);
 void engine_open_uri (GstEngine * engine, gchar * uri);
 gboolean engine_play (GstEngine * engine);
-gboolean engine_seek (GstEngine * engine, gint64 position);
+gboolean engine_seek (GstEngine * engine, gint64 position, gboolean accurate);
 gboolean engine_stop (GstEngine * engine);
 void engine_volume (GstEngine * engine, gdouble level);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);

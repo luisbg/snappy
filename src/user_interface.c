@@ -194,7 +194,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
           /* clamp the timestamp to be within the media */
           pos = CLAMP (pos, 0, ui->engine->media_duration);
-          engine_seek (ui->engine, pos);
+          engine_seek (ui->engine, pos, FALSE);
 
           handled = TRUE;
           break;
@@ -309,7 +309,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           }
 
           progress = ui->engine->media_duration * (dist / ui->seek_width);
-          engine_seek (ui->engine, progress);
+          engine_seek (ui->engine, progress, FALSE);
           clutter_actor_set_size (ui->control_seekbar, dist, ui->seek_height);
 
         } else if (actor == ui->vol_int || actor == ui->vol_int_bg) {
