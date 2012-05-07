@@ -714,15 +714,18 @@ static gboolean
 progress_update_text (gpointer data)
 {
   UserInterface *ui = (UserInterface *) data;
+  GstEngine *engine = ui->engine;
 
-  if (ui->controls_showing && !ui->engine->queries_blocked) {
-    gchar *duration_str;
-    gint64 pos;
+  if (ui->controls_showing && !engine->queries_blocked) {
+    if (engine->media_duration == -1) {
+      gchar *duration_str;
+      gint64 pos;
 
-    pos = query_position (ui->engine);
-    duration_str = g_strdup_printf ("   %s/%s", position_ns_to_str (pos),
-        ui->duration_str);
-    clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
+      pos = query_position (engine);
+      duration_str = g_strdup_printf ("   %s/%s", position_ns_to_str (pos),
+          ui->duration_str);
+      clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
+    }
   }
 
   return TRUE;
@@ -734,19 +737,19 @@ progress_update_seekbar (gpointer data)
   UserInterface *ui = (UserInterface *) data;
   GstEngine *engine = ui->engine;
 
-  if (ui->controls_showing && !ui->engine->queries_blocked) {
-    gint64 pos;
-    gfloat progress = 0.0;
-
+  if (ui->controls_showing && !engine->queries_blocked) {
     if (engine->media_duration == -1) {
+      gint64 pos;
+      gfloat progress = 0.0;
+
       update_media_duration (engine);
+
+      pos = query_position (engine);
+      progress = (float) pos / engine->media_duration;
+
+      clutter_actor_set_size (ui->control_seekbar, progress * ui->seek_width,
+          ui->seek_height);
     }
-
-    pos = query_position (engine);
-    progress = (float) pos / engine->media_duration;
-
-    clutter_actor_set_size (ui->control_seekbar, progress * ui->seek_width,
-        ui->seek_height);
   }
 
   return TRUE;
