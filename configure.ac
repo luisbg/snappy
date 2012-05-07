@@ -27,7 +27,7 @@ AM_PROG_CC_C_O
 AC_STDC_HEADERS
 AM_PROG_LIBTOOL
 
-dnl instruct libtool machinery that the package supports DLLs 
+dnl instruct libtool machinery that the package supports DLLs
 AC_LIBTOOL_WIN32_DLL
 
 AC_CANONICAL_HOST
@@ -41,7 +41,7 @@ GLIB_REQ=2.10.0
 GIO_REQUIRED=2.24
 
 PKG_CHECK_MODULES([GSTREAMER_0_10], \
-    [gstreamer-0.10 >= $GST_0_10_REQS 
+    [gstreamer-0.10 >= $GST_0_10_REQS
     gstreamer-base-0.10 >= $GST_0_10_REQS
     gstreamer-plugins-base-0.10 >= $GST_0_10_REQS])
 AC_SUBST(GSTREAMER_0_10_CFLAGS)
@@ -52,12 +52,12 @@ PKG_CHECK_MODULES([GST_PBUTILS],
 AC_SUBST(GST_PBUTILS_CFLAGS)
 AC_SUBST(GST_PBUTILS_LIBS)
 
-PKG_CHECK_MODULES([CLUTTER], 
+PKG_CHECK_MODULES([CLUTTER],
     [clutter-1.0 >= $CLUTTER_REQS])
 AC_SUBST(CLUTTER_CFLAGS)
 AC_SUBST(CLUTTER_LIBS)
 
-PKG_CHECK_MODULES([CLUTTER_GST], 
+PKG_CHECK_MODULES([CLUTTER_GST],
     [clutter-gst-1.0 >= $CLUTTER_GST_1_0_REQS],
 		[
 			HAVE_CLUTTER_GST_1_0="yes"
