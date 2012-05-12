@@ -54,11 +54,12 @@ gboolean add_uri_to_history (gchar * uri);
 gboolean add_uri_unfinished_playback (GstEngine * engine, gchar * uri,
     gint64 position);
 gboolean discover (GstEngine * engine, gchar * uri);
+gboolean is_stream_seakable (GstEngine * engine);
 gint64 is_uri_unfinished_playback (GstEngine * engine, gchar * uri);
 static void print_tag (const GstTagList * list, const gchar * tag,
     gpointer unused);
 void remove_uri_unfinished_playback (GstEngine * engine, gchar * uri);
-void stream_done (GstEngine * engine, UserInterface *ui);
+void stream_done (GstEngine * engine, UserInterface * ui);
 static void write_key_file_to_file (GKeyFile * keyfile, const char *path);
 
 /* -------------------- static functions --------------------- */
@@ -235,6 +236,25 @@ discover (GstEngine * engine, gchar * uri)
   return TRUE;
 }
 
+/* Query if the current stream is seakable */
+gboolean
+is_stream_seakable (GstEngine * engine)
+{
+  GstQuery *query;
+  gboolean res;
+
+  query = gst_query_new_seeking (GST_FORMAT_TIME);
+  if (gst_element_query (engine->player, query)) {
+    gst_query_parse_seeking (query, NULL, &res, NULL, NULL);
+    GST_DEBUG ("seeking query says the stream is %s seekable",
+        (res) ? "" : " not");
+  } else {
+    GST_DEBUG ("seeking query failed");
+  }
+
+  gst_query_unref (query);
+  return res;
+}
 
 /* Check if URI is in the unfinished playback list */
 gint64
