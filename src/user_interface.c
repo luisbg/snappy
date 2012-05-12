@@ -27,6 +27,10 @@
 #include "user_interface.h"
 #include "utils.h"
 
+#ifdef CLUTTER_WINDOWING_X11
+#include <clutter/x11/clutter-x11.h>
+#endif
+
 // Declaration of static functions
 static gboolean controls_timeout_cb (gpointer data);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
@@ -862,9 +866,70 @@ show_controls (UserInterface * ui, gboolean vis)
   }
 }
 
+#ifdef CLUTTER_WINDOWING_X11
+static void
+toggle_fullscreen_x11 (ClutterStage *stage,
+                       gboolean fullscreen)
+{
+  static gboolean is_fullscreen = FALSE;
+  static float old_width, old_height;
+
+  struct {
+    unsigned long flags;
+    unsigned long functions;
+    unsigned long decorations;
+    long inputMode;
+    unsigned long status;
+  } MWMHints = { 2, 0, 0, 0, 0};
+
+  Display *xdisplay = clutter_x11_get_default_display ();
+  int      xscreen  = clutter_x11_get_default_screen ();
+  Atom     wm_hints = XInternAtom(xdisplay, "_MOTIF_WM_HINTS", True);
+  Window   xwindow  = clutter_x11_get_stage_window (stage);
+
+  if (fullscreen)
+    {
+      int full_width = DisplayWidth (xdisplay, xscreen);
+      int full_height = DisplayHeight (xdisplay, xscreen)+5;
+        /* avoid being detected as fullscreen, workaround for some
+           windowmanagers  */
+      clutter_actor_get_size (CLUTTER_ACTOR (stage), &old_width, &old_height);
+
+      if (wm_hints != None)
+        XChangeProperty (xdisplay, xwindow, wm_hints, wm_hints, 32,
+                         PropModeReplace, (guchar*)&MWMHints,
+                         sizeof(MWMHints)/sizeof(long));
+      clutter_actor_set_size (CLUTTER_ACTOR (stage), full_width, full_height);
+      XMoveResizeWindow (xdisplay, xwindow,
+                         0, 0, full_width, full_height);
+    }
+  else
+    {
+      MWMHints.decorations = 7;
+      if (wm_hints != None )
+        XChangeProperty (xdisplay, xwindow, wm_hints, wm_hints, 32,
+                         PropModeReplace, (guchar*)&MWMHints,
+                         sizeof(MWMHints)/sizeof(long));
+      clutter_stage_set_fullscreen (stage, FALSE);
+      clutter_actor_set_size (CLUTTER_ACTOR (stage), old_width, old_height);
+    }
+}
+#endif
+
 static void
 toggle_fullscreen (UserInterface * ui)
 {
+#ifdef CLUTTER_WINDOWING_X11
+  if (clutter_check_windowing_backend (CLUTTER_WINDOWING_X11))
+    if (ui->fullscreen) {
+      toggle_fullscreen_x11 (CLUTTER_STAGE (ui->stage), FALSE);
+      ui->fullscreen = FALSE;
+    } else {
+      toggle_fullscreen_x11 (CLUTTER_STAGE (ui->stage), TRUE);
+      ui->fullscreen = TRUE;
+    }
+
+#else
   if (ui->fullscreen) {
     clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), FALSE);
     ui->fullscreen = FALSE;
@@ -872,6 +937,7 @@ toggle_fullscreen (UserInterface * ui)
     clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), TRUE);
     ui->fullscreen = TRUE;
   }
+#endif
 }
 
 static void
