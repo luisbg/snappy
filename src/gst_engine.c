@@ -50,7 +50,6 @@ typedef enum
 } GstPlayFlags;
 
 // Declaration of static functions
-static void write_key_file_to_file (GKeyFile * keyfile, const char *path);
 gboolean add_uri_to_history (gchar * uri);
 gboolean add_uri_unfinished_playback (GstEngine * engine, gchar * uri,
     gint64 position);
@@ -60,28 +59,9 @@ static void print_tag (const GstTagList * list, const gchar * tag,
     gpointer unused);
 void remove_uri_unfinished_playback (GstEngine * engine, gchar * uri);
 void stream_done (GstEngine * engine, UserInterface *ui);
+static void write_key_file_to_file (GKeyFile * keyfile, const char *path);
 
 /* -------------------- static functions --------------------- */
-
-static void
-write_key_file_to_file (GKeyFile * keyfile, const char *path)
-{
-  gchar *data, *dir;
-  GError *error = NULL;
-
-  dir = g_path_get_dirname (path);
-  g_mkdir_with_parents (dir, S_IRUSR | S_IWUSR | S_IXUSR);
-  g_free (dir);
-
-  data = g_key_file_to_data (keyfile, NULL, NULL);
-  g_file_set_contents (path, data, strlen (data), &error);
-  if (error != NULL) {
-    g_warning ("Failed to write history file to %s: %s", path, error->message);
-    g_error_free (error);
-  }
-
-  g_free (data);
-}
 
 /*         Add URI to recently viewed list       */
 gboolean
@@ -368,6 +348,26 @@ void stream_done (GstEngine * engine, UserInterface *ui)
       } else {
         interface_play_next_or_prev (ui, TRUE);
       }
+}
+
+static void
+write_key_file_to_file (GKeyFile * keyfile, const char *path)
+{
+  gchar *data, *dir;
+  GError *error = NULL;
+
+  dir = g_path_get_dirname (path);
+  g_mkdir_with_parents (dir, S_IRUSR | S_IWUSR | S_IXUSR);
+  g_free (dir);
+
+  data = g_key_file_to_data (keyfile, NULL, NULL);
+  g_file_set_contents (path, data, strlen (data), &error);
+  if (error != NULL) {
+    g_warning ("Failed to write history file to %s: %s", path, error->message);
+    g_error_free (error);
+  }
+
+  g_free (data);
 }
 
 /* -------------------- non-static functions --------------------- */
