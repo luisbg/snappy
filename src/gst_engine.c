@@ -358,16 +358,17 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 }
 
 /*    When Stream or segment is done play next or loop     */
-void stream_done (GstEngine * engine, UserInterface *ui)
+void
+stream_done (GstEngine * engine, UserInterface * ui)
 {
-      /* When URI is done or looping remove from unfinished list */
-      remove_uri_unfinished_playback (engine, engine->uri);
+  /* When URI is done or looping remove from unfinished list */
+  remove_uri_unfinished_playback (engine, engine->uri);
 
-      if (engine->loop) {
-        engine_seek (engine, 0, TRUE);
-      } else {
-        interface_play_next_or_prev (ui, TRUE);
-      }
+  if (engine->loop) {
+    engine_seek (engine, 0, TRUE);
+  } else {
+    interface_play_next_or_prev (ui, TRUE);
+  }
 }
 
 static void
@@ -714,9 +715,11 @@ engine_seek (GstEngine * engine, gint64 position, gboolean accurate)
   GstSeekFlags flags;
 
   if (accurate) {
-    flags = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE;
+    flags =
+        GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_ACCURATE;
   } else {
-    flags = GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_KEY_UNIT;
+    flags =
+        GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_KEY_UNIT;
   }
 
   ok = gst_element_seek_simple (engine->player, fmt,
