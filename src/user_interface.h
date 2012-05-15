@@ -27,7 +27,7 @@
 #include "screensaver.h"
 
 #define CTL_SHOW_SEC 3
-#define CTL_FADE_DURATION 250
+#define CTL_FADE_DURATION G_TIME_SPAN_MILLISECOND / 4
 
 #define CTL_BORDER 0
 #define SHADOW_CORRECT 15
@@ -60,7 +60,7 @@
 #define SEC_IN_HOUR 3600
 #define SEC_IN_MIN 60
 
-#define PENALTY_TIME 500
+#define PENALTY_TIME G_TIME_SPAN_MILLISECOND / 2
 
 G_BEGIN_DECLS
 

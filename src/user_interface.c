@@ -701,15 +701,15 @@ position_ns_to_str (gint64 nanoseconds)
 static void
 progress_timing (UserInterface * ui)
 {
-  gint64 duration_ns;
+  gint64 duration_ms;
   gint64 timeout_ms;
 
   if (ui->progress_id != -1)
     g_source_remove (ui->progress_id);
 
-  duration_ns = ui->engine->media_duration / GST_MSECOND;
-  if (duration_ns > 0) {
-    timeout_ms = MAX (250, duration_ns / ui->seek_width);
+  duration_ms = ui->engine->media_duration / GST_MSECOND;
+  if (duration_ms > 0) {
+    timeout_ms = MAX (250, duration_ms / ui->seek_width);
     ui->progress_id = g_timeout_add (timeout_ms, progress_update_seekbar, ui);
   }
 }
@@ -1196,8 +1196,8 @@ interface_start (UserInterface * ui, gchar * uri)
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.5));
 
   clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
-  clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT, GST_USECOND,
-      "opacity", 0, NULL);
+  clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT,
+      G_TIME_SPAN_MILLISECOND, "opacity", 0, NULL);
 
   g_signal_connect (CLUTTER_STAGE (ui->stage), "allocation-changed",
       G_CALLBACK (size_change), ui);
@@ -1209,7 +1209,8 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->screensaver = screensaver_new (CLUTTER_STAGE (ui->stage));
   screensaver_enable (ui->screensaver, FALSE);
 
-  g_timeout_add (GST_USECOND, progress_update_text, ui);
+  g_timeout_add (G_TIME_SPAN_MILLISECOND, progress_update_text,
+      ui);
 
   if (!ui->blind)
     clutter_actor_show (ui->stage);
