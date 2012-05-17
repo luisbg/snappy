@@ -920,7 +920,6 @@ static void
 toggle_fullscreen (UserInterface * ui)
 {
 #ifdef CLUTTER_WINDOWING_X11
-  if (clutter_check_windowing_backend (CLUTTER_WINDOWING_X11))
     if (ui->fullscreen) {
       toggle_fullscreen_x11 (CLUTTER_STAGE (ui->stage), FALSE);
       ui->fullscreen = FALSE;
