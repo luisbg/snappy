@@ -721,7 +721,7 @@ progress_update_text (gpointer data)
   GstEngine *engine = ui->engine;
 
   if (ui->controls_showing && !engine->queries_blocked) {
-    if (engine->media_duration == -1) {
+    if (engine->media_duration != -1) {
       gchar *duration_str;
       gint64 pos;
 
@@ -742,7 +742,7 @@ progress_update_seekbar (gpointer data)
   GstEngine *engine = ui->engine;
 
   if (ui->controls_showing && !engine->queries_blocked) {
-    if (engine->media_duration == -1) {
+    if (engine->media_duration != -1) {
       gint64 pos;
       gfloat progress = 0.0;
 
