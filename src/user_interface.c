@@ -402,21 +402,21 @@ load_controls (UserInterface * ui)
   ClutterActor *vol_int_box = NULL;
   GError *error = NULL;
 
-  vid_panel_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR, "/vid-panel.png");
-  ui->play_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-      "/media-actions-start.png");
-  ui->pause_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-      "/media-actions-pause.png");
-  ui->volume_low_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-      "/audio-volume-low.png");
-  ui->volume_high_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-      "/audio-volume-high.png");
-  ui->subtitle_toggle_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-      "/subtitle-toggle.png");
-  ui->video_stream_toggle_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-      "/video-stream-toggle.png");
-  ui->audio_stream_toggle_png = g_strdup_printf ("%s%s", SNAPPY_DATA_DIR,
-      "/audio-stream-toggle.png");
+  vid_panel_png = g_build_filename (SNAPPY_DATA_DIR, "vid-panel.png", NULL);
+  ui->play_png = g_build_filename (SNAPPY_DATA_DIR, "media-actions-start.png",
+      NULL);
+  ui->pause_png = g_build_filename (SNAPPY_DATA_DIR, "media-actions-pause.png",
+      NULL);
+  ui->volume_low_png = g_build_filename (SNAPPY_DATA_DIR,
+      "audio-volume-low.png", NULL);
+  ui->volume_high_png = g_build_filename (SNAPPY_DATA_DIR,
+      "audio-volume-high.png", NULL);
+  ui->subtitle_toggle_png = g_build_filename (SNAPPY_DATA_DIR,
+      "subtitle-toggle.png", NULL);
+  ui->video_stream_toggle_png = g_build_filename (SNAPPY_DATA_DIR,
+      "video-stream-toggle.png", NULL);
+  ui->audio_stream_toggle_png = g_build_filename (SNAPPY_DATA_DIR,
+      "audio-stream-toggle.png", NULL);
 
   icon_files[0] = vid_panel_png;
   icon_files[1] = ui->play_png;
