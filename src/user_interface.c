@@ -868,51 +868,50 @@ show_controls (UserInterface * ui, gboolean vis)
 
 #ifdef CLUTTER_WINDOWING_X11
 static void
-toggle_fullscreen_x11 (ClutterStage *stage,
-                       gboolean fullscreen)
+toggle_fullscreen_x11 (ClutterStage * stage, gboolean fullscreen)
 {
   static gboolean is_fullscreen = FALSE;
   static float old_width, old_height;
 
-  struct {
+  struct
+  {
     unsigned long flags;
     unsigned long functions;
     unsigned long decorations;
     long inputMode;
     unsigned long status;
-  } MWMHints = { 2, 0, 0, 0, 0};
+  } MWMHints = {
+  2, 0, 0, 0, 0};
 
   Display *xdisplay = clutter_x11_get_default_display ();
-  int      xscreen  = clutter_x11_get_default_screen ();
-  Atom     wm_hints = XInternAtom(xdisplay, "_MOTIF_WM_HINTS", True);
-  Window   xwindow  = clutter_x11_get_stage_window (stage);
+  int xscreen = clutter_x11_get_default_screen ();
+  Atom wm_hints = XInternAtom (xdisplay, "_MOTIF_WM_HINTS", True);
+  Window xwindow = clutter_x11_get_stage_window (stage);
+  // XRRScreenResources *xresources = XRRGetScreenResources (xdisplay, xwindow);
+  // g_print ("outputs: %d\n", xresources->ncrtc);
 
-  if (fullscreen)
-    {
-      int full_width = DisplayWidth (xdisplay, xscreen);
-      int full_height = DisplayHeight (xdisplay, xscreen)+5;
-        /* avoid being detected as fullscreen, workaround for some
-           windowmanagers  */
-      clutter_actor_get_size (CLUTTER_ACTOR (stage), &old_width, &old_height);
+  if (fullscreen) {
+    int full_width = DisplayWidth (xdisplay, xscreen);
+    int full_height = DisplayHeight (xdisplay, xscreen) + 5;
+    /* avoid being detected as fullscreen, workaround for some
+       windowmanagers  */
+    clutter_actor_get_size (CLUTTER_ACTOR (stage), &old_width, &old_height);
 
-      if (wm_hints != None)
-        XChangeProperty (xdisplay, xwindow, wm_hints, wm_hints, 32,
-                         PropModeReplace, (guchar*)&MWMHints,
-                         sizeof(MWMHints)/sizeof(long));
-      clutter_actor_set_size (CLUTTER_ACTOR (stage), full_width, full_height);
-      XMoveResizeWindow (xdisplay, xwindow,
-                         0, 0, full_width, full_height);
-    }
-  else
-    {
-      MWMHints.decorations = 7;
-      if (wm_hints != None )
-        XChangeProperty (xdisplay, xwindow, wm_hints, wm_hints, 32,
-                         PropModeReplace, (guchar*)&MWMHints,
-                         sizeof(MWMHints)/sizeof(long));
-      clutter_stage_set_fullscreen (stage, FALSE);
-      clutter_actor_set_size (CLUTTER_ACTOR (stage), old_width, old_height);
-    }
+    if (wm_hints != None)
+      XChangeProperty (xdisplay, xwindow, wm_hints, wm_hints, 32,
+          PropModeReplace, (guchar *) & MWMHints,
+          sizeof (MWMHints) / sizeof (long));
+    clutter_actor_set_size (CLUTTER_ACTOR (stage), full_width, full_height);
+    XMoveResizeWindow (xdisplay, xwindow, 0, 0, full_width, full_height);
+  } else {
+    MWMHints.decorations = 7;
+    if (wm_hints != None)
+      XChangeProperty (xdisplay, xwindow, wm_hints, wm_hints, 32,
+          PropModeReplace, (guchar *) & MWMHints,
+          sizeof (MWMHints) / sizeof (long));
+    clutter_stage_set_fullscreen (stage, FALSE);
+    clutter_actor_set_size (CLUTTER_ACTOR (stage), old_width, old_height);
+  }
 }
 #endif
 
@@ -920,13 +919,13 @@ static void
 toggle_fullscreen (UserInterface * ui)
 {
 #ifdef CLUTTER_WINDOWING_X11
-    if (ui->fullscreen) {
-      toggle_fullscreen_x11 (CLUTTER_STAGE (ui->stage), FALSE);
-      ui->fullscreen = FALSE;
-    } else {
-      toggle_fullscreen_x11 (CLUTTER_STAGE (ui->stage), TRUE);
-      ui->fullscreen = TRUE;
-    }
+  if (ui->fullscreen) {
+    toggle_fullscreen_x11 (CLUTTER_STAGE (ui->stage), FALSE);
+    ui->fullscreen = FALSE;
+  } else {
+    toggle_fullscreen_x11 (CLUTTER_STAGE (ui->stage), TRUE);
+    ui->fullscreen = TRUE;
+  }
 
 #else
   if (ui->fullscreen) {
@@ -1117,10 +1116,10 @@ interface_load_uri (UserInterface * ui, gchar * uri)
 }
 
 void
-interface_play_next_or_prev (UserInterface *ui, gboolean next)
+interface_play_next_or_prev (UserInterface * ui, gboolean next)
 {
-  GList * element;
-  gchar * uri;
+  GList *element;
+  gchar *uri;
 
   element = g_list_find (ui->uri_list, ui->engine->uri);
   if (next)
@@ -1169,7 +1168,7 @@ interface_start (UserInterface * ui, gchar * uri)
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
   clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->media_width,
-                          ui->media_height);
+      ui->media_height);
   clutter_stage_set_title (CLUTTER_STAGE (ui->stage), ui->filename);
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->stage_width,
@@ -1208,8 +1207,7 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->screensaver = screensaver_new (CLUTTER_STAGE (ui->stage));
   screensaver_enable (ui->screensaver, FALSE);
 
-  g_timeout_add (G_TIME_SPAN_MILLISECOND, progress_update_text,
-      ui);
+  g_timeout_add (G_TIME_SPAN_MILLISECOND, progress_update_text, ui);
 
   if (!ui->blind)
     clutter_actor_show (ui->stage);
