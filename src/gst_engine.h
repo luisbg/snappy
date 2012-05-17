@@ -25,6 +25,9 @@
 
 #include <gst/gst.h>
 
+/* GStreamer Interfaces */
+#include <gst/interfaces/navigation.h>
+
 G_BEGIN_DECLS
 
 typedef struct _GstEngine GstEngine;
@@ -48,6 +51,8 @@ struct _GstEngine
   GstElement *sink;
 
   GstBus *bus;
+
+  GstNavigation *navigation;
 };
 
 // Declaration of non-static functions

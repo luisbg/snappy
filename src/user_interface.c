@@ -725,6 +725,11 @@ progress_update_text (gpointer data)
       gchar *duration_str;
       gint64 pos;
 
+      if (ui->media_duration != engine->media_duration) {
+        ui->duration_str = position_ns_to_str (engine->media_duration);
+        progress_timing (ui);
+      }
+
       pos = query_position (engine);
       duration_str = g_strdup_printf ("   %s/%s", position_ns_to_str (pos),
           ui->duration_str);
@@ -745,8 +750,6 @@ progress_update_seekbar (gpointer data)
     if (engine->media_duration != -1) {
       gint64 pos;
       gfloat progress = 0.0;
-
-      update_media_duration (engine);
 
       pos = query_position (engine);
       progress = (float) pos / engine->media_duration;
@@ -1164,6 +1167,7 @@ interface_start (UserInterface * ui, gchar * uri)
 
   ui->progress_id = -1;
   ui->title_length = TITLE_LENGTH;
+  ui->media_duration = -1;
   ui->duration_str = position_ns_to_str (ui->engine->media_duration);
 
   clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);

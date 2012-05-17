@@ -54,6 +54,7 @@ gboolean add_uri_to_history (gchar * uri);
 gboolean add_uri_unfinished_playback (GstEngine * engine, gchar * uri,
     gint64 position);
 gboolean discover (GstEngine * engine, gchar * uri);
+static void handle_element_message (GstEngine * engine, GstMessage * msg);
 gboolean is_stream_seakable (GstEngine * engine);
 gint64 is_uri_unfinished_playback (GstEngine * engine, gchar * uri);
 static void print_tag (const GstTagList * list, const gchar * tag,
@@ -222,8 +223,6 @@ discover (GstEngine * engine, gchar * uri)
     engine->media_width = gst_discoverer_video_info_get_width (v_info);
     engine->media_height = gst_discoverer_video_info_get_height (v_info);
 
-    // g_print ("Found video dimensions: %dx%d\n", engine->media_width,
-    //     engine->media_height);
   } else {
     /* If only audio stream, play visualizations */
     g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
@@ -234,6 +233,27 @@ discover (GstEngine * engine, gchar * uri)
   gst_discoverer_info_unref (info);
 
   return TRUE;
+}
+
+/* Handle GST_ELEMENT_MESSAGEs */
+static void
+handle_element_message (GstEngine * engine, GstMessage * msg)
+{
+  GstNavigationMessageType nav_msg_type = gst_navigation_message_get_type (msg);
+
+  switch (nav_msg_type) {
+    case GST_NAVIGATION_MESSAGE_COMMANDS_CHANGED:{
+      if (is_stream_seakable (engine)) {
+        update_media_duration (engine);
+      }
+
+      break;
+    }
+
+    default:{
+      break;
+    }
+  }
 }
 
 /* Query if the current stream is seakable */
@@ -511,6 +531,12 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       break;
     }
 
+    case GST_MESSAGE_ELEMENT:
+    {
+      handle_element_message (engine, msg);
+      break;
+    }
+
     case GST_MESSAGE_ERROR:
     {
       /* Parse and share Gst Error */
@@ -646,6 +672,8 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->sink = sink;
   g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
   engine->bus = gst_pipeline_get_bus (GST_PIPELINE (engine->player));
+
+  engine->navigation = GST_NAVIGATION (engine->sink);
 
   return TRUE;
 }
