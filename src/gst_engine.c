@@ -243,6 +243,7 @@ handle_element_message (GstEngine * engine, GstMessage * msg)
 
   switch (nav_msg_type) {
     case GST_NAVIGATION_MESSAGE_COMMANDS_CHANGED:{
+      g_debug ("Navigation message commands changed");
       if (is_stream_seakable (engine)) {
         update_media_duration (engine);
       }
@@ -454,6 +455,8 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     case GST_MESSAGE_STATE_CHANGED:
     {
       GstState old, new, pending;
+
+      g_debug ("State changed");
       gst_message_parse_state_changed (msg, &old, &new, &pending);
       if (new == GST_STATE_PLAYING) {
         /* If loading file */
@@ -483,6 +486,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     {
       GstTagList *tags;
 
+      g_debug ("Tag received");
       if (ui->tags) {
         gst_message_parse_tag (msg, &tags);
         if (tags) {
@@ -499,7 +503,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
     case GST_MESSAGE_EOS:
     {
-      g_debug ("End-of-stream");
+      g_debug ("End of stream");
       stream_done (engine, ui);
 
       break;
@@ -507,7 +511,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
     case GST_MESSAGE_SEGMENT_DONE:
     {
-      g_debug ("Segment-done");
+      g_debug ("Segment done");
       stream_done (engine, ui);
 
       break;
@@ -515,17 +519,19 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
     case GST_MESSAGE_STEP_DONE:
     {
+      g_debug ("Step done");
       engine->prev_done = TRUE;
       break;
     }
 
     case GST_MESSAGE_ASYNC_DONE:
+      g_debug ("Async done");
       engine->queries_blocked = FALSE;
       break;
 
     case GST_MESSAGE_DURATION:
     {
-      g_debug ("Gst message duration\n");
+      g_debug ("Message duration received");
       update_media_duration (engine);
 
       break;
