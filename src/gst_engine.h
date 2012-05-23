@@ -30,6 +30,9 @@
 
 G_BEGIN_DECLS
 
+GST_DEBUG_CATEGORY_STATIC (_snappy_gst_debug);
+#define GST_CAT_DEFAULT _snappy_gst_debug
+
 typedef struct _GstEngine GstEngine;
 
 struct _GstEngine

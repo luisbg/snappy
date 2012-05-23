@@ -214,14 +214,16 @@ discover (GstEngine * engine, gchar * uri)
   if (engine->has_video || engine->has_audio)
     engine->media_duration = gst_discoverer_info_get_duration (info);
 
-  g_debug ("Found video %d, audio %d", engine->has_video, engine->has_audio);
+  GST_DEBUG ("Found video %d, audio %d", engine->has_video, engine->has_audio);
 
   /* If it has video stream, get dimensions */
   if (engine->has_video) {
     list = gst_discoverer_info_get_video_streams (info);
     v_info = (GstDiscovererVideoInfo *) list->data;
     engine->media_width = gst_discoverer_video_info_get_width (v_info);
+    GST_DEBUG ("video width: %d", engine->media_width);
     engine->media_height = gst_discoverer_video_info_get_height (v_info);
+    GST_DEBUG ("video height: %d", engine->media_height);
 
   } else {
     /* If only audio stream, play visualizations */
@@ -243,7 +245,7 @@ handle_element_message (GstEngine * engine, GstMessage * msg)
 
   switch (nav_msg_type) {
     case GST_NAVIGATION_MESSAGE_COMMANDS_CHANGED:{
-      g_debug ("Navigation message commands changed");
+      GST_DEBUG ("Navigation message commands changed");
       if (is_stream_seakable (engine)) {
         update_media_duration (engine);
       }
@@ -456,7 +458,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     {
       GstState old, new, pending;
 
-      g_debug ("State changed");
+      GST_DEBUG ("State changed");
       gst_message_parse_state_changed (msg, &old, &new, &pending);
       if (new == GST_STATE_PLAYING) {
         /* If loading file */
@@ -486,7 +488,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
     {
       GstTagList *tags;
 
-      g_debug ("Tag received");
+      GST_DEBUG ("Tag received");
       if (ui->tags) {
         gst_message_parse_tag (msg, &tags);
         if (tags) {
@@ -503,7 +505,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
     case GST_MESSAGE_EOS:
     {
-      g_debug ("End of stream");
+      GST_DEBUG ("End of stream");
       stream_done (engine, ui);
 
       break;
@@ -511,7 +513,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
     case GST_MESSAGE_SEGMENT_DONE:
     {
-      g_debug ("Segment done");
+      GST_DEBUG ("Segment done");
       stream_done (engine, ui);
 
       break;
@@ -519,19 +521,19 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
     case GST_MESSAGE_STEP_DONE:
     {
-      g_debug ("Step done");
+      GST_DEBUG ("Step done");
       engine->prev_done = TRUE;
       break;
     }
 
     case GST_MESSAGE_ASYNC_DONE:
-      g_debug ("Async done");
+      GST_DEBUG ("Async done");
       engine->queries_blocked = FALSE;
       break;
 
     case GST_MESSAGE_DURATION:
     {
-      g_debug ("Message duration received");
+      GST_DEBUG ("Message duration received");
       update_media_duration (engine);
 
       break;
@@ -551,11 +553,11 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
       gst_message_parse_error (msg, &err, &debug);
 
-      g_debug ("Error: %s", err->message);
+      GST_DEBUG ("Error: %s", err->message);
       g_error_free (err);
 
       if (debug) {
-        g_debug ("Debug details: %s", debug);
+        GST_DEBUG ("Debug details: %s", debug);
         g_free (debug);
       }
 
@@ -666,6 +668,14 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->second = GST_SECOND;
 
   engine->uri = NULL;
+
+  gchar *version_str;
+
+  version_str = gst_version_string ();
+  GST_DEBUG_CATEGORY_INIT (_snappy_gst_debug, "snappy", 0,
+      "snappy media player");
+  GST_DEBUG ("Initialised %s", version_str);
+  g_free (version_str);
 
   /* Make playbin2 element */
   engine->player = gst_element_factory_make ("playbin2", "playbin2");
@@ -947,7 +957,7 @@ update_media_duration (GstEngine * engine)
     if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {
       success = TRUE;
     } else {
-      g_debug ("Could not get media's duration");
+      GST_DEBUG ("Could not get media's duration");
       success = FALSE;
     }
   }

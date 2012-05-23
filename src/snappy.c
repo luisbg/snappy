@@ -135,7 +135,7 @@ process_args (int argc, char *argv[],
   if (argc > 1) {
     /* Save uris in the file glist */
     for (index = 1; index < argc; index++) {
-      g_debug ("Adding file: %s", argv[index]);
+      g_print ("Adding file: %s", argv[index]);
       uri_list = g_list_append (uri_list, clean_uri (argv[index]));
       pos++;
     }
