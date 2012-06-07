@@ -91,6 +91,7 @@ struct _UserInterface
   gchar *volume_low_png, *volume_high_png;
   gchar *subtitle_toggle_png;
   gchar *video_stream_toggle_png, *audio_stream_toggle_png;
+  gchar *data_dir;
   gchar *duration_str;
 
   GList *uri_list;

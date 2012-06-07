@@ -402,20 +402,20 @@ load_controls (UserInterface * ui)
   ClutterActor *vol_int_box = NULL;
   GError *error = NULL;
 
-  vid_panel_png = g_build_filename (SNAPPY_DATA_DIR, "vid-panel.png", NULL);
-  ui->play_png = g_build_filename (SNAPPY_DATA_DIR, "media-actions-start.png",
+  vid_panel_png = g_build_filename (ui->data_dir, "vid-panel.png", NULL);
+  ui->play_png = g_build_filename (ui->data_dir, "media-actions-start.png",
       NULL);
-  ui->pause_png = g_build_filename (SNAPPY_DATA_DIR, "media-actions-pause.png",
+  ui->pause_png = g_build_filename (ui->data_dir, "media-actions-pause.png",
       NULL);
-  ui->volume_low_png = g_build_filename (SNAPPY_DATA_DIR,
+  ui->volume_low_png = g_build_filename (ui->data_dir,
       "audio-volume-low.png", NULL);
-  ui->volume_high_png = g_build_filename (SNAPPY_DATA_DIR,
+  ui->volume_high_png = g_build_filename (ui->data_dir,
       "audio-volume-high.png", NULL);
-  ui->subtitle_toggle_png = g_build_filename (SNAPPY_DATA_DIR,
+  ui->subtitle_toggle_png = g_build_filename (ui->data_dir,
       "subtitle-toggle.png", NULL);
-  ui->video_stream_toggle_png = g_build_filename (SNAPPY_DATA_DIR,
+  ui->video_stream_toggle_png = g_build_filename (ui->data_dir,
       "video-stream-toggle.png", NULL);
-  ui->audio_stream_toggle_png = g_build_filename (SNAPPY_DATA_DIR,
+  ui->audio_stream_toggle_png = g_build_filename (ui->data_dir,
       "audio-stream-toggle.png", NULL);
 
   icon_files[0] = vid_panel_png;
