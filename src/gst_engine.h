@@ -26,7 +26,7 @@
 #include <gst/gst.h>
 
 /* GStreamer Interfaces */
-#include <gst/interfaces/navigation.h>
+#include <gst/video/navigation.h>
 
 G_BEGIN_DECLS
 

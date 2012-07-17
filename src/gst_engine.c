@@ -23,6 +23,7 @@
 #include <clutter-gst/clutter-gst.h>
 #include <gst/pbutils/pbutils.h>
 #include <string.h>
+#include <sys/stat.h> /* for S_IRUSR | S_IWUSR | S_IXUSR */
 
 #include "user_interface.h"
 #include "gst_engine.h"
@@ -33,7 +34,7 @@
 
 #define RECENTLY_VIEWED_MAX 50
 
-// GstPlayFlags flags from playbin2. It is the policy of GStreamer to
+// GstPlayFlags flags from playbin. It is the policy of GStreamer to
 // not publicly expose element-specific enums. That's why this
 // GstPlayFlags enum has been copied here.
 typedef enum
@@ -46,7 +47,9 @@ typedef enum
   GST_PLAY_FLAG_NATIVE_AUDIO = 0x00000020,
   GST_PLAY_FLAG_NATIVE_VIDEO = 0x00000040,
   GST_PLAY_FLAG_DOWNLOAD = 0x00000080,
-  GST_PLAY_FLAG_BUFFERING = 0x000000100
+  GST_PLAY_FLAG_BUFFERING = 0x000000100,
+  GST_PLAY_FLAG_DEINTERLACE = 0x000000200,
+  GST_PLAY_FLAG_SOFT_COLORBALANCE = 0x000000400
 } GstPlayFlags;
 
 // Declaration of static functions
@@ -674,14 +677,14 @@ engine_init (GstEngine * engine, GstElement * sink)
   GST_DEBUG_CATEGORY_INIT (_snappy_gst_debug, "snappy", 0,
       "snappy media player");
 
-  /* Make playbin2 element */
-  engine->player = gst_element_factory_make ("playbin2", "playbin2");
+  /* Make playbin element */
+  engine->player = gst_element_factory_make ("playbin", "playbin");
   if (engine->player == NULL) {
     g_print ("ERROR: Failed to create playbin element\n");
     return FALSE;
   }
 
-  /* Set Clutter texture as playbin2's videos sink */
+  /* Set Clutter texture as playbin's videos sink */
   engine->sink = sink;
   g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
   engine->bus = gst_pipeline_get_bus (GST_PIPELINE (engine->player));
@@ -716,7 +719,7 @@ engine_load_uri (GstEngine * engine, gchar * uri)
 void
 engine_open_uri (GstEngine * engine, gchar * uri)
 {
-  /* Need to set back to Ready state so Playbin2 loads uri */
+  /* Need to set back to Ready state so Playbin loads uri */
   engine->uri = uri;
 
   g_print ("Open uri: %s\n", uri);
@@ -819,8 +822,7 @@ frame_stepping (GstEngine * engine, gboolean foward)
       /* Change of direction needed */
       engine->direction_foward = foward;
 
-      fmt = GST_FORMAT_TIME;
-      ok = gst_element_query_position (engine->player, &fmt, &pos);
+      ok = gst_element_query_position (engine->player, GST_FORMAT_TIME, &pos);
       gst_element_get_state (engine->player, NULL, NULL, GST_SECOND);
 
       if (foward)
@@ -897,9 +899,8 @@ query_position (GstEngine * engine)
 {
   gboolean ok;
   gint64 position;
-  GstFormat fmt = GST_FORMAT_TIME;
 
-  ok = gst_element_query_position (engine->player, &fmt, &position);
+  ok = gst_element_query_position (engine->player, GST_FORMAT_TIME, &position);
 
   if (!ok)
     position = 0;
@@ -948,11 +949,10 @@ gboolean
 update_media_duration (GstEngine * engine)
 {
   gboolean success = FALSE;
-  GstFormat fmt = GST_FORMAT_TIME;
 
-  if (gst_element_query_duration (engine->player, &fmt,
+  if (gst_element_query_duration (engine->player, GST_FORMAT_TIME,
           &engine->media_duration)) {
-    if (engine->media_duration != -1 && fmt == GST_FORMAT_TIME) {
+    if (engine->media_duration != -1) {
       success = TRUE;
     } else {
       GST_DEBUG ("Could not get media's duration");
