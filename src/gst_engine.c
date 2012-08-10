@@ -360,6 +360,19 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 
   /* Config file path */
   config_dir = g_get_user_config_dir ();
+
+  /* Self config directory, i.e. .config/snappy/ */
+  struct stat st_self;
+  if ( 0 != stat(g_strdup_printf("%s/snappy", config_dir), &st_self)) {
+     if ( 0 != mkdir( g_strdup_printf("%s/snappy", config_dir), 0777))
+       perror("Failed to create ~/.config/snappy/ directory");
+  }
+  else if (!S_ISDIR(st_self.st_mode)) {
+     errno = ENOTDIR;
+     perror("~/config/snappy/ already exists");
+  }
+
+  /* History file */
   path = g_strdup_printf ("%s/snappy/history", config_dir);
 
   /* Remove key from history file */
