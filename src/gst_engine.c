@@ -400,7 +400,7 @@ stream_done (GstEngine * engine, UserInterface * ui)
   /* When URI is done or looping remove from unfinished list */
   remove_uri_unfinished_playback (engine, engine->uri);
 
-  if (engine->loop) {
+  if (engine->loop && (interface_is_it_last (ui))) {
     engine_seek (engine, 0, TRUE);
   } else {
     interface_play_next_or_prev (ui, TRUE);

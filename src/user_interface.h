@@ -118,6 +118,7 @@ struct _UserInterface
 
 // Declaration of non-static functions
 void interface_init (UserInterface * ui);
+gboolean interface_is_it_last (UserInterface * ui);
 gboolean interface_load_uri (UserInterface * ui, gchar * uri);
 void interface_play_next_or_prev (UserInterface * ui, gboolean next);
 void interface_start (UserInterface * ui, gchar * uri);

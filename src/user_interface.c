@@ -1024,6 +1024,17 @@ interface_init (UserInterface * ui)
 }
 
 gboolean
+interface_is_it_last (UserInterface * ui)
+{
+  GList *element;
+
+  element = g_list_find (ui->uri_list, ui->engine->uri);
+  element = g_list_next (element);
+
+  return (element == NULL);
+}
+
+gboolean
 interface_load_uri (UserInterface * ui, gchar * uri)
 {
   ui->fileuri = uri;
