@@ -777,9 +777,7 @@ engine_seek (GstEngine * engine, gint64 position, gboolean accurate)
         GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_KEY_UNIT;
   }
 
-  ok = gst_element_seek_simple (engine->player, fmt,
-      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_KEY_UNIT,
-      position);
+  ok = gst_element_seek_simple (engine->player, fmt, flags, position);
 
   engine->queries_blocked = TRUE;
 
