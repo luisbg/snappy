@@ -363,6 +363,19 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 
   /* Config file path */
   config_dir = g_get_user_config_dir ();
+
+  /* Self config directory, i.e. .config/snappy/ */
+  struct stat st_self;
+  if ( 0 != stat(g_strdup_printf("%s/snappy", config_dir), &st_self)) {
+     if ( 0 != mkdir( g_strdup_printf("%s/snappy", config_dir), 0777))
+       perror("Failed to create ~/.config/snappy/ directory");
+  }
+  else if (!S_ISDIR(st_self.st_mode)) {
+     errno = ENOTDIR;
+     perror("~/config/snappy/ already exists");
+  }
+
+  /* History file */
   path = g_strdup_printf ("%s/snappy/history", config_dir);
 
   /* Remove key from history file */
@@ -390,7 +403,7 @@ stream_done (GstEngine * engine, UserInterface * ui)
   /* When URI is done or looping remove from unfinished list */
   remove_uri_unfinished_playback (engine, engine->uri);
 
-  if (engine->loop) {
+  if (engine->loop && (interface_is_it_last (ui))) {
     engine_seek (engine, 0, TRUE);
   } else {
     interface_play_next_or_prev (ui, TRUE);
@@ -767,9 +780,7 @@ engine_seek (GstEngine * engine, gint64 position, gboolean accurate)
         GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_KEY_UNIT;
   }
 
-  ok = gst_element_seek_simple (engine->player, fmt,
-      GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_SEGMENT | GST_SEEK_FLAG_KEY_UNIT,
-      position);
+  ok = gst_element_seek_simple (engine->player, fmt, flags, position);
 
   engine->queries_blocked = TRUE;
 

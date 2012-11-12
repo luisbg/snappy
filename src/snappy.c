@@ -110,16 +110,19 @@ process_args (int argc, char *argv[],
   /* Recently viewed uris */
   if (recent) {
     gchar **recent = NULL;
-
-    g_print ("These are the recently viewed URIs: \n\n");
-
     recent = get_recently_viewed ();
 
-    for (c = 0; recent[c] != NULL; c++) {
-      if (c < 9)
-        g_print ("0%d: %s \n", c + 1, recent[c]);
-      else
-        g_print ("%d: %s \n", c + 1, recent[c]);
+    if (recent) {
+      g_print ("These are the recently viewed URIs: \n\n");
+
+      for (c = 0; recent[c] != NULL; c++) {
+        if (c < 9)
+          g_print ("0%d: %s \n", c + 1, recent[c]);
+        else
+          g_print ("%d: %s \n", c + 1, recent[c]);
+      }
+    } else {
+      g_print ("ERROR: Can't find history of recently viewed URIs\n");
     }
 
     return NULL;
