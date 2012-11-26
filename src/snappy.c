@@ -201,9 +201,6 @@ main (int argc, char *argv[])
     }
   }
 
-  if (!g_thread_supported ())
-    g_thread_init (NULL);
-
   context = g_option_context_new ("<media file> - Play movie files");
 
   /* Process command arguments */
