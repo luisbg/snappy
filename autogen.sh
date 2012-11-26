@@ -10,7 +10,7 @@ PKG_NAME="snappy"
   && test -d $srcdir/src \
   && test -f $srcdir/src/snappy.c) || {
     echo -n "**Error**: Directory "\`$srcdir\'" does not look like the"
-    echo " top-level snanny directory"
+    echo " top-level snappy directory"
     exit 1
 }
 
