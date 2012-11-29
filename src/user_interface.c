@@ -1082,6 +1082,9 @@ interface_play_next_or_prev (UserInterface * ui, gboolean next)
     engine_open_uri (ui->engine, uri);
     interface_load_uri (ui, uri);
     engine_play (ui->engine);
+  } else {
+    engine_seek (ui->engine, 0, TRUE);
+    toggle_playing (ui);
   }
 }
 
