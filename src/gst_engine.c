@@ -20,7 +20,6 @@
  * USA
  */
 
-#include <clutter-gst/clutter-gst.h>
 #include <gst/pbutils/pbutils.h>
 #include <string.h>
 #include <sys/stat.h> /* for S_IRUSR | S_IWUSR | S_IXUSR */

@@ -22,7 +22,6 @@
 
 #include <string.h>
 #include <clutter/clutter.h>
-#include <clutter-gst/clutter-gst.h>
 
 #include "user_interface.h"
 #include "utils.h"
