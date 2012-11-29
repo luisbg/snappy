@@ -434,7 +434,8 @@ load_controls (UserInterface * ui)
   // Controls layout management
   controls_layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
       CLUTTER_BIN_ALIGNMENT_FIXED);
-  ui->control_box = clutter_box_new (controls_layout);
+  ui->control_box = clutter_actor_new ();
+  clutter_actor_set_layout_manager (ui->control_box, controls_layout);
 
   // Controls background
   ui->control_bg = clutter_texture_new_from_file (vid_panel_png, &error);
@@ -458,13 +459,14 @@ load_controls (UserInterface * ui)
   // Main Box
   main_box_layout = clutter_box_layout_new ();
   clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (main_box_layout), FALSE);
-  ui->main_box = clutter_box_new (main_box_layout);
+  ui->main_box = clutter_actor_new ();
+  clutter_actor_set_layout_manager (ui->main_box, main_box_layout);
 
   clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
-      ui->main_box);
-  clutter_actor_add_constraint (ui->main_box,
+      CLUTTER_ACTOR (ui->main_box));
+  clutter_actor_add_constraint (CLUTTER_ACTOR (ui->main_box),
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.03));
-  clutter_actor_add_constraint (ui->main_box,
+  clutter_actor_add_constraint (CLUTTER_ACTOR (ui->main_box),
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.03));
 
   // Controls play toggle
@@ -505,7 +507,8 @@ load_controls (UserInterface * ui)
   // Controls seek
   seek_box_layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
       CLUTTER_BIN_ALIGNMENT_FIXED);
-  seek_box = clutter_box_new (seek_box_layout);
+  seek_box = clutter_actor_new ();
+  clutter_actor_set_layout_manager (seek_box, seek_box_layout);
 
   // background box rectangle shows as the border
   ui->control_seek1 = clutter_rectangle_new_with_color (&control_color1);
@@ -847,8 +850,8 @@ show_controls (UserInterface * ui, gboolean vis)
     progress_update_seekbar (ui);
     progress_update_text (ui);
     clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
-    clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT,
-        CTL_FADE_DURATION, "opacity", 0xa0, NULL);
+    clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
+        CLUTTER_EASE_OUT_QUINT, CTL_FADE_DURATION, "opacity", 0xa0, NULL);
 
     if (ui->controls_timeout == -1) {
       ui->controls_timeout = g_timeout_add_seconds (CTL_SHOW_SEC,
@@ -860,8 +863,8 @@ show_controls (UserInterface * ui, gboolean vis)
     ui->controls_showing = FALSE;
 
     clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
-    clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT,
-        CTL_FADE_DURATION, "opacity", 0, NULL);
+    clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
+        CLUTTER_EASE_OUT_QUINT, CTL_FADE_DURATION, "opacity", 0, NULL);
   }
 }
 
@@ -916,7 +919,7 @@ update_controls_size (UserInterface * ui)
     ctl_height = ctl_width / CONTROLS_ASPECT_RATIO;
   }
 
-  clutter_actor_set_size (ui->control_box,
+  clutter_actor_set_size (CLUTTER_ACTOR (ui->control_box),
       ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT),
       ctl_height + ((ctl_height / BG_H) * SHADOW_BOTTOM));
 
@@ -1138,8 +1141,8 @@ interface_start (UserInterface * ui, gchar * uri)
   // Add video texture and control UI to stage
   clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->texture, NULL);
   if (!ui->hide) {
-    clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->control_box,
-        NULL);
+    clutter_container_add (CLUTTER_CONTAINER (ui->stage),
+        CLUTTER_ACTOR (ui->control_box), NULL);
   }
   clutter_actor_add_constraint (ui->texture,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
@@ -1147,8 +1150,8 @@ interface_start (UserInterface * ui, gchar * uri)
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.5));
 
   clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
-  clutter_actor_animate (ui->control_box, CLUTTER_EASE_OUT_QUINT,
-      G_TIME_SPAN_MILLISECOND, "opacity", 0, NULL);
+  clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
+      CLUTTER_EASE_OUT_QUINT, G_TIME_SPAN_MILLISECOND, "opacity", 0, NULL);
 
   g_signal_connect (CLUTTER_STAGE (ui->stage), "allocation-changed",
       G_CALLBACK (size_change), ui);
