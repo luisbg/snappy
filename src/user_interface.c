@@ -21,8 +21,11 @@
  */
 
 #include <string.h>
+
+#include <gtk/gtk.h>
 #include <clutter/clutter.h>
 #include <clutter-gst/clutter-gst.h>
+#include <clutter-gtk/clutter-gtk.h>
 
 #include "user_interface.h"
 #include "utils.h"
@@ -79,7 +82,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_q:
         case CLUTTER_Escape:
         {
-          clutter_main_quit ();
+          gtk_main_quit ();
 
           handled = TRUE;
           break;
@@ -449,7 +452,7 @@ load_controls (UserInterface * ui)
       clutter_bind_constraint_new (ui->control_box, CLUTTER_BIND_SIZE, 0));
 
   g_free (vid_panel_png);
-  clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
+  clutter_actor_add_child (CLUTTER_ACTOR (ui->control_box),
       ui->control_bg);
   clutter_actor_add_constraint (ui->control_box,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
@@ -462,7 +465,7 @@ load_controls (UserInterface * ui)
   ui->main_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (ui->main_box, main_box_layout);
 
-  clutter_container_add_actor (CLUTTER_CONTAINER (ui->control_box),
+  clutter_actor_add_child (CLUTTER_ACTOR (ui->control_box),
       CLUTTER_ACTOR (ui->main_box));
   clutter_actor_add_constraint (CLUTTER_ACTOR (ui->main_box),
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.03));
@@ -512,7 +515,7 @@ load_controls (UserInterface * ui)
 
   // background box rectangle shows as the border
   ui->control_seek1 = clutter_rectangle_new_with_color (&control_color1);
-  clutter_container_add_actor (CLUTTER_CONTAINER (seek_box), ui->control_seek1);
+  clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek1);
   clutter_actor_add_constraint (ui->control_seek1,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
   clutter_actor_add_constraint (ui->control_seek1,
@@ -520,12 +523,12 @@ load_controls (UserInterface * ui)
 
   // smaller background rectangle inside seek1 to create a border
   ui->control_seek2 = clutter_rectangle_new_with_color (&control_color2);
-  clutter_container_add_actor (CLUTTER_CONTAINER (seek_box), ui->control_seek2);
+  clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek2);
   clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
 
   // progress rectangle
   ui->control_seekbar = clutter_rectangle_new_with_color (&control_color1);
-  clutter_container_add_actor (CLUTTER_CONTAINER (seek_box),
+  clutter_actor_add_child (CLUTTER_ACTOR (seek_box),
       ui->control_seekbar);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
@@ -570,11 +573,11 @@ load_controls (UserInterface * ui)
   vol_int_box = clutter_box_new (vol_int_box_layout);
 
   ui->vol_int_bg = clutter_rectangle_new_with_color (&control_color1);
-  clutter_container_add_actor (CLUTTER_CONTAINER (vol_int_box), ui->vol_int_bg);
+  clutter_actor_add_child (CLUTTER_ACTOR (vol_int_box), ui->vol_int_bg);
   clutter_actor_set_position (ui->vol_int_bg, 0, 0);
 
   ui->vol_int = clutter_rectangle_new_with_color (&control_color1);
-  clutter_container_add_actor (CLUTTER_CONTAINER (vol_int_box), ui->vol_int);
+  clutter_actor_add_child (CLUTTER_ACTOR (vol_int_box), ui->vol_int);
 
   clutter_box_pack (CLUTTER_BOX (ui->volume_box), vol_int_box,
       "x-fill", FALSE,
@@ -1045,7 +1048,7 @@ interface_load_uri (UserInterface * ui, gchar * uri)
   ui->filename = g_path_get_basename (ui->fileuri);
 
   if (ui->stage != NULL) {
-    clutter_stage_set_title (CLUTTER_STAGE (ui->stage), ui->filename);
+    gtk_window_set_title (GTK_WINDOW (ui->window), "Clutter Embedding");
     clutter_text_set_text (CLUTTER_TEXT (ui->control_title), ui->filename);
   }
 
@@ -1107,7 +1110,31 @@ interface_start (UserInterface * ui, gchar * uri)
 
   ui->stage_width = ui->media_width;
   ui->stage_height = ui->media_height;
-  ui->stage = clutter_stage_get_default ();
+
+  /* Create the window and some child widgets: */
+  ui->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_title (GTK_WINDOW (ui->window), ui->filename);
+  g_signal_connect (ui->window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
+
+  ui->box = gtk_grid_new ();
+  gtk_orientable_set_orientation (GTK_ORIENTABLE (ui->box),
+      GTK_ORIENTATION_VERTICAL);
+  gtk_widget_set_hexpand (ui->box, TRUE);
+  gtk_widget_set_vexpand (ui->box, TRUE);
+  gtk_container_add (GTK_CONTAINER (ui->window), ui->box);
+
+  /* Create the clutter widget: */
+  ui->clutter_widget = gtk_clutter_embed_new ();
+  gtk_container_add (GTK_CONTAINER (ui->box), ui->clutter_widget);
+
+  /* Get the stage */
+  ui->stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (ui->clutter_widget));
+  clutter_actor_set_background_color (CLUTTER_ACTOR (ui->stage), &stage_color);
+  /* Set the size of the widget,
+   * because we should not set the size of its stage when using GtkClutterEmbed.
+   */
+  gtk_widget_set_size_request (ui->clutter_widget, ui->stage_width,
+      ui->stage_height);
 
   ui->controls_showing = FALSE;
   ui->keep_showing_controls = FALSE;
@@ -1122,11 +1149,6 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->media_duration = -1;
   ui->duration_str = position_ns_to_str (ui->engine->media_duration);
 
-  clutter_stage_set_color (CLUTTER_STAGE (ui->stage), &stage_color);
-  clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->media_width,
-      ui->media_height);
-  clutter_stage_set_title (CLUTTER_STAGE (ui->stage), ui->filename);
-
   clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->stage_width,
       ui->stage_height);
   clutter_stage_set_user_resizable (CLUTTER_STAGE (ui->stage), TRUE);
@@ -1139,10 +1161,9 @@ interface_start (UserInterface * ui, gchar * uri)
   load_controls (ui);
 
   // Add video texture and control UI to stage
-  clutter_container_add (CLUTTER_CONTAINER (ui->stage), ui->texture, NULL);
+  clutter_actor_add_child (ui->stage, ui->texture);
   if (!ui->hide) {
-    clutter_container_add (CLUTTER_CONTAINER (ui->stage),
-        CLUTTER_ACTOR (ui->control_box), NULL);
+    clutter_actor_add_child (ui->stage, CLUTTER_ACTOR (ui->control_box));
   }
   clutter_actor_add_constraint (ui->texture,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
@@ -1153,6 +1174,7 @@ interface_start (UserInterface * ui, gchar * uri)
   clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
       CLUTTER_EASE_OUT_QUINT, G_TIME_SPAN_MILLISECOND, "opacity", 0, NULL);
 
+  /* Connect a signal handler to mouse clicks and key presses on the stage */
   g_signal_connect (CLUTTER_STAGE (ui->stage), "allocation-changed",
       G_CALLBACK (size_change), ui);
   g_signal_connect (CLUTTER_STAGE (ui->stage), "event", G_CALLBACK (event_cb),
@@ -1165,8 +1187,10 @@ interface_start (UserInterface * ui, gchar * uri)
 
   g_timeout_add (G_TIME_SPAN_MILLISECOND, progress_update_text, ui);
 
-  if (!ui->blind)
-    clutter_actor_show (ui->stage);
+  if (!ui->blind) {
+    /* Show the window */
+    gtk_widget_show_all (ui->window);
+  }
 }
 
 gboolean

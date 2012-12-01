@@ -23,6 +23,8 @@
 #ifndef __USER_INTERFACE_H__
 #define __USER_INTERFACE_H__
 
+#include <gtk/gtk.h>
+
 #include "gst_engine.h"
 #include "screensaver.h"
 
@@ -95,6 +97,8 @@ struct _UserInterface
   gchar *duration_str;
 
   GList *uri_list;
+
+  GtkWidget *window, *box, *clutter_widget;
 
   ClutterColor stage_color, control_color1, control_color2;
 

@@ -218,9 +218,8 @@ main (int argc, char *argv[])
   ui->tags = tags;
   ui->data_dir = data_dir;
   interface_init (ui);
-  video_texture = clutter_texture_new ();
-
-  clutter_gst_init (&argc, &argv);
+  video_texture = g_object_new (CLUTTER_TYPE_TEXTURE, "disable-slicing", TRUE,
+      NULL);
 
   version_str = gst_version_string ();
   GST_DEBUG_CATEGORY_INIT (_snappy_gst_debug, "snappy", 0,
@@ -234,8 +233,7 @@ main (int argc, char *argv[])
     GST_DEBUG ("autocluttersink not found, falling back to cluttersink\n");
     sink = gst_element_factory_make ("cluttersink", "cluttersink");
   }
-  g_object_set (G_OBJECT (sink), "texture", CLUTTER_TEXTURE (video_texture),
-      NULL);
+  g_object_set (G_OBJECT (sink), "texture", video_texture, NULL);
 
   ok = engine_init (engine, sink);
   if (!ok)
@@ -254,6 +252,7 @@ main (int argc, char *argv[])
   uri = g_list_first (uri_list)->data;
 
   /* Load engine and start interface */
+  gtk_clutter_init (&argc, &argv);
   engine_load_uri (engine, uri);
   interface_start (ui, uri);
 
@@ -276,7 +275,7 @@ main (int argc, char *argv[])
 #endif
 
   /* Main loop */
-  clutter_main ();
+  gtk_main ();
 
   /* Close snappy */
   close_down (ui, engine);
