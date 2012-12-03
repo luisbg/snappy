@@ -441,7 +441,9 @@ load_controls (UserInterface * ui)
   clutter_actor_set_layout_manager (ui->control_box, controls_layout);
 
   // Controls background
-  ui->control_bg = clutter_texture_new_from_file (vid_panel_png, &error);
+  ui->control_bg = gtk_clutter_texture_new ();
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->control_bg),
+      gdk_pixbuf_new_from_file (vid_panel_png, NULL), &error);
   if (!ui->control_bg && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -473,8 +475,9 @@ load_controls (UserInterface * ui)
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.03));
 
   // Controls play toggle
-  ui->control_play_toggle =
-      clutter_texture_new_from_file (ui->pause_png, &error);
+  ui->control_play_toggle = gtk_clutter_texture_new ();
+  gtk_clutter_texture_set_from_pixbuf (ui->control_play_toggle,
+      gdk_pixbuf_new_from_file (ui->pause_png, NULL), &error);
   if (!ui->control_play_toggle && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -556,7 +559,9 @@ load_controls (UserInterface * ui)
       "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", FALSE, NULL);
 
   // Controls volume low
-  ui->volume_low = clutter_texture_new_from_file (ui->volume_low_png, &error);
+  ui->volume_low = gtk_clutter_texture_new ();
+  gtk_clutter_texture_set_from_pixbuf (ui->volume_low,
+      gdk_pixbuf_new_from_file (ui->volume_low_png, NULL), &error);
   if (!ui->volume_low && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -584,7 +589,9 @@ load_controls (UserInterface * ui)
       "y-fill", FALSE, "y-align", CLUTTER_BOX_ALIGNMENT_CENTER, NULL);
 
   // Controls volume high
-  ui->volume_high = clutter_texture_new_from_file (ui->volume_high_png, &error);
+  ui->volume_high = gtk_clutter_texture_new ();
+  gtk_clutter_texture_set_from_pixbuf (ui->volume_high,
+      gdk_pixbuf_new_from_file (ui->volume_high_png, NULL), &error);
   if (!ui->volume_high && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -616,8 +623,9 @@ load_controls (UserInterface * ui)
   bottom_box = clutter_box_new (bottom_box_layout);
 
   // Controls video stream toggle
-  ui->video_stream_toggle = clutter_texture_new_from_file
-      (ui->video_stream_toggle_png, &error);
+  ui->video_stream_toggle = gtk_clutter_texture_new ();
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->video_stream_toggle),
+      gdk_pixbuf_new_from_file (ui->video_stream_toggle_png, NULL), &error);
   if (!ui->video_stream_toggle && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -628,8 +636,9 @@ load_controls (UserInterface * ui)
       "x-align", CLUTTER_BOX_ALIGNMENT_START, NULL);
 
   // Controls audio stream toggle
-  ui->audio_stream_toggle = clutter_texture_new_from_file
-      (ui->audio_stream_toggle_png, &error);
+  ui->audio_stream_toggle = gtk_clutter_texture_new ();
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->audio_stream_toggle),
+      gdk_pixbuf_new_from_file (ui->audio_stream_toggle_png, NULL), &error);
   if (!ui->audio_stream_toggle && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -640,8 +649,9 @@ load_controls (UserInterface * ui)
       "x-align", CLUTTER_BOX_ALIGNMENT_END, NULL);
 
   // Controls subtitle toggle
-  ui->subtitle_toggle = clutter_texture_new_from_file (ui->subtitle_toggle_png,
-      &error);
+  ui->subtitle_toggle = gtk_clutter_texture_new ();
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->subtitle_toggle),
+      gdk_pixbuf_new_from_file (ui->subtitle_toggle_png, NULL), &error);
   if (!ui->subtitle_toggle && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
