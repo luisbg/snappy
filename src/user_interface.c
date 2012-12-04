@@ -782,17 +782,15 @@ progress_update_seekbar (gpointer data)
 gboolean
 rotate_video (UserInterface * ui)
 {
-  gfloat *x = 0, *y = 0, *z = 0;
   gfloat vid_width, vid_height;
   gfloat x_center, y_center;
   gdouble angle;
 
-  angle = clutter_actor_get_rotation (ui->texture, CLUTTER_Z_AXIS, x, y, z);
+  angle = clutter_actor_get_rotation_angle (ui->texture, CLUTTER_Z_AXIS);
   angle += 90;
   if (angle == 360)
     angle = 0;
-  clutter_actor_set_z_rotation_from_gravity (ui->texture, angle,
-      CLUTTER_GRAVITY_CENTER);
+  clutter_actor_set_rotation_angle (ui->texture, CLUTTER_Z_AXIS, angle);
 
   size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 
@@ -1188,6 +1186,8 @@ interface_start (UserInterface * ui, gchar * uri)
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
   clutter_actor_add_constraint (ui->texture,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.5));
+
+  clutter_actor_set_pivot_point (ui->texture, 0.5, 0.5);
 
   clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
   clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
