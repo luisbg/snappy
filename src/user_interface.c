@@ -67,6 +67,7 @@ controls_timeout_cb (gpointer data)
   return FALSE;
 }
 
+
 static gboolean
 event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 {
@@ -463,7 +464,9 @@ load_controls (UserInterface * ui)
 
   // Main Box
   main_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (main_box_layout), FALSE);
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (main_box_layout),
+      CLUTTER_ORIENTATION_HORIZONTAL);
+
   ui->main_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (ui->main_box, main_box_layout);
 
@@ -495,7 +498,8 @@ load_controls (UserInterface * ui)
 
   // Controls title
   info_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (info_box_layout), TRUE);
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (info_box_layout),
+      CLUTTER_ORIENTATION_VERTICAL);
 
   ui->info_box = clutter_box_new (info_box_layout);
 
@@ -544,14 +548,15 @@ load_controls (UserInterface * ui)
 
   // Controls middle box
   middle_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (middle_box_layout),
-      FALSE);
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (middle_box_layout),
+      CLUTTER_ORIENTATION_HORIZONTAL);
+
   middle_box = clutter_box_new (middle_box_layout);
 
   // Controls volume box
   volume_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (volume_box_layout),
-      FALSE);
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (volume_box_layout),
+      CLUTTER_ORIENTATION_HORIZONTAL);
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (volume_box_layout), 5);
   ui->volume_box = clutter_box_new (volume_box_layout);
 
@@ -617,8 +622,8 @@ load_controls (UserInterface * ui)
 
   // Controls bottom box
   bottom_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_vertical (CLUTTER_BOX_LAYOUT (bottom_box_layout),
-      FALSE);
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (bottom_box_layout),
+      CLUTTER_ORIENTATION_HORIZONTAL);
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (bottom_box_layout), 5);
   bottom_box = clutter_box_new (bottom_box_layout);
 
