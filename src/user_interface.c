@@ -885,10 +885,10 @@ static void
 toggle_fullscreen (UserInterface * ui)
 {
   if (ui->fullscreen) {
-    clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), FALSE);
+    gtk_window_fullscreen (ui->window);
     ui->fullscreen = FALSE;
   } else {
-    clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), TRUE);
+    gtk_window_unfullscreen (ui->window);
     ui->fullscreen = TRUE;
   }
 }
@@ -1164,7 +1164,7 @@ interface_start (UserInterface * ui, gchar * uri)
   clutter_stage_set_user_resizable (CLUTTER_STAGE (ui->stage), TRUE);
 
   if (ui->fullscreen) {
-    clutter_stage_set_fullscreen (CLUTTER_STAGE (ui->stage), TRUE);
+    gtk_window_fullscreen (ui->window);
   }
 
   // Controls
