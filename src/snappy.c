@@ -175,6 +175,8 @@ main (int argc, char *argv[])
   SnappyMP *mp_obj = NULL;
 #endif
 
+  gtk_clutter_init (&argc, &argv);
+
 
   /* Try to find the path for our resources in case snappy was relocated */
   data_dir = g_strdup(SNAPPY_DATA_DIR);
@@ -252,7 +254,6 @@ main (int argc, char *argv[])
   uri = g_list_first (uri_list)->data;
 
   /* Load engine and start interface */
-  gtk_clutter_init (&argc, &argv);
   engine_load_uri (engine, uri);
   interface_start (ui, uri);
 
