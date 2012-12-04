@@ -455,8 +455,7 @@ load_controls (UserInterface * ui)
       clutter_bind_constraint_new (ui->control_box, CLUTTER_BIND_SIZE, 0));
 
   g_free (vid_panel_png);
-  clutter_actor_add_child (CLUTTER_ACTOR (ui->control_box),
-      ui->control_bg);
+  clutter_actor_add_child (CLUTTER_ACTOR (ui->control_box), ui->control_bg);
   clutter_actor_add_constraint (ui->control_box,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
   clutter_actor_add_constraint (ui->control_box,
@@ -479,8 +478,9 @@ load_controls (UserInterface * ui)
 
   // Controls play toggle
   ui->control_play_toggle = gtk_clutter_texture_new ();
-  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->control_play_toggle),
-      gdk_pixbuf_new_from_file (ui->pause_png, NULL), &error);
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+      (ui->control_play_toggle), gdk_pixbuf_new_from_file (ui->pause_png, NULL),
+      &error);
   if (!ui->control_play_toggle && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -489,10 +489,9 @@ load_controls (UserInterface * ui)
   }
   g_assert (ui->control_bg && ui->control_play_toggle);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
-      ui->control_play_toggle, FALSE,        /* expand */
-      FALSE,                            /* x-fill */
-      FALSE,                            /* y-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->control_play_toggle, FALSE,        /* expand */
+      FALSE,                    /* x-fill */
+      FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
@@ -508,8 +507,7 @@ load_controls (UserInterface * ui)
       cut_long_filename (ui->filename, ui->title_length), &control_color1);
   clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
       ui->title_length);
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
-      ui->control_title, TRUE,  /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), ui->control_title, TRUE,       /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
@@ -539,12 +537,10 @@ load_controls (UserInterface * ui)
   // progress rectangle
   ui->control_seekbar = clutter_actor_new ();
   clutter_actor_set_background_color (ui->control_seekbar, &control_color1);
-  clutter_actor_add_child (CLUTTER_ACTOR (seek_box),
-      ui->control_seekbar);
+  clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seekbar);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
-      seek_box, TRUE,           /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), seek_box, TRUE,        /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
@@ -614,12 +610,11 @@ load_controls (UserInterface * ui)
       &control_color1);
   clutter_actor_add_child (middle_box, ui->control_pos);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
-      middle_box, TRUE,         /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), middle_box, TRUE,      /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_END,     /* x-align */
-      CLUTTER_BOX_ALIGNMENT_END);    /* y-align */
+      CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
+      CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
 
   // Controls bottom box
   bottom_box_layout = clutter_box_layout_new ();
@@ -631,7 +626,8 @@ load_controls (UserInterface * ui)
 
   // Controls video stream toggle
   ui->video_stream_toggle = gtk_clutter_texture_new ();
-  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->video_stream_toggle),
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+      (ui->video_stream_toggle),
       gdk_pixbuf_new_from_file (ui->video_stream_toggle_png, NULL), &error);
   if (!ui->video_stream_toggle && error)
     g_debug ("Clutter error: %s", error->message);
@@ -643,7 +639,8 @@ load_controls (UserInterface * ui)
 
   // Controls audio stream toggle
   ui->audio_stream_toggle = gtk_clutter_texture_new ();
-  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->audio_stream_toggle),
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+      (ui->audio_stream_toggle),
       gdk_pixbuf_new_from_file (ui->audio_stream_toggle_png, NULL), &error);
   if (!ui->audio_stream_toggle && error)
     g_debug ("Clutter error: %s", error->message);
@@ -655,8 +652,9 @@ load_controls (UserInterface * ui)
 
   // Controls subtitle toggle
   ui->subtitle_toggle = gtk_clutter_texture_new ();
-  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->subtitle_toggle),
-      gdk_pixbuf_new_from_file (ui->subtitle_toggle_png, NULL), &error);
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+      (ui->subtitle_toggle), gdk_pixbuf_new_from_file (ui->subtitle_toggle_png,
+          NULL), &error);
   if (!ui->subtitle_toggle && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -665,15 +663,13 @@ load_controls (UserInterface * ui)
   }
   clutter_actor_add_child (bottom_box, ui->subtitle_toggle);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
-      bottom_box, TRUE,         /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), bottom_box, TRUE,      /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout),
-      ui->info_box, FALSE,      /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->info_box, FALSE,   /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
@@ -904,15 +900,17 @@ toggle_playing (UserInterface * ui)
     change_state (engine, "Paused");
     engine->playing = FALSE;
 
-    gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->control_play_toggle),
-      gdk_pixbuf_new_from_file (ui->play_png, NULL), NULL);
+    gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+        (ui->control_play_toggle), gdk_pixbuf_new_from_file (ui->play_png,
+            NULL), NULL);
 
   } else {
     change_state (engine, "Playing");
     engine->playing = TRUE;
 
-    gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->control_play_toggle),
-      gdk_pixbuf_new_from_file (ui->pause_png, NULL), NULL);
+    gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+        (ui->control_play_toggle), gdk_pixbuf_new_from_file (ui->pause_png,
+            NULL), NULL);
 
   }
 }
@@ -1112,7 +1110,7 @@ void
 interface_start (UserInterface * ui, gchar * uri)
 {
   ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
-  GtkSettings * gtk_settings;
+  GtkSettings *gtk_settings;
 
   g_print ("Loading ui!\n");
 
@@ -1146,7 +1144,8 @@ interface_start (UserInterface * ui, gchar * uri)
   gtk_container_add (GTK_CONTAINER (ui->box), ui->clutter_widget);
 
   /* Get the stage */
-  ui->stage = gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (ui->clutter_widget));
+  ui->stage =
+      gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (ui->clutter_widget));
   clutter_actor_set_background_color (CLUTTER_ACTOR (ui->stage), &stage_color);
   /* Set the size of the widget,
    * because we should not set the size of its stage when using GtkClutterEmbed.
@@ -1174,7 +1173,6 @@ interface_start (UserInterface * ui, gchar * uri)
   if (ui->fullscreen) {
     gtk_window_fullscreen (GTK_WINDOW (ui->window));
   }
-
   // Controls
   load_controls (ui);
 

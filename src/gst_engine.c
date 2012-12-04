@@ -22,7 +22,7 @@
 
 #include <gst/pbutils/pbutils.h>
 #include <string.h>
-#include <sys/stat.h> /* for S_IRUSR | S_IWUSR | S_IXUSR */
+#include <sys/stat.h>           /* for S_IRUSR | S_IWUSR | S_IXUSR */
 
 #include "user_interface.h"
 #include "gst_engine.h"
@@ -365,13 +365,12 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
 
   /* Self config directory, i.e. .config/snappy/ */
   struct stat st_self;
-  if ( 0 != stat(g_strdup_printf("%s/snappy", config_dir), &st_self)) {
-     if ( 0 != mkdir( g_strdup_printf("%s/snappy", config_dir), 0777))
-       perror("Failed to create ~/.config/snappy/ directory");
-  }
-  else if (!S_ISDIR(st_self.st_mode)) {
-     errno = ENOTDIR;
-     perror("~/config/snappy/ already exists");
+  if (0 != stat (g_strdup_printf ("%s/snappy", config_dir), &st_self)) {
+    if (0 != mkdir (g_strdup_printf ("%s/snappy", config_dir), 0777))
+      perror ("Failed to create ~/.config/snappy/ directory");
+  } else if (!S_ISDIR (st_self.st_mode)) {
+    errno = ENOTDIR;
+    perror ("~/config/snappy/ already exists");
   }
 
   /* History file */
@@ -385,7 +384,8 @@ remove_uri_unfinished_playback (GstEngine * engine, gchar * uri)
   data = g_key_file_to_data (keyfile, NULL, NULL);
   g_file_set_contents (path, data, strlen (data), &error);
   if (error != NULL) {
-    GST_WARNING ("Failed to write history file to %s: %s", path, error->message);
+    GST_WARNING ("Failed to write history file to %s: %s", path,
+        error->message);
     g_error_free (error);
   }
 
@@ -422,7 +422,8 @@ write_key_file_to_file (GKeyFile * keyfile, const char *path)
   data = g_key_file_to_data (keyfile, NULL, NULL);
   g_file_set_contents (path, data, strlen (data), &error);
   if (error != NULL) {
-    GST_WARNING ("Failed to write history file to %s: %s", path, error->message);
+    GST_WARNING ("Failed to write history file to %s: %s", path,
+        error->message);
     g_error_free (error);
   }
 
@@ -701,8 +702,9 @@ engine_init (GstEngine * engine, GstElement * sink)
   g_object_set (G_OBJECT (engine->player), "video-sink", engine->sink, NULL);
   engine->bus = gst_pipeline_get_bus (GST_PIPELINE (engine->player));
 
-  engine->navigation = GST_NAVIGATION (gst_bin_get_by_interface (GST_BIN (engine->player),
-                                                                 GST_TYPE_NAVIGATION));
+  engine->navigation =
+      GST_NAVIGATION (gst_bin_get_by_interface (GST_BIN (engine->player),
+          GST_TYPE_NAVIGATION));
 
   return TRUE;
 }
