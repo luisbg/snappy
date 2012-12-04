@@ -522,7 +522,8 @@ load_controls (UserInterface * ui)
   clutter_actor_set_layout_manager (seek_box, seek_box_layout);
 
   // background box rectangle shows as the border
-  ui->control_seek1 = clutter_rectangle_new_with_color (&control_color1);
+  ui->control_seek1 = clutter_actor_new ();
+  clutter_actor_set_background_color (ui->control_seek1, &control_color1);
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek1);
   clutter_actor_add_constraint (ui->control_seek1,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
@@ -530,12 +531,14 @@ load_controls (UserInterface * ui)
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0));
 
   // smaller background rectangle inside seek1 to create a border
-  ui->control_seek2 = clutter_rectangle_new_with_color (&control_color2);
+  ui->control_seek2 = clutter_actor_new ();
+  clutter_actor_set_background_color (ui->control_seek2, &control_color2);
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek2);
   clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
 
   // progress rectangle
-  ui->control_seekbar = clutter_rectangle_new_with_color (&control_color1);
+  ui->control_seekbar = clutter_actor_new ();
+  clutter_actor_set_background_color (ui->control_seekbar, &control_color1);
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box),
       ui->control_seekbar);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
@@ -584,11 +587,13 @@ load_controls (UserInterface * ui)
   vol_int_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (vol_int_box, vol_int_box_layout);
 
-  ui->vol_int_bg = clutter_rectangle_new_with_color (&control_color1);
+  ui->vol_int_bg = clutter_actor_new ();
+  clutter_actor_set_background_color (ui->vol_int_bg, &control_color1);
   clutter_actor_add_child (CLUTTER_ACTOR (vol_int_box), ui->vol_int_bg);
   clutter_actor_set_position (ui->vol_int_bg, 0, 0);
 
-  ui->vol_int = clutter_rectangle_new_with_color (&control_color1);
+  ui->vol_int = clutter_actor_new ();
+  clutter_actor_set_background_color (ui->vol_int, &control_color1);
   clutter_actor_add_child (ui->volume_box, vol_int_box);
 
   // Controls volume high
