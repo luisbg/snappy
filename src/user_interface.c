@@ -1108,6 +1108,7 @@ void
 interface_start (UserInterface * ui, gchar * uri)
 {
   ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
+  GtkSettings * gtk_settings;
 
   g_print ("Loading ui!\n");
 
@@ -1125,6 +1126,9 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title (GTK_WINDOW (ui->window), ui->filename);
   g_signal_connect (ui->window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
+  gtk_settings = gtk_settings_get_default ();
+  g_object_set (G_OBJECT (gtk_settings), "gtk-application-prefer-dark-theme",
+      TRUE, NULL);
 
   ui->box = gtk_grid_new ();
   gtk_orientable_set_orientation (GTK_ORIENTABLE (ui->box),
