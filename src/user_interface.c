@@ -904,14 +904,16 @@ toggle_playing (UserInterface * ui)
     change_state (engine, "Paused");
     engine->playing = FALSE;
 
-    clutter_texture_set_from_file (CLUTTER_TEXTURE (ui->control_play_toggle),
-        ui->play_png, NULL);
+    gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->control_play_toggle),
+      gdk_pixbuf_new_from_file (ui->play_png, NULL), NULL);
+
   } else {
     change_state (engine, "Playing");
     engine->playing = TRUE;
 
-    clutter_texture_set_from_file (CLUTTER_TEXTURE (ui->control_play_toggle),
-        ui->pause_png, NULL);
+    gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->control_play_toggle),
+      gdk_pixbuf_new_from_file (ui->pause_png, NULL), NULL);
+
   }
 }
 
