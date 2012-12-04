@@ -476,7 +476,7 @@ load_controls (UserInterface * ui)
 
   // Controls play toggle
   ui->control_play_toggle = gtk_clutter_texture_new ();
-  gtk_clutter_texture_set_from_pixbuf (ui->control_play_toggle,
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->control_play_toggle),
       gdk_pixbuf_new_from_file (ui->pause_png, NULL), &error);
   if (!ui->control_play_toggle && error)
     g_debug ("Clutter error: %s", error->message);
@@ -560,7 +560,7 @@ load_controls (UserInterface * ui)
 
   // Controls volume low
   ui->volume_low = gtk_clutter_texture_new ();
-  gtk_clutter_texture_set_from_pixbuf (ui->volume_low,
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->volume_low),
       gdk_pixbuf_new_from_file (ui->volume_low_png, NULL), &error);
   if (!ui->volume_low && error)
     g_debug ("Clutter error: %s", error->message);
@@ -590,7 +590,7 @@ load_controls (UserInterface * ui)
 
   // Controls volume high
   ui->volume_high = gtk_clutter_texture_new ();
-  gtk_clutter_texture_set_from_pixbuf (ui->volume_high,
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->volume_high),
       gdk_pixbuf_new_from_file (ui->volume_high_png, NULL), &error);
   if (!ui->volume_high && error)
     g_debug ("Clutter error: %s", error->message);
@@ -885,10 +885,10 @@ static void
 toggle_fullscreen (UserInterface * ui)
 {
   if (ui->fullscreen) {
-    gtk_window_fullscreen (ui->window);
+    gtk_window_fullscreen (GTK_WINDOW (ui->window));
     ui->fullscreen = FALSE;
   } else {
-    gtk_window_unfullscreen (ui->window);
+    gtk_window_unfullscreen (GTK_WINDOW (ui->window));
     ui->fullscreen = TRUE;
   }
 }
@@ -1168,7 +1168,7 @@ interface_start (UserInterface * ui, gchar * uri)
   clutter_stage_set_user_resizable (CLUTTER_STAGE (ui->stage), TRUE);
 
   if (ui->fullscreen) {
-    gtk_window_fullscreen (ui->window);
+    gtk_window_fullscreen (GTK_WINDOW (ui->window));
   }
 
   // Controls

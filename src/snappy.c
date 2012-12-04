@@ -177,7 +177,6 @@ main (int argc, char *argv[])
 
   gtk_clutter_init (&argc, &argv);
 
-
   /* Try to find the path for our resources in case snappy was relocated */
   data_dir = g_strdup(SNAPPY_DATA_DIR);
   if (!g_file_test(data_dir, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) {
