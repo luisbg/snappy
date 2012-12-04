@@ -501,7 +501,8 @@ load_controls (UserInterface * ui)
   clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (info_box_layout),
       CLUTTER_ORIENTATION_VERTICAL);
 
-  ui->info_box = clutter_box_new (info_box_layout);
+  ui->info_box = clutter_actor_new ();
+  clutter_actor_set_layout_manager (ui->info_box, info_box_layout);
 
   ui->control_title = clutter_text_new_full ("Sans 32px",
       cut_long_filename (ui->filename, ui->title_length), &control_color1);
@@ -551,17 +552,18 @@ load_controls (UserInterface * ui)
   clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (middle_box_layout),
       CLUTTER_ORIENTATION_HORIZONTAL);
 
-  middle_box = clutter_box_new (middle_box_layout);
+  middle_box = clutter_actor_new ();
+  clutter_actor_set_layout_manager (middle_box, middle_box_layout);
 
   // Controls volume box
   volume_box_layout = clutter_box_layout_new ();
   clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (volume_box_layout),
       CLUTTER_ORIENTATION_HORIZONTAL);
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (volume_box_layout), 5);
-  ui->volume_box = clutter_box_new (volume_box_layout);
+  ui->volume_box = clutter_actor_new ();
+  clutter_actor_set_layout_manager (ui->volume_box, volume_box_layout);
 
-  clutter_box_pack (CLUTTER_BOX (middle_box), ui->volume_box,
-      "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", FALSE, NULL);
+  clutter_actor_add_child (middle_box, ui->volume_box);
 
   // Controls volume low
   ui->volume_low = gtk_clutter_texture_new ();
@@ -573,25 +575,21 @@ load_controls (UserInterface * ui)
     g_error_free (error);
     error = NULL;
   }
-  clutter_box_pack (CLUTTER_BOX (ui->volume_box), ui->volume_low, "x-align",
-      CLUTTER_BOX_ALIGNMENT_START, NULL);
+  clutter_actor_add_child (ui->volume_box, ui->volume_low);
 
   // Controls volume intensity
   vol_int_box_layout =
       clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
       CLUTTER_BIN_ALIGNMENT_FIXED);
-  vol_int_box = clutter_box_new (vol_int_box_layout);
+  vol_int_box = clutter_actor_new ();
+  clutter_actor_set_layout_manager (vol_int_box, vol_int_box_layout);
 
   ui->vol_int_bg = clutter_rectangle_new_with_color (&control_color1);
   clutter_actor_add_child (CLUTTER_ACTOR (vol_int_box), ui->vol_int_bg);
   clutter_actor_set_position (ui->vol_int_bg, 0, 0);
 
   ui->vol_int = clutter_rectangle_new_with_color (&control_color1);
-  clutter_actor_add_child (CLUTTER_ACTOR (vol_int_box), ui->vol_int);
-
-  clutter_box_pack (CLUTTER_BOX (ui->volume_box), vol_int_box,
-      "x-fill", FALSE,
-      "y-fill", FALSE, "y-align", CLUTTER_BOX_ALIGNMENT_CENTER, NULL);
+  clutter_actor_add_child (ui->volume_box, vol_int_box);
 
   // Controls volume high
   ui->volume_high = gtk_clutter_texture_new ();
@@ -603,15 +601,13 @@ load_controls (UserInterface * ui)
     g_error_free (error);
     error = NULL;
   }
-  clutter_box_pack (CLUTTER_BOX (ui->volume_box), ui->volume_high, "x-align",
-      CLUTTER_BOX_ALIGNMENT_END, NULL);
+  clutter_actor_add_child (ui->volume_box, ui->volume_high);
 
   // Controls position text
   duration_str = g_strdup_printf ("   0:00:00/%s", ui->duration_str);
   ui->control_pos = clutter_text_new_full ("Sans 22px", duration_str,
       &control_color1);
-  clutter_box_pack (CLUTTER_BOX (middle_box), ui->control_pos,
-      "x-align", CLUTTER_BOX_ALIGNMENT_END, "expand", FALSE, NULL);
+  clutter_actor_add_child (middle_box, ui->control_pos);
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
       middle_box, TRUE,         /* expand */
@@ -625,7 +621,8 @@ load_controls (UserInterface * ui)
   clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (bottom_box_layout),
       CLUTTER_ORIENTATION_HORIZONTAL);
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (bottom_box_layout), 5);
-  bottom_box = clutter_box_new (bottom_box_layout);
+  bottom_box = clutter_actor_new ();
+  clutter_actor_set_layout_manager (bottom_box, bottom_box_layout);
 
   // Controls video stream toggle
   ui->video_stream_toggle = gtk_clutter_texture_new ();
@@ -637,8 +634,7 @@ load_controls (UserInterface * ui)
     g_error_free (error);
     error = NULL;
   }
-  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->video_stream_toggle,
-      "x-align", CLUTTER_BOX_ALIGNMENT_START, NULL);
+  clutter_actor_add_child (bottom_box, ui->video_stream_toggle);
 
   // Controls audio stream toggle
   ui->audio_stream_toggle = gtk_clutter_texture_new ();
@@ -650,8 +646,7 @@ load_controls (UserInterface * ui)
     g_error_free (error);
     error = NULL;
   }
-  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->audio_stream_toggle,
-      "x-align", CLUTTER_BOX_ALIGNMENT_END, NULL);
+  clutter_actor_add_child (bottom_box, ui->audio_stream_toggle);
 
   // Controls subtitle toggle
   ui->subtitle_toggle = gtk_clutter_texture_new ();
@@ -663,8 +658,7 @@ load_controls (UserInterface * ui)
     g_error_free (error);
     error = NULL;
   }
-  clutter_box_pack (CLUTTER_BOX (bottom_box), ui->subtitle_toggle, "x-align",
-      CLUTTER_BOX_ALIGNMENT_END, NULL);
+  clutter_actor_add_child (bottom_box, ui->subtitle_toggle);
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout),
       bottom_box, TRUE,         /* expand */
