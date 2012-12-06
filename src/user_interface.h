@@ -35,8 +35,8 @@
 #define SHADOW_CORRECT 15
 #define CTL_SPACING 0
 
-#define CONTROLS_WIDTH_RATIO 0.8f
-#define CONTROLS_HEIGHT_RATIO 0.25f
+#define CONTROLS_WIDTH_RATIO 0.48f
+#define CONTROLS_HEIGHT_RATIO 0.28f
 #define CONTROLS_ASPECT_RATIO 4.0f
 
 #define BG_W 986.0f
@@ -47,8 +47,8 @@
 #define MAIN_BOX_W 0.95f
 #define MAIN_BOX_H 0.8f
 
-#define PLAY_TOGGLE_RATIO 0.9f
-#define TITLE_RATIO 0.03f
+#define PLAY_TOGGLE_RATIO 0.4f
+#define TITLE_RATIO 0.04f
 #define SEEK_WIDTH_RATIO 0.9f
 #define SEEK_HEIGHT_RATIO 0.15f
 #define SEEK_BORDER 2.0f
@@ -114,6 +114,7 @@ struct _UserInterface
   ClutterActor *video_stream_toggle, *audio_stream_toggle;
   ClutterActor *vol_int, *vol_int_bg, *volume_point;
   ClutterActor *info_box;
+  ClutterActor *pos_n_vol_box;
   ClutterActor *main_box;
 
   GstEngine *engine;
