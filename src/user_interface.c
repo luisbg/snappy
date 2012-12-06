@@ -919,7 +919,7 @@ static void
 update_controls_size (UserInterface * ui)
 {
   gchar *font_name;
-  gfloat ctl_width, ctl_height, text_width;
+  gfloat ctl_width, ctl_height;
   gfloat icon_size;
 
   // g_print ("Updating controls size for stage: %ux%u\n", ui->stage_width,
@@ -945,7 +945,6 @@ update_controls_size (UserInterface * ui)
 
   font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_width * TITLE_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
-  text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_title));
 
   ui->seek_width = 12 +         // accomodate volume_box spacing
       (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO -
@@ -963,7 +962,6 @@ update_controls_size (UserInterface * ui)
 
   font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_height * POS_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_pos), font_name);
-  text_width = clutter_actor_get_width (CLUTTER_ACTOR (ui->control_pos));
 
   ui->volume_width =
       (ctl_width * MAIN_BOX_W - icon_size -
