@@ -117,6 +117,8 @@ struct _UserInterface
   ClutterActor *pos_n_vol_box;
   ClutterActor *main_box;
 
+  ClutterLayoutManager *main_box_layout;
+
   GstEngine *engine;
   ScreenSaver *screensaver;
 };
