@@ -386,8 +386,8 @@ load_controls (UserInterface * ui)
   gchar *icon_files[8];
   gchar *duration_str = NULL;
   gint c;
-  ClutterColor control_color1 = { 0x12, 0x12, 0x12, 0xff };
-  ClutterColor control_color2 = { 0xcc, 0xcc, 0xcc, 0xff };
+  ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xff };
+  ClutterColor control_color2 = { 0xff, 0xff, 0xff, 0xff };
   ClutterLayoutManager *controls_layout = NULL;
   ClutterLayoutManager *main_box_layout = NULL;
   ClutterLayoutManager *info_box_layout = NULL;
@@ -479,7 +479,7 @@ load_controls (UserInterface * ui)
 
   // Controls title
   ui->control_title = clutter_text_new_full ("Sans 32px",
-      cut_long_filename (ui->filename, ui->title_length), &control_color1);
+      cut_long_filename (ui->filename, ui->title_length), &control_color2);
   clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
       ui->title_length);
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (main_box_layout), ui->control_title, TRUE,       /* expand */
@@ -531,7 +531,8 @@ load_controls (UserInterface * ui)
 
   // background box rectangle shows as the border
   ui->control_seek1 = clutter_actor_new ();
-  clutter_actor_set_background_color (ui->control_seek1, &control_color1);
+  clutter_actor_set_background_color (ui->control_seek1, &control_color2);
+  clutter_actor_set_opacity (ui->control_seek1, 255);
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek1);
   clutter_actor_add_constraint (ui->control_seek1,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
@@ -540,13 +541,15 @@ load_controls (UserInterface * ui)
 
   // smaller background rectangle inside seek1 to create a border
   ui->control_seek2 = clutter_actor_new ();
-  clutter_actor_set_background_color (ui->control_seek2, &control_color2);
+  clutter_actor_set_background_color (ui->control_seek2, &control_color1);
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek2);
+  clutter_actor_set_opacity (ui->control_seek2, 255);
   clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
 
   // progress rectangle
   ui->control_seekbar = clutter_actor_new ();
-  clutter_actor_set_background_color (ui->control_seekbar, &control_color1);
+  clutter_actor_set_background_color (ui->control_seekbar, &control_color2);
+  clutter_actor_set_opacity (ui->control_seekbar, 255);
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seekbar);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
@@ -599,7 +602,9 @@ load_controls (UserInterface * ui)
   clutter_actor_set_position (ui->vol_int_bg, 0, 0);
 
   ui->vol_int = clutter_actor_new ();
-  clutter_actor_set_background_color (ui->vol_int, &control_color1);
+  clutter_actor_set_background_color (ui->vol_int, &control_color2);
+  clutter_actor_insert_child_above (vol_int_box, ui->vol_int, ui->vol_int_bg);
+
   clutter_actor_add_child (ui->volume_box, vol_int_box);
 
   // Controls volume high
@@ -615,9 +620,9 @@ load_controls (UserInterface * ui)
   clutter_actor_add_child (ui->volume_box, ui->volume_high);
 
   // Controls position text
-  duration_str = g_strdup_printf ("   0:00:00/%s", ui->duration_str);
+  duration_str = g_strdup_printf ("   0:00:00 | %s", ui->duration_str);
   ui->control_pos = clutter_text_new_full ("Sans 22px", duration_str,
-      &control_color1);
+      &control_color2);
   clutter_actor_add_child (middle_box, ui->control_pos);
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), middle_box, TRUE,      /* expand */
@@ -761,7 +766,7 @@ progress_update_text (gpointer data)
       }
 
       pos = query_position (engine);
-      duration_str = g_strdup_printf ("   %s/%s", position_ns_to_str (pos),
+      duration_str = g_strdup_printf ("   %s | %s", position_ns_to_str (pos),
           ui->duration_str);
       clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
     }
@@ -880,7 +885,7 @@ show_controls (UserInterface * ui, gboolean vis)
     progress_update_text (ui);
     clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
     clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
-        CLUTTER_EASE_OUT_QUINT, CTL_FADE_DURATION, "opacity", 0xa0, NULL);
+        CLUTTER_EASE_OUT_QUINT, CTL_FADE_DURATION, "opacity", 0xff, NULL);
 
     if (ui->controls_timeout == -1) {
       ui->controls_timeout = g_timeout_add_seconds (CTL_SHOW_SEC,
