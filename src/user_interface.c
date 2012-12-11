@@ -481,7 +481,7 @@ load_controls (UserInterface * ui)
       cut_long_filename (ui->filename, ui->title_length), &control_color2);
   clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
       ui->title_length);
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->control_title, TRUE,       /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->control_title, TRUE,   /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
@@ -552,7 +552,7 @@ load_controls (UserInterface * ui)
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seekbar);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), seek_box, TRUE,        /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), seek_box, TRUE,       /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
@@ -624,13 +624,13 @@ load_controls (UserInterface * ui)
       &control_color2);
   clutter_actor_add_child (middle_box, ui->control_pos);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), middle_box, TRUE,      /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), middle_box, TRUE,     /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
 
-  if (FALSE) {                        // hide this buttons (TODO: optional Flag)
+  if (FALSE) {                  // hide this buttons (TODO: optional Flag)
     // Controls bottom box
     bottom_box_layout = clutter_box_layout_new ();
     clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (bottom_box_layout),
@@ -678,20 +678,20 @@ load_controls (UserInterface * ui)
     }
     clutter_actor_add_child (bottom_box, ui->subtitle_toggle);
 
-    clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), bottom_box, TRUE,    /* expand */
+    clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), bottom_box, TRUE,   /* expand */
         FALSE,                  /* x-fill */
         FALSE,                  /* y-fill */
         CLUTTER_BOX_ALIGNMENT_END,      /* x-align */
         CLUTTER_BOX_ALIGNMENT_END);     /* y-align */
   }
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->info_box, FALSE,   /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->info_box, FALSE,       /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_CENTER,        /* x-align */
-      CLUTTER_BOX_ALIGNMENT_CENTER);     /* y-align */
+      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
+      CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), ui->pos_n_vol_box, FALSE,   /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), ui->pos_n_vol_box, FALSE,      /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
@@ -999,7 +999,7 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
   clutter_actor_set_size (ui->volume_high, icon_size * 1.2f, icon_size);        /* originally 120x100 */
 
-  if (FALSE) {                        // hide this buttons (TODO: optional Flag)
+  if (FALSE) {                  // hide this buttons (TODO: optional Flag)
     clutter_actor_set_size (ui->subtitle_toggle, icon_size, icon_size);
     clutter_actor_set_size (ui->video_stream_toggle, icon_size, icon_size);
     clutter_actor_set_size (ui->audio_stream_toggle, icon_size, icon_size);
