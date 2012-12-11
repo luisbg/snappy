@@ -389,7 +389,6 @@ load_controls (UserInterface * ui)
   ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xff };
   ClutterColor control_color2 = { 0xff, 0xff, 0xff, 0xff };
   ClutterLayoutManager *controls_layout = NULL;
-  ClutterLayoutManager *info_box_layout = NULL;
   ClutterLayoutManager *pos_n_vol_layout = NULL;
   ClutterLayoutManager *middle_box_layout = NULL;
   ClutterLayoutManager *bottom_box_layout = NULL;
@@ -488,12 +487,12 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
   // Info Box
-  info_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (info_box_layout),
+  ui->info_box_layout = clutter_box_layout_new ();
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (ui->info_box_layout),
       CLUTTER_ORIENTATION_HORIZONTAL);
 
   ui->info_box = clutter_actor_new ();
-  clutter_actor_set_layout_manager (ui->info_box, info_box_layout);
+  clutter_actor_set_layout_manager (ui->info_box, ui->info_box_layout);
 
   // Controls play toggle
   ui->control_play_toggle = gtk_clutter_texture_new ();
@@ -508,7 +507,7 @@ load_controls (UserInterface * ui)
   }
   g_assert (ui->control_bg && ui->control_play_toggle);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), ui->control_play_toggle, FALSE,        /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->control_play_toggle, FALSE,    /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
@@ -691,7 +690,7 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (info_box_layout), ui->pos_n_vol_box, FALSE,      /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->pos_n_vol_box, FALSE,  /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
@@ -965,6 +964,9 @@ update_controls_size (UserInterface * ui)
   clutter_actor_set_size (ui->info_box, (ctl_width * MAIN_BOX_W - icon_size),
       ctl_height * MAIN_BOX_H);
 
+  clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->info_box_layout),
+      ctl_width * 0.04f);
+
   font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_width * TITLE_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
 
@@ -1064,6 +1066,7 @@ interface_init (UserInterface * ui)
   ui->main_box = NULL;
 
   ui->main_box_layout = NULL;
+  ui->info_box_layout = NULL;
 
   ui->engine = NULL;
   ui->screensaver = NULL;
