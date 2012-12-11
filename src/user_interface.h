@@ -119,6 +119,7 @@ struct _UserInterface
 
   ClutterLayoutManager *main_box_layout;
   ClutterLayoutManager *info_box_layout;
+  ClutterLayoutManager *pos_n_vol_layout;
 
   GstEngine *engine;
   ScreenSaver *screensaver;

@@ -389,7 +389,6 @@ load_controls (UserInterface * ui)
   ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xff };
   ClutterColor control_color2 = { 0xff, 0xff, 0xff, 0xff };
   ClutterLayoutManager *controls_layout = NULL;
-  ClutterLayoutManager *pos_n_vol_layout = NULL;
   ClutterLayoutManager *middle_box_layout = NULL;
   ClutterLayoutManager *bottom_box_layout = NULL;
   ClutterLayoutManager *volume_box_layout = NULL;
@@ -514,12 +513,12 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
   // Controls box
-  pos_n_vol_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (pos_n_vol_layout),
+  ui->pos_n_vol_layout = clutter_box_layout_new ();
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout),
       CLUTTER_ORIENTATION_VERTICAL);
 
   ui->pos_n_vol_box = clutter_actor_new ();
-  clutter_actor_set_layout_manager (ui->pos_n_vol_box, pos_n_vol_layout);
+  clutter_actor_set_layout_manager (ui->pos_n_vol_box, ui->pos_n_vol_layout);
 
   // Controls seek
   seek_box_layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
@@ -551,7 +550,7 @@ load_controls (UserInterface * ui)
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seekbar);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), seek_box, TRUE,       /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), seek_box, TRUE,   /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
@@ -623,7 +622,7 @@ load_controls (UserInterface * ui)
       &control_color2);
   clutter_actor_add_child (middle_box, ui->control_pos);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), middle_box, TRUE,     /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), middle_box, TRUE, /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
@@ -677,7 +676,7 @@ load_controls (UserInterface * ui)
     }
     clutter_actor_add_child (bottom_box, ui->subtitle_toggle);
 
-    clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (pos_n_vol_layout), bottom_box, TRUE,   /* expand */
+    clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), bottom_box, TRUE,       /* expand */
         FALSE,                  /* x-fill */
         FALSE,                  /* y-fill */
         CLUTTER_BOX_ALIGNMENT_END,      /* x-align */
@@ -983,6 +982,9 @@ update_controls_size (UserInterface * ui)
 
   clutter_actor_set_size (ui->control_seek2, ui->seek_width, ui->seek_height);
 
+  clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout),
+      ctl_height * 0.15f);
+
   progress_update_seekbar (ui);
 
   font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_height * POS_RATIO));
@@ -1065,6 +1067,7 @@ interface_init (UserInterface * ui)
 
   ui->main_box_layout = NULL;
   ui->info_box_layout = NULL;
+  ui->pos_n_vol_layout = NULL;
 
   ui->engine = NULL;
   ui->screensaver = NULL;
