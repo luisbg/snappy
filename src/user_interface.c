@@ -961,8 +961,6 @@ update_controls_size (UserInterface * ui)
 
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
-  clutter_actor_set_size (ui->info_box, (ctl_width * MAIN_BOX_W - icon_size),
-      ctl_height * MAIN_BOX_H);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->info_box_layout),
       ctl_width * 0.04f);
