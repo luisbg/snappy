@@ -410,7 +410,7 @@ load_controls (UserInterface * ui)
   ui->volume_high_png = g_build_filename (ui->data_dir,
       "audio-volume-high.png", NULL);
   ui->subtitle_toggle_png = g_build_filename (ui->data_dir,
-      "subtitle-toggle.png", NULL);
+      "subtitles-active.png", NULL);
   ui->video_stream_toggle_png = g_build_filename (ui->data_dir,
       "video-stream-toggle.png", NULL);
   ui->audio_stream_toggle_png = g_build_filename (ui->data_dir,
