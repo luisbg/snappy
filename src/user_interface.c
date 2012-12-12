@@ -727,7 +727,10 @@ position_ns_to_str (gint64 nanoseconds)
   minutes = seconds / SEC_IN_MIN;
   seconds = seconds - (minutes * SEC_IN_MIN);
 
-  return g_strdup_printf ("%d:%02d:%02ld", hours, minutes, seconds);
+  if (hours >= 1)
+    return g_strdup_printf ("%d:%02d:%02ld", hours, minutes, seconds);
+  else
+    return g_strdup_printf ("%02d:%02ld", minutes, seconds);
 }
 
 static void
