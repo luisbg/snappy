@@ -134,6 +134,9 @@ dnl keep this alphabetic per directory, please
 AC_CONFIG_FILES([
 Makefile
 data/Makefile
+data/icons/Makefile
+data/icons/256x256/Makefile
+data/icons/48x48/Makefile
 src/Makefile
 ])
 AC_OUTPUT

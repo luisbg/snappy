@@ -1,3 +1,5 @@
+SUBDIRS = icons
+
 icons_DATA = \
     audio-stream-toggle.png \
     audio-volume-high.png \
