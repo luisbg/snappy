@@ -15,4 +15,4 @@ desktop_DATA = snappy.desktop
 desktopdir = $(datadir)/applications
 
 EXTRA_DIST = \
-    $(icons_DATA)
+    $(icons_DATA) $(desktop_DATA)
