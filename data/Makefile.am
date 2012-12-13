@@ -11,5 +11,8 @@ icons_DATA = \
     vid-panel.png
 iconsdir = $(datadir)/snappy
 
+desktop_DATA = snappy.desktop
+desktopdir = $(datadir)/applications
+
 EXTRA_DIST = \
     $(icons_DATA)
