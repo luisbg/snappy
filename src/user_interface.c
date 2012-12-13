@@ -663,19 +663,6 @@ load_controls (UserInterface * ui)
     }
     clutter_actor_add_child (bottom_box, ui->audio_stream_toggle);
 
-    // Controls subtitle toggle
-    ui->subtitle_toggle = gtk_clutter_texture_new ();
-    gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
-        (ui->subtitle_toggle),
-        gdk_pixbuf_new_from_file (ui->subtitle_toggle_png, NULL), &error);
-    if (!ui->subtitle_toggle && error)
-      g_debug ("Clutter error: %s", error->message);
-    if (error) {
-      g_error_free (error);
-      error = NULL;
-    }
-    clutter_actor_add_child (bottom_box, ui->subtitle_toggle);
-
     clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), bottom_box, TRUE,       /* expand */
         FALSE,                  /* x-fill */
         FALSE,                  /* y-fill */
@@ -683,17 +670,35 @@ load_controls (UserInterface * ui)
         CLUTTER_BOX_ALIGNMENT_END);     /* y-align */
   }
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->info_box, FALSE,       /* expand */
-      FALSE,                    /* x-fill */
-      FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
-      CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
-
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->pos_n_vol_box, FALSE,  /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
+
+  // Controls subtitle toggle
+  ui->subtitle_toggle = gtk_clutter_texture_new ();
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+      (ui->subtitle_toggle),
+      gdk_pixbuf_new_from_file (ui->subtitle_toggle_png, NULL), &error);
+  if (!ui->subtitle_toggle && error)
+    g_debug ("Clutter error: %s", error->message);
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
+  // clutter_actor_add_child (ui->info_box, ui->subtitle_toggle);
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->subtitle_toggle, FALSE,       /* expand */
+      FALSE,                    /* x-fill */
+      FALSE,                    /* y-fill */
+      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
+      CLUTTER_BOX_ALIGNMENT_START);    /* y-align */
+
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->info_box, FALSE,       /* expand */
+      FALSE,                    /* x-fill */
+      FALSE,                    /* y-fill */
+      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
+      CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
   clutter_actor_lower_bottom (ui->control_bg);
 
@@ -957,11 +962,12 @@ update_controls_size (UserInterface * ui)
     ctl_height = ctl_width / CONTROLS_ASPECT_RATIO;
   }
 
+  icon_size = ctl_height * PLAY_TOGGLE_RATIO;
+
   clutter_actor_set_size (CLUTTER_ACTOR (ui->control_box),
-      ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT),
+      ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT) + (icon_size * 0.72f),
       ctl_height + ((ctl_height / BG_H) * SHADOW_BOTTOM));
 
-  icon_size = ctl_height * PLAY_TOGGLE_RATIO;
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->info_box_layout),
@@ -1003,9 +1009,10 @@ update_controls_size (UserInterface * ui)
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
   clutter_actor_set_size (ui->volume_high, icon_size * 1.2f, icon_size);        /* originally 120x100 */
+  clutter_actor_set_size (ui->subtitle_toggle, icon_size * 1.4f,
+      icon_size);
 
   if (FALSE) {                  // hide this buttons (TODO: optional Flag)
-    clutter_actor_set_size (ui->subtitle_toggle, icon_size, icon_size);
     clutter_actor_set_size (ui->video_stream_toggle, icon_size, icon_size);
     clutter_actor_set_size (ui->audio_stream_toggle, icon_size, icon_size);
   }
