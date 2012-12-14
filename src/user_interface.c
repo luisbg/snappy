@@ -247,12 +247,13 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           // toggle subtitles
           if (toggle_subtitles (ui->engine)) {
             gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
-               (ui->subtitle_toggle),
-               gdk_pixbuf_new_from_file (ui->subtitle_active_png, NULL), NULL);
+                (ui->subtitle_toggle),
+                gdk_pixbuf_new_from_file (ui->subtitle_active_png, NULL), NULL);
           } else {
-            gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
-               (ui->subtitle_toggle),
-               gdk_pixbuf_new_from_file (ui->subtitle_inactive_png, NULL), NULL);
+            gtkclutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+                (ui->subtitle_toggle),
+                gdk_pixbuf_new_from_file (ui->subtitle_inactive_png, NULL),
+                NULL);
           }
 
           handled = TRUE;
@@ -364,12 +365,13 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         } else if (actor == ui->subtitle_toggle) {
           if (toggle_subtitles (ui->engine)) {
             gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
-               (ui->subtitle_toggle),
-               gdk_pixbuf_new_from_file (ui->subtitle_active_png, NULL), NULL);
+                (ui->subtitle_toggle),
+                gdk_pixbuf_new_from_file (ui->subtitle_active_png, NULL), NULL);
           } else {
             gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
-               (ui->subtitle_toggle),
-               gdk_pixbuf_new_from_file (ui->subtitle_inactive_png, NULL), NULL);
+                (ui->subtitle_toggle),
+                gdk_pixbuf_new_from_file (ui->subtitle_inactive_png, NULL),
+                NULL);
           }
 
         } else if (actor == ui->video_stream_toggle) {
@@ -992,14 +994,14 @@ update_controls_size (UserInterface * ui)
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
 
   if (ui->subtitles_available) {
-    control_box_width = ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT) + (icon_size * 0.72f);
+    control_box_width =
+        ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT) + (icon_size * 0.72f);
   } else {
     control_box_width = ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT);
   }
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->control_box),
-      control_box_width,
-      ctl_height + ((ctl_height / BG_H) * SHADOW_BOTTOM));
+      control_box_width, ctl_height + ((ctl_height / BG_H) * SHADOW_BOTTOM));
 
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
 
@@ -1042,8 +1044,7 @@ update_controls_size (UserInterface * ui)
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
   clutter_actor_set_size (ui->volume_high, icon_size * 1.2f, icon_size);        /* originally 120x100 */
-  clutter_actor_set_size (ui->subtitle_toggle, icon_size * 1.4f,
-      icon_size);
+  clutter_actor_set_size (ui->subtitle_toggle, icon_size * 1.4f, icon_size);
 
   if (FALSE) {                  // hide this buttons (TODO: optional Flag)
     clutter_actor_set_size (ui->video_stream_toggle, icon_size, icon_size);
