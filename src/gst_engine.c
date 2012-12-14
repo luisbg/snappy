@@ -477,6 +477,8 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       GST_DEBUG ("State changed");
       gst_message_parse_state_changed (msg, &old, &new, &pending);
       if (new == GST_STATE_PLAYING) {
+        gint streams;
+
         /* If loading file */
         if (!engine->has_started) {
           gint64 position;
@@ -491,6 +493,13 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
             add_uri_to_history (engine->uri);
           else
             g_print ("Secret mode. Not saving uri in history.\n");
+
+          g_object_get (G_OBJECT (engine->player), "n-text", &streams, NULL);
+          if (streams > 0) {
+            ui->subtitles_available = TRUE;
+          } else {
+            ui->subtitles_available = FALSE;
+          }
 
           interface_update_controls (ui);
           engine->has_started = TRUE;

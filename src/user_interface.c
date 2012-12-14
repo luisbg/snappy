@@ -687,7 +687,7 @@ load_controls (UserInterface * ui)
     g_error_free (error);
     error = NULL;
   }
-  // clutter_actor_add_child (ui->info_box, ui->subtitle_toggle);
+  clutter_actor_hide (ui->subtitle_toggle);
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->subtitle_toggle, FALSE,       /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
@@ -886,6 +886,13 @@ show_controls (UserInterface * ui, gboolean vis)
   else if (vis == TRUE && ui->controls_showing == FALSE) {
     ui->controls_showing = TRUE;
 
+    if (ui->subtitles_available) {
+      clutter_actor_show (ui->subtitle_toggle);
+    } else {
+      clutter_actor_hide (ui->subtitle_toggle);
+    }
+
+    update_controls_size (ui);
     progress_update_seekbar (ui);
     progress_update_text (ui);
     clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
@@ -949,6 +956,7 @@ update_controls_size (UserInterface * ui)
   gchar *font_name;
   gfloat ctl_width, ctl_height;
   gfloat icon_size;
+  gfloat control_box_width;
 
   // g_print ("Updating controls size for stage: %ux%u\n", ui->stage_width,
   //     ui->stage_height);
@@ -964,8 +972,14 @@ update_controls_size (UserInterface * ui)
 
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
 
+  if (ui->subtitles_available) {
+    control_box_width = ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT) + (icon_size * 0.72f);
+  } else {
+    control_box_width = ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT);
+  }
+
   clutter_actor_set_size (CLUTTER_ACTOR (ui->control_box),
-      ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT) + (icon_size * 0.72f),
+      control_box_width,
       ctl_height + ((ctl_height / BG_H) * SHADOW_BOTTOM));
 
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
@@ -1047,6 +1061,7 @@ interface_init (UserInterface * ui)
   ui->volume_high_png = NULL;
 
   ui->subtitle_toggle_png = NULL;
+  ui->subtitles_available = FALSE;
   ui->video_stream_toggle_png = NULL;
   ui->audio_stream_toggle_png = NULL;
 
