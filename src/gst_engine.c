@@ -667,8 +667,6 @@ cycle_streams (GstEngine * engine, guint streamid)
   }
 
   g_object_set (G_OBJECT (engine->player), c, current, NULL);
-
-  return;
 }
 
 
@@ -942,7 +940,7 @@ set_subtitle_uri (GstEngine * engine, gchar * suburi)
 
 
 /*               Toggle subtitles                */
-void
+gboolean
 toggle_subtitles (GstEngine * engine)
 {
   gint flags;
@@ -961,7 +959,10 @@ toggle_subtitles (GstEngine * engine)
     g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
   }
 
-  return;
+  g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
+  sub_state = flags & (1 << 2);
+
+  return sub_state;
 }
 
 

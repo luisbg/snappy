@@ -245,7 +245,15 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_v:
         {
           // toggle subtitles
-          toggle_subtitles (ui->engine);
+          if (toggle_subtitles (ui->engine)) {
+            gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+               (ui->subtitle_toggle),
+               gdk_pixbuf_new_from_file (ui->subtitle_active_png, NULL), NULL);
+          } else {
+            gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+               (ui->subtitle_toggle),
+               gdk_pixbuf_new_from_file (ui->subtitle_inactive_png, NULL), NULL);
+          }
 
           handled = TRUE;
           break;
@@ -354,7 +362,15 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           cycle_streams (ui->engine, STREAM_AUDIO);
 
         } else if (actor == ui->subtitle_toggle) {
-          toggle_subtitles (ui->engine);
+          if (toggle_subtitles (ui->engine)) {
+            gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+               (ui->subtitle_toggle),
+               gdk_pixbuf_new_from_file (ui->subtitle_active_png, NULL), NULL);
+          } else {
+            gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+               (ui->subtitle_toggle),
+               gdk_pixbuf_new_from_file (ui->subtitle_inactive_png, NULL), NULL);
+          }
 
         } else if (actor == ui->video_stream_toggle) {
           cycle_streams (ui->engine, STREAM_VIDEO);
@@ -409,8 +425,10 @@ load_controls (UserInterface * ui)
       "audio-volume-low.png", NULL);
   ui->volume_high_png = g_build_filename (ui->data_dir,
       "audio-volume-high.png", NULL);
-  ui->subtitle_toggle_png = g_build_filename (ui->data_dir,
+  ui->subtitle_active_png = g_build_filename (ui->data_dir,
       "subtitles-active.png", NULL);
+  ui->subtitle_inactive_png = g_build_filename (ui->data_dir,
+      "subtitles-inactive.png", NULL);
   ui->video_stream_toggle_png = g_build_filename (ui->data_dir,
       "video-stream-toggle.png", NULL);
   ui->audio_stream_toggle_png = g_build_filename (ui->data_dir,
@@ -421,11 +439,12 @@ load_controls (UserInterface * ui)
   icon_files[2] = ui->pause_png;
   icon_files[3] = ui->volume_low_png;
   icon_files[4] = ui->volume_high_png;
-  icon_files[5] = ui->subtitle_toggle_png;
-  icon_files[6] = ui->video_stream_toggle_png;
-  icon_files[7] = ui->audio_stream_toggle_png;
+  icon_files[5] = ui->subtitle_active_png;
+  icon_files[6] = ui->subtitle_inactive_png;
+  icon_files[7] = ui->video_stream_toggle_png;
+  icon_files[8] = ui->audio_stream_toggle_png;
 
-  for (c = 0; c < 8; c++) {
+  for (c = 0; c < 9; c++) {
     if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS)) {
       g_print ("Icon file doesn't exist, are you sure you have "
           " installed snappy correctly?\nThis file needed is: %s\n",
@@ -680,7 +699,7 @@ load_controls (UserInterface * ui)
   ui->subtitle_toggle = gtk_clutter_texture_new ();
   gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
       (ui->subtitle_toggle),
-      gdk_pixbuf_new_from_file (ui->subtitle_toggle_png, NULL), &error);
+      gdk_pixbuf_new_from_file (ui->subtitle_active_png, NULL), &error);
   if (!ui->subtitle_toggle && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -1060,7 +1079,8 @@ interface_init (UserInterface * ui)
   ui->volume_low_png = NULL;
   ui->volume_high_png = NULL;
 
-  ui->subtitle_toggle_png = NULL;
+  ui->subtitle_active_png = NULL;
+  ui->subtitle_inactive_png = NULL;
   ui->subtitles_available = FALSE;
   ui->video_stream_toggle_png = NULL;
   ui->audio_stream_toggle_png = NULL;

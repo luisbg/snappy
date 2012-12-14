@@ -76,7 +76,7 @@ gchar **get_recently_viewed ();
 GstState get_state (GstEngine * engine);
 gint64 query_position (GstEngine * engine);
 void set_subtitle_uri (GstEngine * engine, gchar *suburi);
-void toggle_subtitles (GstEngine * engine);
+gboolean toggle_subtitles (GstEngine * engine);
 gboolean update_media_duration (GstEngine * engine);
 
 G_END_DECLS
