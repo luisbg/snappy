@@ -632,7 +632,7 @@ change_state (GstEngine * engine, gchar * state)
 
 
 /*               Cycle through streams           */
-void
+gboolean
 cycle_streams (GstEngine * engine, guint streamid)
 {
   gboolean last_stream = FALSE;
@@ -665,8 +665,9 @@ cycle_streams (GstEngine * engine, guint streamid)
     current = 0;
     last_stream = TRUE;
   }
-
   g_object_set (G_OBJECT (engine->player), c, current, NULL);
+
+  return last_stream;
 }
 
 
@@ -944,16 +945,18 @@ gboolean
 toggle_subtitles (GstEngine * engine)
 {
   gint flags;
+  gboolean last_stream;
   gboolean sub_state;
 
   g_object_get (G_OBJECT (engine->player), "flags", &flags, NULL);
   sub_state = flags & (1 << 2);
 
   if (sub_state) {              // If subtitles on, cycle streams and if last turn off
-    cycle_streams (engine, STREAM_TEXT);
-    flags &= ~(1 << 2);
-    g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
-
+    last_stream = cycle_streams (engine, STREAM_TEXT);
+    if (last_stream) {
+      flags &= ~(1 << 2);
+      g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
+    }
   } else {                      // If subtitles off, turn them on
     flags |= (1 << 2);
     g_object_set (G_OBJECT (engine->player), "flags", flags, NULL);
