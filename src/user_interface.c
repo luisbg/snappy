@@ -250,7 +250,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
                 (ui->subtitle_toggle),
                 gdk_pixbuf_new_from_file (ui->subtitle_active_png, NULL), NULL);
           } else {
-            gtkclutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+            gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
                 (ui->subtitle_toggle),
                 gdk_pixbuf_new_from_file (ui->subtitle_inactive_png, NULL),
                 NULL);
