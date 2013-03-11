@@ -144,6 +144,7 @@ process_args (int argc, char *argv[],
     }
   } else {
     /* If no files passed by user display help */
+    g_print ("Opening snappy without content.\n\n");
     g_print ("%s", g_option_context_get_help (context, TRUE, NULL));
   }
 
@@ -164,7 +165,7 @@ main (int argc, char *argv[])
   gboolean secret = FALSE, tags = FALSE;
   gint ret = 0;
   guint c, index, pos = 0;
-  gchar *uri;
+  gchar *uri = NULL;
   gchar *suburi = NULL;
   gchar *version_str;
   GList *uri_list;
@@ -207,8 +208,6 @@ main (int argc, char *argv[])
   /* Process command arguments */
   uri_list = process_args (argc, argv, &blind, &fullscreen, &hide,
       &loop, &secret, &suburi, &tags, context);
-  if (uri_list == NULL)
-    goto quit;
 
   /* User Interface */
   ui = g_new (UserInterface, 1);
@@ -250,7 +249,8 @@ main (int argc, char *argv[])
   gst_object_unref (engine->bus);
 
   /* Get uri to load */
-  uri = g_list_first (uri_list)->data;
+  if (uri_list)
+    uri = g_list_first (uri_list)->data;
 
   /* Load engine and start interface */
   engine_load_uri (engine, uri);

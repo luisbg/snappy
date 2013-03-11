@@ -728,10 +728,12 @@ engine_load_uri (GstEngine * engine, gchar * uri)
   engine->has_started = FALSE;
   engine->queries_blocked = TRUE;
 
-  discover (engine, uri);
+  if (uri) {
+    discover (engine, uri);
 
-  g_print ("Loading: %s\n", uri);
-  g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
+    g_print ("Loading: %s\n", uri);
+    g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
+  }
 
   return;
 }

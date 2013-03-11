@@ -1193,14 +1193,25 @@ interface_start (UserInterface * ui, gchar * uri)
   g_print ("Loading ui!\n");
 
   // Init UserInterface structure variables
-  ui->fileuri = uri;
-  ui->filename = g_path_get_basename (ui->fileuri);
+  if (uri) {
+    ui->fileuri = uri;
 
-  ui->media_width = ui->engine->media_width;
-  ui->media_height = ui->engine->media_height;
+    ui->filename = g_path_get_basename (ui->fileuri);
 
-  ui->stage_width = ui->media_width;
-  ui->stage_height = ui->media_height;
+    ui->media_width = ui->engine->media_width;
+    ui->media_height = ui->engine->media_height;
+
+    ui->stage_width = ui->media_width;
+    ui->stage_height = ui->media_height;
+  } else {
+    ui->filename = "";
+
+    ui->media_width = DEFAULT_WIDTH;
+    ui->media_height = DEFAULT_HEIGHT;
+
+    ui->stage_width = DEFAULT_WIDTH;
+    ui->stage_height = DEFAULT_HEIGHT;
+  }
 
   /* Create the window and some child widgets: */
   ui->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
