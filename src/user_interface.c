@@ -1298,6 +1298,10 @@ interface_start (UserInterface * ui, gchar * uri)
     /* Show the window */
     gtk_widget_show_all (ui->window);
   }
+
+  if (!ui->fileuri) {
+    clutter_actor_hide (ui->texture);
+  }
 }
 
 gboolean
