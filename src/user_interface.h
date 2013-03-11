@@ -129,10 +129,18 @@ struct _UserInterface
   ScreenSaver *screensaver;
 };
 
+static const GtkTargetEntry drop_target_table[] = {
+  {(gchar *) "text/uri-list", 0, 0}
+};
+
+
 // Declaration of non-static functions
 void interface_init (UserInterface * ui);
 gboolean interface_is_it_last (UserInterface * ui);
 gboolean interface_load_uri (UserInterface * ui, gchar * uri);
+void interface_on_drop_cb (GtkWidget * widget, GdkDragContext * context, gint x,
+    gint y, GtkSelectionData * data, guint info, guint _time,
+    UserInterface * ui);
 void interface_play_next_or_prev (UserInterface * ui, gboolean next);
 void interface_start (UserInterface * ui, gchar * uri);
 gboolean interface_update_controls (UserInterface * ui);

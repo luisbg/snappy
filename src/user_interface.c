@@ -1161,6 +1161,26 @@ interface_load_uri (UserInterface * ui, gchar * uri)
 }
 
 void
+interface_on_drop_cb (GtkWidget * widget,
+    GdkDragContext * context,
+    gint x,
+    gint y,
+    GtkSelectionData * data, guint info, guint _time, UserInterface * ui)
+{
+  char **list;
+
+  list = g_uri_list_extract_uris (gtk_selection_data_get_data (data));
+
+  engine_open_uri (ui->engine, list[0]);
+  interface_load_uri (ui, list[0]);
+  engine_play (ui->engine);
+
+  if (!CLUTTER_ACTOR_IS_VISIBLE (ui->texture)) {
+    clutter_actor_show (ui->texture);
+  }
+}
+
+void
 interface_play_next_or_prev (UserInterface * ui, gboolean next)
 {
   GList *element;
@@ -1302,6 +1322,12 @@ interface_start (UserInterface * ui, gchar * uri)
   if (!ui->fileuri) {
     clutter_actor_hide (ui->texture);
   }
+
+  gtk_drag_dest_set (GTK_WIDGET (ui->box), GTK_DEST_DEFAULT_ALL,
+      drop_target_table, G_N_ELEMENTS (drop_target_table),
+      GDK_ACTION_COPY | GDK_ACTION_MOVE);
+  g_signal_connect (G_OBJECT (ui->box), "drag_data_received",
+      G_CALLBACK (interface_on_drop_cb), ui);
 }
 
 gboolean
