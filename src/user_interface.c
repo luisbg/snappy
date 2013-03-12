@@ -1154,13 +1154,13 @@ interface_load_uri (UserInterface * ui, gchar * uri)
     ui->stage_width = ui->media_width;
     ui->stage_height = ui->media_height;
 
-    gtk_widget_set_size_request (ui->clutter_widget, ui->stage_width,
-      ui->stage_height);
-    clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->media_width,
-        ui->media_height);
+    gtk_widget_set_size_request (ui->clutter_widget, ui->stage_width / 2,
+      ui->stage_height / 2);
+    clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->stage_width,
+        ui->stage_height);
 
-    gtk_window_resize (GTK_WINDOW (ui->window), ui->media_width,
-        ui->media_height);
+    gtk_window_resize (GTK_WINDOW (ui->window), ui->stage_width,
+        ui->stage_height);
   }
 
   if (!ui->penalty_box_active)
@@ -1271,7 +1271,9 @@ interface_start (UserInterface * ui, gchar * uri)
   /* Set the size of the widget,
    * because we should not set the size of its stage when using GtkClutterEmbed.
    */
-  gtk_widget_set_size_request (ui->clutter_widget, ui->stage_width,
+  gtk_widget_set_size_request (ui->clutter_widget, ui->stage_width / 2,
+      ui->stage_height / 2);
+  gtk_window_resize (GTK_WINDOW (ui->window), ui->stage_width,
       ui->stage_height);
 
   ui->controls_showing = FALSE;
