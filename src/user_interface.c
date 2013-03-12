@@ -1138,7 +1138,7 @@ interface_load_uri (UserInterface * ui, gchar * uri)
   ui->filename = g_path_get_basename (ui->fileuri);
 
   if (ui->stage != NULL) {
-    gtk_window_set_title (GTK_WINDOW (ui->window), "Clutter Embedding");
+    gtk_window_set_title (GTK_WINDOW (ui->window), ui->filename);
     clutter_text_set_text (CLUTTER_TEXT (ui->control_title), ui->filename);
   }
 
@@ -1235,7 +1235,10 @@ interface_start (UserInterface * ui, gchar * uri)
 
   /* Create the window and some child widgets: */
   ui->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  gtk_window_set_title (GTK_WINDOW (ui->window), ui->filename);
+  if (ui->filename != "")
+    gtk_window_set_title (GTK_WINDOW (ui->window), ui->filename);
+  else
+    gtk_window_set_title (GTK_WINDOW (ui->window), "snappy");
   g_signal_connect (ui->window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
   gtk_settings = gtk_settings_get_default ();
   g_object_set (G_OBJECT (gtk_settings), "gtk-application-prefer-dark-theme",
