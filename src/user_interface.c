@@ -1150,9 +1150,18 @@ interface_load_uri (UserInterface * ui, gchar * uri)
       ui->media_height);
   size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 
-  if (!ui->fullscreen)
+  if (!ui->fullscreen) {
+    ui->stage_width = ui->media_width;
+    ui->stage_height = ui->media_height;
+
+    gtk_widget_set_size_request (ui->clutter_widget, ui->stage_width,
+      ui->stage_height);
     clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->media_width,
         ui->media_height);
+
+    gtk_window_resize (GTK_WINDOW (ui->window), ui->media_width,
+        ui->media_height);
+  }
 
   if (!ui->penalty_box_active)
     show_controls (ui, TRUE);
