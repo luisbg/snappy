@@ -63,6 +63,7 @@ gboolean add_uri_unfinished (GstEngine * engine);
 gboolean at_the_eos (GstEngine * engine);
 gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
 gboolean change_state (GstEngine * engine, gchar * state);
+gboolean check_missing_plugins_error (GstEngine * engine, GstMessage * msg);
 gboolean cycle_streams (GstEngine * engine, guint streamid);
 gboolean engine_init (GstEngine * engine, GstElement * sink);
 void engine_load_uri (GstEngine * engine, gchar * uri);

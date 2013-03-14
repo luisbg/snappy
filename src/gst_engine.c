@@ -578,8 +578,11 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
       gst_message_parse_warning (msg, &err, &debug);
       if (err) {
-        g_print ("Warning: %s", err->message);
-        GST_DEBUG ("Warning: %s", err->message);
+        // If warning is missing plugins inform the user, if not display warning
+        if (!check_missing_plugins_error (engine, msg)) {
+          g_print ("Warning: %s", err->message);
+          GST_DEBUG ("Warning: %s", err->message);
+        }
 
         g_error_free (err);
 
@@ -654,6 +657,29 @@ change_state (GstEngine * engine, gchar * state)
   return ok;
 }
 
+gboolean
+check_missing_plugins_error (GstEngine * engine, GstMessage * msg)
+{
+  gboolean error_src_is_decoder, error_src_is_missing_plugins;
+  GError *err = NULL;
+
+  gst_message_parse_warning (msg, &err, NULL);
+
+  // Is the Error coming from uridecodebin?
+  error_src_is_decoder = g_str_has_prefix (gst_object_get_name (msg->src),
+      "uridecodebin");
+  // Is the error "Codec not found"? Then display verbose warning
+  if (error_src_is_decoder && err->code == GST_STREAM_ERROR_CODEC_NOT_FOUND) {
+    g_print ("You are missing a GStreamer plugin needed to play this file.%s",
+             "\nCheck your GStreamer installation.\n");
+    GST_DEBUG("Warning: Codec not Found");
+    error_src_is_missing_plugins = TRUE;
+  } else {
+    error_src_is_missing_plugins = FALSE;
+  }
+
+  return error_src_is_missing_plugins;
+}
 
 /*               Cycle through streams           */
 gboolean
