@@ -570,6 +570,28 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       break;
     }
 
+    case GST_MESSAGE_WARNING:
+    {
+      /* Parse and share Gst Warning */
+      gchar *debug = NULL;
+      GError *err = NULL;
+
+      gst_message_parse_warning (msg, &err, &debug);
+      if (err) {
+        g_print ("Warning: %s", err->message);
+        GST_DEBUG ("Warning: %s", err->message);
+
+        g_error_free (err);
+
+        if (debug) {
+          GST_DEBUG ("Debug details: %s", debug);
+          g_free (debug);
+        }
+      }
+
+      break;
+    }
+
     case GST_MESSAGE_ERROR:
     {
       /* Parse and share Gst Error */
@@ -577,13 +599,15 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       GError *err = NULL;
 
       gst_message_parse_error (msg, &err, &debug);
+      if (err) {
+        g_print ("Error: %s", err->message);
+        GST_DEBUG ("Error: %s", err->message);
+        g_error_free (err);
 
-      GST_DEBUG ("Error: %s", err->message);
-      g_error_free (err);
-
-      if (debug) {
-        GST_DEBUG ("Debug details: %s", debug);
-        g_free (debug);
+        if (debug) {
+          GST_DEBUG ("Debug details: %s", debug);
+          g_free (debug);
+        }
       }
 
       break;
