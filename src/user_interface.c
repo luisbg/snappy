@@ -401,7 +401,7 @@ load_controls (UserInterface * ui)
 {
   // Check icon files exist
   gchar *vid_panel_png = NULL;
-  gchar *icon_files[8];
+  gchar *icon_files[9];
   gchar *duration_str = NULL;
   gint c;
   ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xff };
