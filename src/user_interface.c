@@ -1244,7 +1244,7 @@ interface_start (UserInterface * ui, gchar * uri)
 
   /* Create the window and some child widgets: */
   ui->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  if (ui->filename != "")
+  if (strcmp(ui->filename, "") != 0)
     gtk_window_set_title (GTK_WINDOW (ui->window), ui->filename);
   else
     gtk_window_set_title (GTK_WINDOW (ui->window), "snappy");
