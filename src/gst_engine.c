@@ -785,6 +785,9 @@ engine_load_uri (GstEngine * engine, gchar * uri)
 
     g_print ("Loading: %s\n", uri);
     g_object_set (G_OBJECT (engine->player), "uri", uri, NULL);
+  } else {
+    g_print ("No media set. %s\n",
+        "You can drag and drop a file into snappy to play it.");
   }
 
   return;

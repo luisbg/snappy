@@ -498,6 +498,10 @@ load_controls (UserInterface * ui)
   // Controls title
   ui->control_title = clutter_text_new_full ("Sans 32px",
       cut_long_filename (ui->filename, ui->title_length), &control_color2);
+  if (strcmp (ui->filename, "") == 0) {
+    clutter_text_set_text (CLUTTER_TEXT (ui->control_title),
+        "Drag and drop a file here to play it");
+  }
   clutter_text_set_max_length (CLUTTER_TEXT (ui->control_title),
       ui->title_length);
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->control_title, TRUE,   /* expand */
