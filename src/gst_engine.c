@@ -603,7 +603,7 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
 
       gst_message_parse_error (msg, &err, &debug);
       if (err) {
-        g_print ("Error: %s", err->message);
+        g_print ("Error: %s\n", err->message);
         GST_DEBUG ("Error: %s", err->message);
         g_error_free (err);
 
@@ -671,8 +671,8 @@ check_missing_plugins_error (GstEngine * engine, GstMessage * msg)
   // Is the error "Codec not found"? Then display verbose warning
   if (error_src_is_decoder && err->code == GST_STREAM_ERROR_CODEC_NOT_FOUND) {
     g_print ("You are missing a GStreamer plugin needed to play this file.%s",
-             "\nCheck your GStreamer installation.\n");
-    GST_DEBUG("Warning: Codec not Found");
+        "\nCheck your GStreamer installation.\n");
+    GST_DEBUG ("Warning: Codec not Found");
     error_src_is_missing_plugins = TRUE;
   } else {
     error_src_is_missing_plugins = FALSE;

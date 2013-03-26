@@ -709,11 +709,11 @@ load_controls (UserInterface * ui)
     error = NULL;
   }
   clutter_actor_hide (ui->subtitle_toggle);
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->subtitle_toggle, FALSE,       /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->subtitle_toggle, FALSE,        /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
-      CLUTTER_BOX_ALIGNMENT_START);    /* y-align */
+      CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->info_box, FALSE,       /* expand */
       FALSE,                    /* x-fill */
@@ -1155,7 +1155,7 @@ interface_load_uri (UserInterface * ui, gchar * uri)
     ui->stage_height = ui->media_height;
 
     gtk_widget_set_size_request (ui->clutter_widget, ui->stage_width / 2,
-      ui->stage_height / 2);
+        ui->stage_height / 2);
     clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->stage_width,
         ui->stage_height);
 
@@ -1244,7 +1244,7 @@ interface_start (UserInterface * ui, gchar * uri)
 
   /* Create the window and some child widgets: */
   ui->window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-  if (strcmp(ui->filename, "") != 0)
+  if (strcmp (ui->filename, "") != 0)
     gtk_window_set_title (GTK_WINDOW (ui->window), ui->filename);
   else
     gtk_window_set_title (GTK_WINDOW (ui->window), "snappy");
