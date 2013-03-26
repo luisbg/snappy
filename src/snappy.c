@@ -262,10 +262,11 @@ main (int argc, char *argv[])
     set_subtitle_uri (engine, suburi);
   }
 
-  /* Start playing */
-  change_state (engine, "Paused");
-  change_state (engine, "Playing");
-
+  /* Start playing if we have a URI to play */
+  if (uri) {
+    change_state (engine, "Paused");
+    change_state (engine, "Playing");
+  }
 #ifdef ENABLE_DBUS
   /* Start MPRIS Dbus object */
   mp_obj = g_new (SnappyMP, 1);
