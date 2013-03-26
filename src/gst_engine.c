@@ -440,8 +440,10 @@ add_uri_unfinished (GstEngine * engine)
   gboolean ret;
   gint64 position;
 
-  position = query_position (engine);
-  ret = add_uri_unfinished_playback (engine, engine->uri, position);
+  if (engine->uri) {
+    position = query_position (engine);
+    ret = add_uri_unfinished_playback (engine, engine->uri, position);
+  }
 
   return ret;
 }
