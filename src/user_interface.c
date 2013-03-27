@@ -1230,6 +1230,8 @@ interface_start (UserInterface * ui, gchar * uri)
 {
   ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
   GtkSettings *gtk_settings;
+  GdkScreen *screen;
+  gint screen_width, screen_height;
 
   g_print ("Loading ui!\n");
 
@@ -1242,8 +1244,31 @@ interface_start (UserInterface * ui, gchar * uri)
     ui->media_width = ui->engine->media_width;
     ui->media_height = ui->engine->media_height;
 
-    ui->stage_width = ui->media_width;
-    ui->stage_height = ui->media_height;
+    // Get screen size
+    screen = gdk_screen_get_default();
+    screen_width = gdk_screen_get_width(screen);
+    screen_height = gdk_screen_get_height(screen);
+
+    if (ui->media_width < screen_width && ui->media_height < screen_height) {
+      ui->stage_width = ui->media_width;
+      ui->stage_height = ui->media_height;
+
+    } else {
+      // Media bigger than the screen
+      gfloat aspect_ratio;
+
+      aspect_ratio = (float) ui->media_width / ui->media_height;
+      // Scale down to screen width proportionally
+      ui->stage_width = screen_width;
+      ui->stage_height = screen_width / aspect_ratio;
+
+      if (ui->stage_height > screen_height) {
+        // Stage height still too big, scale down to screen height
+        ui->stage_width = screen_height * aspect_ratio;
+        ui->stage_height = screen_height;
+      }
+    }
+
   } else {
     ui->filename = "";
 
