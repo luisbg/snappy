@@ -738,11 +738,11 @@ penalty_box (gpointer data)
   if (ui->penalty_box_active) {
     ui->penalty_box_active = FALSE;
   } else {
-    g_timeout_add (PENALTY_TIME, penalty_box, ui);
     ui->penalty_box_active = TRUE;
+    g_timeout_add (PENALTY_TIME, penalty_box, ui);
   }
 
-  return ui->penalty_box_active;
+  return FALSE;
 }
 
 static gchar *
