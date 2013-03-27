@@ -81,6 +81,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
       guint keyval = clutter_event_get_key_symbol (event);
       switch (keyval) {
         case CLUTTER_q:
+        case CLUTTER_Q:
         case CLUTTER_Escape:
         {
           gtk_main_quit ();
@@ -90,6 +91,8 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         }
 
         case CLUTTER_f:
+        case CLUTTER_F:
+        case CLUTTER_F11:
         {
           // Fullscreen button
           toggle_fullscreen (ui);
@@ -108,6 +111,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         }
 
         case CLUTTER_l:
+        case CLUTTER_L:
         {
           // Loop
           ui->engine->loop = !ui->engine->loop;
@@ -205,6 +209,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         }
 
         case CLUTTER_r:
+        case CLUTTER_R:
         {
           // rotate texture 90 degrees.
           rotate_video (ui);
@@ -214,6 +219,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         }
 
         case CLUTTER_c:
+        case CLUTTER_C:
         {
           // show or hide controls
           penalty_box (ui);
@@ -243,6 +249,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         }
 
         case CLUTTER_v:
+        case CLUTTER_V:
         {
           // toggle subtitles
           if (toggle_subtitles (ui->engine)) {
@@ -263,13 +270,14 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_numbersign:
         case CLUTTER_underscore:
         case CLUTTER_j:
+        case CLUTTER_J:
         {
           // cycle through available audio/text/video streams
           guint streamid;
 
           if (keyval == CLUTTER_numbersign)
             streamid = STREAM_AUDIO;
-          else if (keyval == CLUTTER_j)
+          else if (keyval == CLUTTER_j || keyval == CLUTTER_J)
             streamid = STREAM_TEXT;
           else if (keyval == CLUTTER_underscore)
             streamid = STREAM_VIDEO;
