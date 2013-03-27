@@ -1,8 +1,8 @@
 /*
- * snappy - 0.2
+ * snappy - 0.3
  *
- * Copyright (C) 2011 Collabora Multimedia Ltd.
- * <sebastian.droege@collabora.co.uk>
+ * Copyright (C) 2011-2013 Collabora Ltd.
+ * Sebastian Droege <sebastian.droege@collabora.co.uk>
  *
  * The screensaver code is heavily based on totem, which is
  *  Copyright (C) 2004-2006 Bastien Nocera <hadess@hadess.net>
