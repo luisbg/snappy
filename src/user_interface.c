@@ -412,8 +412,11 @@ load_controls (UserInterface * ui)
   gchar *icon_files[9];
   gchar *duration_str = NULL;
   gint c;
+  guint8 gradient_pixels[8];
   ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xff };
   ClutterColor control_color2 = { 0xff, 0xff, 0xff, 0xff };
+  ClutterColor palette_color, palette_second_color;
+  ClutterContent *gradient_image;
   ClutterLayoutManager *controls_layout = NULL;
   ClutterLayoutManager *middle_box_layout = NULL;
   ClutterLayoutManager *bottom_box_layout = NULL;
@@ -576,9 +579,28 @@ load_controls (UserInterface * ui)
   clutter_actor_set_opacity (ui->control_seek2, 255);
   clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
 
+  clutter_color_from_string (&palette_color, "#608276ff");
+  clutter_color_from_string (&palette_second_color, "#3eb48aff");
+
+  gradient_pixels[0] = palette_color.red;
+  gradient_pixels[1] = palette_color.green;
+  gradient_pixels[2] = palette_color.blue;
+  gradient_pixels[3] = palette_color.alpha;
+  gradient_pixels[4] = palette_second_color.red;
+  gradient_pixels[5] = palette_second_color.green;
+  gradient_pixels[6] = palette_second_color.blue;
+  gradient_pixels[7] = palette_second_color.alpha;
+
+  gradient_image = clutter_image_new ();
+  if (!clutter_image_set_data (CLUTTER_IMAGE (gradient_image),
+                               gradient_pixels,
+                               COGL_PIXEL_FORMAT_RGBA_8888,
+                               2, 1, 4, NULL))
+    g_warning ("error setting image");
+
   // progress rectangle
   ui->control_seekbar = clutter_actor_new ();
-  clutter_actor_set_background_color (ui->control_seekbar, &control_color2);
+  clutter_actor_set_content (ui->control_seekbar, gradient_image);
   clutter_actor_set_opacity (ui->control_seekbar, 255);
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seekbar);
   clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
