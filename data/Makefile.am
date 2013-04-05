@@ -9,8 +9,7 @@ icons_DATA = \
     media-actions-start.png \
     subtitles-active.png \
     subtitles-inactive.png \
-    video-stream-toggle.png \
-    vid-panel.png
+    video-stream-toggle.png
 iconsdir = $(datadir)/snappy
 
 desktop_DATA = snappy.desktop

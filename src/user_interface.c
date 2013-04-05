@@ -24,6 +24,8 @@
 
 #include <gtk/gtk.h>
 #include <clutter/clutter.h>
+#include <cairo.h>
+#include <math.h>
 #include <clutter-gst/clutter-gst.h>
 #include <clutter-gtk/clutter-gtk.h>
 
@@ -32,6 +34,8 @@
 
 // Declaration of static functions
 static gboolean controls_timeout_cb (gpointer data);
+static gboolean draw_rounded_rectangle (ClutterCanvas * canvas, cairo_t * cr,
+    int surface_width, int surface_height);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
     UserInterface * ui);
 static void load_controls (UserInterface * ui);
@@ -65,6 +69,50 @@ controls_timeout_cb (gpointer data)
   }
 
   return FALSE;
+}
+
+
+static gboolean
+draw_rounded_rectangle (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
+    int surface_height)
+{
+  /* rounded rectangle taken from:
+   *
+   *   http://cairographics.org/samples/rounded_rectangle/
+   *
+   */
+  double x, y, width, height, aspect, corner_radius, radius, degrees;
+
+  x = 1.0;
+  y = 1.0;
+  width = surface_width - 2.0;
+  height = surface_height - 2.0;
+  aspect = 1.0;                 // aspect ratio
+  corner_radius = height / 10.0;        // and corner curvature radius
+
+  radius = corner_radius / aspect;
+  degrees = M_PI / 180.0;
+
+  cairo_save (cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint (cr);
+  cairo_restore (cr);
+
+  cairo_new_sub_path (cr);
+  cairo_arc (cr, x + width - radius, y + radius, radius, -90 * degrees,
+      0 * degrees);
+  cairo_arc (cr, x + width - radius, y + height - radius, radius, 0 * degrees,
+      90 * degrees);
+  cairo_arc (cr, x + radius, y + height - radius, radius, 90 * degrees,
+      180 * degrees);
+  cairo_arc (cr, x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
+  cairo_close_path (cr);
+
+  cairo_set_source_rgba (cr, 0.0, 0.0, 0.0, 0.5);
+  cairo_fill (cr);
+
+  // We are done drawing
+  return TRUE;
 }
 
 
@@ -404,19 +452,19 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
   return handled;
 }
 
+
 static void
 load_controls (UserInterface * ui)
 {
   // Check icon files exist
-  gchar *vid_panel_png = NULL;
-  gchar *icon_files[9];
+  gchar *icon_files[8];
   gchar *duration_str = NULL;
   gint c;
   guint8 gradient_pixels[8];
   ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xff };
   ClutterColor control_color2 = { 0xff, 0xff, 0xff, 0xff };
   ClutterColor palette_color, palette_second_color;
-  ClutterContent *gradient_image;
+  ClutterContent *gradient_image, *canvas;
   ClutterLayoutManager *controls_layout = NULL;
   ClutterLayoutManager *middle_box_layout = NULL;
   ClutterLayoutManager *bottom_box_layout = NULL;
@@ -429,7 +477,6 @@ load_controls (UserInterface * ui)
   ClutterActor *vol_int_box = NULL;
   GError *error = NULL;
 
-  vid_panel_png = g_build_filename (ui->data_dir, "vid-panel.png", NULL);
   ui->play_png = g_build_filename (ui->data_dir, "media-actions-start.png",
       NULL);
   ui->pause_png = g_build_filename (ui->data_dir, "media-actions-pause.png",
@@ -447,17 +494,16 @@ load_controls (UserInterface * ui)
   ui->audio_stream_toggle_png = g_build_filename (ui->data_dir,
       "audio-stream-toggle.png", NULL);
 
-  icon_files[0] = vid_panel_png;
-  icon_files[1] = ui->play_png;
-  icon_files[2] = ui->pause_png;
-  icon_files[3] = ui->volume_low_png;
-  icon_files[4] = ui->volume_high_png;
-  icon_files[5] = ui->subtitle_active_png;
-  icon_files[6] = ui->subtitle_inactive_png;
-  icon_files[7] = ui->video_stream_toggle_png;
-  icon_files[8] = ui->audio_stream_toggle_png;
+  icon_files[0] = ui->play_png;
+  icon_files[1] = ui->pause_png;
+  icon_files[2] = ui->volume_low_png;
+  icon_files[3] = ui->volume_high_png;
+  icon_files[4] = ui->subtitle_active_png;
+  icon_files[5] = ui->subtitle_inactive_png;
+  icon_files[6] = ui->video_stream_toggle_png;
+  icon_files[7] = ui->audio_stream_toggle_png;
 
-  for (c = 0; c < 9; c++) {
+  for (c = 0; c < 8; c++) {
     if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS)) {
       g_print ("Icon file doesn't exist, are you sure you have "
           " installed snappy correctly?\nThis file needed is: %s\n",
@@ -471,20 +517,24 @@ load_controls (UserInterface * ui)
   ui->control_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (ui->control_box, controls_layout);
 
-  // Controls background
-  ui->control_bg = gtk_clutter_texture_new ();
-  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE (ui->control_bg),
-      gdk_pixbuf_new_from_file (vid_panel_png, NULL), &error);
-  if (!ui->control_bg && error)
-    g_debug ("Clutter error: %s", error->message);
-  if (error) {
-    g_error_free (error);
-    error = NULL;
-  }
+  // Controls rectangular background with curved edges (drawn in cairo)
+  canvas = clutter_canvas_new ();
+  clutter_canvas_set_size (CLUTTER_CANVAS (canvas),
+      ui->media_width * CONTROLS_WIDTH_RATIO,
+      ui->media_height * CONTROLS_HEIGHT_RATIO);
+
+  ui->control_bg = clutter_actor_new ();
+  clutter_actor_set_content (ui->control_bg, canvas);
+
+  // The actor now owns the canvas
+  g_object_unref (canvas);
+  g_signal_connect (canvas, "draw", G_CALLBACK (draw_rounded_rectangle), NULL);
+  // Invalidate the canvas, so that we can draw before the main loop starts
+  clutter_content_invalidate (canvas);
+
   clutter_actor_add_constraint (ui->control_bg,
       clutter_bind_constraint_new (ui->control_box, CLUTTER_BIND_SIZE, 0));
 
-  g_free (vid_panel_png);
   clutter_actor_add_child (CLUTTER_ACTOR (ui->control_box), ui->control_bg);
   clutter_actor_add_constraint (ui->control_box,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.5));
