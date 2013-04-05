@@ -643,9 +643,7 @@ load_controls (UserInterface * ui)
 
   gradient_image = clutter_image_new ();
   if (!clutter_image_set_data (CLUTTER_IMAGE (gradient_image),
-                               gradient_pixels,
-                               COGL_PIXEL_FORMAT_RGBA_8888,
-                               2, 1, 4, NULL))
+          gradient_pixels, COGL_PIXEL_FORMAT_RGBA_8888, 2, 1, 4, NULL))
     g_warning ("error setting image");
 
   // progress rectangle
@@ -1317,9 +1315,9 @@ interface_start (UserInterface * ui, gchar * uri)
     ui->media_height = ui->engine->media_height;
 
     // Get screen size
-    screen = gdk_screen_get_default();
-    screen_width = gdk_screen_get_width(screen);
-    screen_height = gdk_screen_get_height(screen);
+    screen = gdk_screen_get_default ();
+    screen_width = gdk_screen_get_width (screen);
+    screen_height = gdk_screen_get_height (screen);
 
     if (ui->media_width < screen_width && ui->media_height < screen_height) {
       ui->stage_width = ui->media_width;
