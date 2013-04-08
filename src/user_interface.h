@@ -111,7 +111,7 @@ struct _UserInterface
   ClutterActor *texture;
   ClutterActor *control_box;
   ClutterActor *control_bg, *control_title, *control_play_toggle;
-  ClutterActor *control_seekbar, *control_seek_bg;
+  ClutterActor *control_seekbar;
   ClutterActor *control_pos;
   ClutterActor *volume_box;
   ClutterActor *volume_low, *volume_high;

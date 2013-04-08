@@ -430,8 +430,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         if (actor == ui->control_play_toggle) {
           toggle_playing (ui);
 
-        } else if (actor == ui->control_seek_bg ||
-            actor == ui->control_seekbar) {
+        } else if (actor == ui->control_seekbar) {
           gfloat x, y, dist;
           gint64 progress;
 
@@ -677,16 +676,6 @@ load_controls (UserInterface * ui)
   seek_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (seek_box, seek_box_layout);
 
-  // Background holder for the seekbar
-  ui->control_seek_bg = clutter_actor_new ();
-  clutter_actor_set_background_color (ui->control_seek_bg, &control_color1);
-  clutter_actor_set_opacity (ui->control_seek_bg, 0);
-  clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek_bg);
-  clutter_actor_add_constraint (ui->control_seekbar,
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
-  clutter_actor_add_constraint (ui->control_seekbar,
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0));
-
   // Seek progress bar
   ui->seek_canvas = clutter_canvas_new();
   clutter_canvas_set_size (CLUTTER_CANVAS (ui->seek_canvas),
@@ -694,6 +683,10 @@ load_controls (UserInterface * ui)
       (ui->media_height * CONTROLS_HEIGHT_RATIO ) /  5);
   ui->control_seekbar = clutter_actor_new();
   clutter_actor_set_content (ui->control_seekbar, ui->seek_canvas);
+  clutter_actor_add_constraint (ui->control_seekbar,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
+  clutter_actor_add_constraint (ui->control_seekbar,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0));
 
   pos = 0.0;
   g_signal_connect (ui->seek_canvas, "draw", G_CALLBACK (draw_progressbar), ui);
@@ -1152,9 +1145,6 @@ update_controls_size (UserInterface * ui)
   ui->seek_height =
       ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 2.0f * SEEK_BORDER;
 
-  clutter_actor_set_size (ui->control_seek_bg,
-      ui->seek_width + 2.0f * SEEK_BORDER,
-      ui->seek_height + 2.0f * SEEK_BORDER);
   clutter_actor_set_size (ui->control_seekbar,
       ui->seek_width + 2.0f * SEEK_BORDER,
       ui->seek_height + 2.0f * SEEK_BORDER);
@@ -1230,7 +1220,6 @@ interface_init (UserInterface * ui)
   ui->control_play_toggle = NULL;
 
   ui->control_seekbar = NULL;
-  ui->control_seek_bg = NULL;
   ui->control_pos = NULL;
 
   ui->volume_box = NULL;
