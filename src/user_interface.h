@@ -88,6 +88,7 @@ struct _UserInterface
   guint media_width, media_height;
   guint stage_width, stage_height;
   gint64 media_duration;
+  gfloat progress;
   gfloat seek_width, seek_height;
   gfloat volume_width, volume_height;
 
@@ -110,7 +111,7 @@ struct _UserInterface
   ClutterActor *texture;
   ClutterActor *control_box;
   ClutterActor *control_bg, *control_title, *control_play_toggle;
-  ClutterActor *control_seek1, *control_seek2, *control_seekbar;
+  ClutterActor *control_seekbar, *control_seek_bg;
   ClutterActor *control_pos;
   ClutterActor *volume_box;
   ClutterActor *volume_low, *volume_high;
@@ -120,6 +121,8 @@ struct _UserInterface
   ClutterActor *info_box;
   ClutterActor *pos_n_vol_box;
   ClutterActor *main_box;
+
+  ClutterContent *seek_canvas;
 
   ClutterLayoutManager *main_box_layout;
   ClutterLayoutManager *info_box_layout;

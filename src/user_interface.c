@@ -34,8 +34,10 @@
 
 // Declaration of static functions
 static gboolean controls_timeout_cb (gpointer data);
-static gboolean draw_rounded_rectangle (ClutterCanvas * canvas, cairo_t * cr,
+static gboolean draw_background (ClutterCanvas * canvas, cairo_t * cr,
     int surface_width, int surface_height, ClutterColor *color);
+static gboolean draw_progressbar (ClutterCanvas * canvas, cairo_t * cr,
+    int surface_width, int surface_height, UserInterface * ui);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
     UserInterface * ui);
 static void load_controls (UserInterface * ui);
@@ -73,7 +75,7 @@ controls_timeout_cb (gpointer data)
 
 
 static gboolean
-draw_rounded_rectangle (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
+draw_background (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
     int surface_height, ClutterColor *color)
 {
   /* rounded rectangle taken from:
@@ -116,6 +118,59 @@ draw_rounded_rectangle (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
 
   cairo_set_source_rgba (cr, red, green, blue, alpha);
   cairo_fill (cr);
+
+  // We are done drawing
+  return TRUE;
+}
+
+
+static gboolean
+draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
+    int surface_height, UserInterface * ui)
+{
+  double x, y, width, height, aspect, corner_radius, radius, degrees;
+  double red, green, blue, alpha;
+  cairo_pattern_t *pattern;
+
+  x = 1.0;
+  y = 1.0;
+  width = surface_width - 2.0;
+  height = surface_height - 2.0;
+  aspect = 1.0;                 // aspect ratio
+  corner_radius = height / 5.0;        // and corner curvature radius
+
+  radius = corner_radius / aspect;
+  degrees = M_PI / 180.0;
+
+  cairo_save (cr);
+  cairo_set_operator (cr, CAIRO_OPERATOR_CLEAR);
+  cairo_paint (cr);
+  cairo_restore (cr);
+
+  pattern = cairo_pattern_create_linear(0.0, 0.0, surface_width,
+      0.0);
+
+  cairo_pattern_add_color_stop_rgba(pattern, 0.0, 0.375, 0.508, 0.461, 0.75);
+  cairo_pattern_add_color_stop_rgba(pattern, ui->progress, 0.242, 0.703, 0.539,
+      0.75);
+  cairo_pattern_add_color_stop_rgba(pattern, ui->progress + 0.0001, 0, 0, 0,
+      0.75);
+  cairo_pattern_add_color_stop_rgba(pattern, 1.0, 0, 0, 0, 0.75);
+  cairo_set_source(cr, pattern);
+
+  cairo_arc (cr, x + width - radius, y + radius, radius, -90 * degrees,
+      0 * degrees);
+  cairo_arc (cr, x + width - radius, y + height - radius, radius, 0 * degrees,
+      90 * degrees);
+  cairo_arc (cr, x + radius, y + height - radius, radius, 90 * degrees,
+      180 * degrees);
+  cairo_arc (cr, x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
+  cairo_close_path (cr);
+
+  cairo_fill_preserve(cr);
+
+  cairo_set_source_rgba (cr, 0.0, 0.0, 0.0, 1.0);
+  cairo_stroke (cr);
 
   // We are done drawing
   return TRUE;
@@ -375,8 +430,8 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         if (actor == ui->control_play_toggle) {
           toggle_playing (ui);
 
-        } else if (actor == ui->control_seek1 ||
-            actor == ui->control_seek2 || actor == ui->control_seekbar) {
+        } else if (actor == ui->control_seek_bg ||
+            actor == ui->control_seekbar) {
           gfloat x, y, dist;
           gint64 progress;
 
@@ -390,7 +445,10 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
           progress = ui->engine->media_duration * (dist / ui->seek_width);
           engine_seek (ui->engine, progress, FALSE);
-          clutter_actor_set_size (ui->control_seekbar, dist, ui->seek_height);
+
+          ui->progress = (float)progress / ui->engine->media_duration;
+          // Invalidate calls a redraw of the canvas
+          clutter_content_invalidate (ui->seek_canvas);
 
         } else if (actor == ui->vol_int || actor == ui->vol_int_bg) {
           gfloat x, y, dist;
@@ -466,11 +524,11 @@ load_controls (UserInterface * ui)
   gchar *icon_files[8];
   gchar *duration_str = NULL;
   gint c;
-  guint8 gradient_pixels[8];
-  ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0x88 };
+  gfloat pos;
+  ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xaa };
   ClutterColor control_color2 = { 0xff, 0xff, 0xff, 0xff };
   ClutterColor palette_color, palette_second_color;
-  ClutterContent *gradient_image, *canvas;
+  ClutterContent *canvas;
   ClutterLayoutManager *controls_layout = NULL;
   ClutterLayoutManager *middle_box_layout = NULL;
   ClutterLayoutManager *bottom_box_layout = NULL;
@@ -534,7 +592,7 @@ load_controls (UserInterface * ui)
 
   // The actor now owns the canvas
   g_object_unref (canvas);
-  g_signal_connect (canvas, "draw", G_CALLBACK (draw_rounded_rectangle),
+  g_signal_connect (canvas, "draw", G_CALLBACK (draw_background),
       &control_color1);
   // Invalidate the canvas, so that we can draw before the main loop starts
   clutter_content_invalidate (canvas);
@@ -619,47 +677,29 @@ load_controls (UserInterface * ui)
   seek_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (seek_box, seek_box_layout);
 
-  // background box rectangle shows as the border
-  ui->control_seek1 = clutter_actor_new ();
-  clutter_actor_set_background_color (ui->control_seek1, &control_color2);
-  clutter_actor_set_opacity (ui->control_seek1, 255);
-  clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek1);
-  clutter_actor_add_constraint (ui->control_seek1,
+  // Background holder for the seekbar
+  ui->control_seek_bg = clutter_actor_new ();
+  clutter_actor_set_background_color (ui->control_seek_bg, &control_color1);
+  clutter_actor_set_opacity (ui->control_seek_bg, 0);
+  clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek_bg);
+  clutter_actor_add_constraint (ui->control_seekbar,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
-  clutter_actor_add_constraint (ui->control_seek1,
+  clutter_actor_add_constraint (ui->control_seekbar,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0));
 
-  // smaller background rectangle inside seek1 to create a border
-  ui->control_seek2 = clutter_actor_new ();
-  control_color1.alpha = 0xff;
-  clutter_actor_set_background_color (ui->control_seek2, &control_color1);
-  clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek2);
-  clutter_actor_set_opacity (ui->control_seek2, 255);
-  clutter_actor_set_position (ui->control_seek2, SEEK_BORDER, SEEK_BORDER);
+  // Seek progress bar
+  ui->seek_canvas = clutter_canvas_new();
+  clutter_canvas_set_size (CLUTTER_CANVAS (ui->seek_canvas),
+      ui->media_width * CONTROLS_WIDTH_RATIO,
+      (ui->media_height * CONTROLS_HEIGHT_RATIO ) /  5);
+  ui->control_seekbar = clutter_actor_new();
+  clutter_actor_set_content (ui->control_seekbar, ui->seek_canvas);
 
-  clutter_color_from_string (&palette_color, "#608276ff");
-  clutter_color_from_string (&palette_second_color, "#3eb48aff");
+  pos = 0.0;
+  g_signal_connect (ui->seek_canvas, "draw", G_CALLBACK (draw_progressbar), ui);
+  clutter_content_invalidate (ui->seek_canvas);
 
-  gradient_pixels[0] = palette_color.red;
-  gradient_pixels[1] = palette_color.green;
-  gradient_pixels[2] = palette_color.blue;
-  gradient_pixels[3] = palette_color.alpha;
-  gradient_pixels[4] = palette_second_color.red;
-  gradient_pixels[5] = palette_second_color.green;
-  gradient_pixels[6] = palette_second_color.blue;
-  gradient_pixels[7] = palette_second_color.alpha;
-
-  gradient_image = clutter_image_new ();
-  if (!clutter_image_set_data (CLUTTER_IMAGE (gradient_image),
-          gradient_pixels, COGL_PIXEL_FORMAT_RGBA_8888, 2, 1, 4, NULL))
-    g_warning ("error setting image");
-
-  // progress rectangle
-  ui->control_seekbar = clutter_actor_new ();
-  clutter_actor_set_content (ui->control_seekbar, gradient_image);
-  clutter_actor_set_opacity (ui->control_seekbar, 255);
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seekbar);
-  clutter_actor_set_position (ui->control_seekbar, SEEK_BORDER, SEEK_BORDER);
 
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), seek_box, TRUE,   /* expand */
       FALSE,                    /* x-fill */
@@ -704,6 +744,7 @@ load_controls (UserInterface * ui)
   vol_int_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (vol_int_box, vol_int_box_layout);
 
+  control_color1.alpha = 0xff;
   ui->vol_int_bg = clutter_actor_new ();
   clutter_actor_set_background_color (ui->vol_int_bg, &control_color1);
   clutter_actor_add_child (CLUTTER_ACTOR (vol_int_box), ui->vol_int_bg);
@@ -904,9 +945,10 @@ progress_update_seekbar (gpointer data)
 
       pos = query_position (engine);
       progress = (float) pos / engine->media_duration;
+      ui->progress = progress;
 
-      clutter_actor_set_size (ui->control_seekbar, progress * ui->seek_width,
-          ui->seek_height);
+      // Invalidate calls a redraw of the canvas
+      clutter_content_invalidate (ui->seek_canvas);
     }
   }
 
@@ -1110,11 +1152,12 @@ update_controls_size (UserInterface * ui)
   ui->seek_height =
       ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 2.0f * SEEK_BORDER;
 
-  clutter_actor_set_size (ui->control_seek1,
+  clutter_actor_set_size (ui->control_seek_bg,
       ui->seek_width + 2.0f * SEEK_BORDER,
       ui->seek_height + 2.0f * SEEK_BORDER);
-
-  clutter_actor_set_size (ui->control_seek2, ui->seek_width, ui->seek_height);
+  clutter_actor_set_size (ui->control_seekbar,
+      ui->seek_width + 2.0f * SEEK_BORDER,
+      ui->seek_height + 2.0f * SEEK_BORDER);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout),
       ctl_height * 0.15f);
@@ -1186,9 +1229,8 @@ interface_init (UserInterface * ui)
   ui->control_title = NULL;
   ui->control_play_toggle = NULL;
 
-  ui->control_seek1 = NULL;
-  ui->control_seek2 = NULL;
   ui->control_seekbar = NULL;
+  ui->control_seek_bg = NULL;
   ui->control_pos = NULL;
 
   ui->volume_box = NULL;
@@ -1207,6 +1249,8 @@ interface_init (UserInterface * ui)
 
   ui->engine = NULL;
   ui->screensaver = NULL;
+
+  ui->progress = 0;
 }
 
 gboolean
