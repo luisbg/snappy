@@ -35,7 +35,7 @@
 // Declaration of static functions
 static gboolean controls_timeout_cb (gpointer data);
 static gboolean draw_rounded_rectangle (ClutterCanvas * canvas, cairo_t * cr,
-    int surface_width, int surface_height);
+    int surface_width, int surface_height, ClutterColor *color);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
     UserInterface * ui);
 static void load_controls (UserInterface * ui);
@@ -74,7 +74,7 @@ controls_timeout_cb (gpointer data)
 
 static gboolean
 draw_rounded_rectangle (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
-    int surface_height)
+    int surface_height, ClutterColor *color)
 {
   /* rounded rectangle taken from:
    *
@@ -82,6 +82,7 @@ draw_rounded_rectangle (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
    *
    */
   double x, y, width, height, aspect, corner_radius, radius, degrees;
+  double red, green, blue, alpha;
 
   x = 1.0;
   y = 1.0;
@@ -108,7 +109,12 @@ draw_rounded_rectangle (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
   cairo_arc (cr, x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
   cairo_close_path (cr);
 
-  cairo_set_source_rgba (cr, 0.0, 0.0, 0.0, 0.5);
+  red = (double)color->red / 256.0;
+  green = (double)color->green / 256.0;
+  blue = (double)color->blue / 256.0;
+  alpha = (double)color->alpha / 256.0;
+
+  cairo_set_source_rgba (cr, red, green, blue, alpha);
   cairo_fill (cr);
 
   // We are done drawing
@@ -461,7 +467,7 @@ load_controls (UserInterface * ui)
   gchar *duration_str = NULL;
   gint c;
   guint8 gradient_pixels[8];
-  ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xff };
+  ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0x88 };
   ClutterColor control_color2 = { 0xff, 0xff, 0xff, 0xff };
   ClutterColor palette_color, palette_second_color;
   ClutterContent *gradient_image, *canvas;
@@ -528,7 +534,8 @@ load_controls (UserInterface * ui)
 
   // The actor now owns the canvas
   g_object_unref (canvas);
-  g_signal_connect (canvas, "draw", G_CALLBACK (draw_rounded_rectangle), NULL);
+  g_signal_connect (canvas, "draw", G_CALLBACK (draw_rounded_rectangle),
+      &control_color1);
   // Invalidate the canvas, so that we can draw before the main loop starts
   clutter_content_invalidate (canvas);
 
@@ -624,6 +631,7 @@ load_controls (UserInterface * ui)
 
   // smaller background rectangle inside seek1 to create a border
   ui->control_seek2 = clutter_actor_new ();
+  control_color1.alpha = 0xff;
   clutter_actor_set_background_color (ui->control_seek2, &control_color1);
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seek2);
   clutter_actor_set_opacity (ui->control_seek2, 255);
