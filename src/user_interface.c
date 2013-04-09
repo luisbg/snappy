@@ -322,6 +322,10 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           pos = CLAMP (pos, 0, ui->engine->media_duration);
           engine_seek (ui->engine, pos, FALSE);
 
+          ui->playback_position = (float)pos / ui->engine->media_duration;
+          // Invalidate calls a redraw of the canvas
+          clutter_content_invalidate (ui->seek_canvas);
+
           handled = TRUE;
           break;
         }
