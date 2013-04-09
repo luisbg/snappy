@@ -545,9 +545,6 @@ load_controls (UserInterface * ui)
   ClutterLayoutManager *middle_box_layout = NULL;
   ClutterLayoutManager *bottom_box_layout = NULL;
   ClutterLayoutManager *volume_box_layout = NULL;
-  ClutterLayoutManager *seek_box_layout = NULL;
-  ClutterLayoutManager *vol_int_box_layout = NULL;
-  ClutterActor *seek_box = NULL;
   ClutterActor *middle_box = NULL;
   ClutterActor *bottom_box = NULL;
   ClutterActor *vol_int_box = NULL;
@@ -683,12 +680,6 @@ load_controls (UserInterface * ui)
   ui->pos_n_vol_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (ui->pos_n_vol_box, ui->pos_n_vol_layout);
 
-  // Controls seek
-  seek_box_layout = clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
-      CLUTTER_BIN_ALIGNMENT_FIXED);
-  seek_box = clutter_actor_new ();
-  clutter_actor_set_layout_manager (seek_box, seek_box_layout);
-
   // Seek progress bar
   ui->seek_canvas = clutter_canvas_new();
   clutter_canvas_set_size (CLUTTER_CANVAS (ui->seek_canvas),
@@ -704,10 +695,9 @@ load_controls (UserInterface * ui)
   g_signal_connect (ui->seek_canvas, "draw", G_CALLBACK (draw_progressbar), ui);
   clutter_content_invalidate (ui->seek_canvas);
 
-  clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seekbar);
-
   // Add seek box to Position and Volume Layout
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), seek_box, TRUE,   /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout),
+      ui->control_seekbar, TRUE,   /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
@@ -744,11 +734,7 @@ load_controls (UserInterface * ui)
   clutter_actor_add_child (ui->volume_box, ui->volume_low);
 
   // Controls volume intensity
-  vol_int_box_layout =
-      clutter_bin_layout_new (CLUTTER_BIN_ALIGNMENT_FIXED,
-      CLUTTER_BIN_ALIGNMENT_FIXED);
   vol_int_box = clutter_actor_new ();
-  clutter_actor_set_layout_manager (vol_int_box, vol_int_box_layout);
 
   ui->vol_int_canvas = clutter_canvas_new();
   clutter_canvas_set_size (CLUTTER_CANVAS (ui->vol_int_canvas),
