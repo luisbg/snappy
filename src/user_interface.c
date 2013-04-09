@@ -91,7 +91,7 @@ draw_background (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
   width = surface_width - 2.0;
   height = surface_height - 2.0;
   aspect = 1.0;                 // aspect ratio
-  corner_radius = height / 10.0;        // and corner curvature radius
+  corner_radius = height / 15.0;        // and corner curvature radius
 
   radius = corner_radius / aspect;
   degrees = M_PI / 180.0;
@@ -149,7 +149,7 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
   width = surface_width - 2.0;
   height = surface_height - 2.0;
   aspect = 1.0;                 // aspect ratio
-  corner_radius = height / 5.0;        // and corner curvature radius
+  corner_radius = height / 4.0;        // and corner curvature radius
 
   radius = corner_radius / aspect;
   degrees = M_PI / 180.0;
