@@ -105,7 +105,8 @@ struct _UserInterface
 
   GtkWidget *window, *box, *clutter_widget;
 
-  ClutterColor stage_color, control_color1, control_color2;
+  ClutterColor stage_bg_color, text_color, border_color;
+  ClutterColor gradient_start, gradient_finish;
 
   ClutterActor *stage;
   ClutterActor *texture;

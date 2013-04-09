@@ -35,7 +35,7 @@
 // Declaration of static functions
 static gboolean controls_timeout_cb (gpointer data);
 static gboolean draw_background (ClutterCanvas * canvas, cairo_t * cr,
-    int surface_width, int surface_height, ClutterColor *color);
+    int surface_width, int surface_height, UserInterface * ui);
 static gboolean draw_progressbar (ClutterCanvas * canvas, cairo_t * cr,
     int surface_width, int surface_height, UserInterface * ui);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
@@ -76,7 +76,7 @@ controls_timeout_cb (gpointer data)
 
 static gboolean
 draw_background (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
-    int surface_height, ClutterColor *color)
+    int surface_height, UserInterface * ui)
 {
   /* rounded rectangle taken from:
    *
@@ -111,13 +111,24 @@ draw_background (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
   cairo_arc (cr, x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
   cairo_close_path (cr);
 
-  red = (double)color->red / 256.0;
-  green = (double)color->green / 256.0;
-  blue = (double)color->blue / 256.0;
-  alpha = (double)color->alpha / 256.0;
+  red = (double)ui->stage_bg_color.red / 256.0;
+  green = (double)ui->stage_bg_color.green / 256.0;
+  blue = (double)ui->stage_bg_color.blue / 256.0;
+  alpha = (double)ui->stage_bg_color.alpha / 256.0;
 
   cairo_set_source_rgba (cr, red, green, blue, alpha);
-  cairo_fill (cr);
+  cairo_close_path (cr);
+
+  cairo_fill_preserve(cr);
+
+  red = (double)ui->border_color.red / 256.0;
+  green = (double)ui->border_color.green / 256.0;
+  blue = (double)ui->border_color.blue / 256.0;
+  alpha = (double)ui->border_color.alpha / 256.0;
+
+  cairo_set_source_rgba (cr, red, green, blue, alpha);
+  cairo_stroke (cr);
+
 
   // We are done drawing
   return TRUE;
@@ -159,12 +170,21 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
     position = ui->volume;
   }
 
-  cairo_pattern_add_color_stop_rgba(pattern, 0.0, 0.375, 0.508, 0.461, 0.75);
-  cairo_pattern_add_color_stop_rgba(pattern, position, 0.242, 0.703, 0.539,
-      0.75);
+  red = (double)ui->gradient_start.red / 256.0;
+  green = (double)ui->gradient_start.green / 256.0;
+  blue = (double)ui->gradient_start.blue / 256.0;
+  alpha = (double)ui->gradient_start.alpha / 256.0;
+  cairo_pattern_add_color_stop_rgba(pattern, 0.0, red, green, blue, alpha);
+
+  red = (double)ui->gradient_finish.red / 256.0;
+  green = (double)ui->gradient_finish.green / 256.0;
+  blue = (double)ui->gradient_finish.blue / 256.0;
+  alpha = (double)ui->gradient_finish.alpha / 256.0;
+  cairo_pattern_add_color_stop_rgba(pattern, position, red, green, blue, alpha);
+
   cairo_pattern_add_color_stop_rgba(pattern, position + 0.0001, 0, 0, 0,
-      0.75);
-  cairo_pattern_add_color_stop_rgba(pattern, 1.0, 0, 0, 0, 0.75);
+      0.0);
+  cairo_pattern_add_color_stop_rgba(pattern, 1.0, 0, 0, 0, 0.0);
   cairo_set_source(cr, pattern);
 
   cairo_arc (cr, x + width - radius, y + radius, radius, -90 * degrees,
@@ -178,7 +198,12 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
 
   cairo_fill_preserve(cr);
 
-  cairo_set_source_rgba (cr, 0.0, 0.0, 0.0, 1.0);
+  red = (double)ui->border_color.red / 256.0;
+  green = (double)ui->border_color.green / 256.0;
+  blue = (double)ui->border_color.blue / 256.0;
+  alpha = (double)ui->border_color.alpha / 256.0;
+
+  cairo_set_source_rgba (cr, red, green, blue, alpha);
   cairo_stroke (cr);
 
   // We are done drawing
@@ -538,8 +563,7 @@ load_controls (UserInterface * ui)
   gchar *duration_str = NULL;
   gint c;
   gfloat pos;
-  ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xaa };
-  ClutterColor control_color2 = { 0xff, 0xff, 0xff, 0xff };
+
   ClutterContent *canvas;
   ClutterLayoutManager *controls_layout = NULL;
   ClutterLayoutManager *middle_box_layout = NULL;
@@ -601,8 +625,7 @@ load_controls (UserInterface * ui)
 
   // The actor now owns the canvas
   g_object_unref (canvas);
-  g_signal_connect (canvas, "draw", G_CALLBACK (draw_background),
-      &control_color1);
+  g_signal_connect (canvas, "draw", G_CALLBACK (draw_background), ui);
   // Invalidate the canvas, so that we can draw before the main loop starts
   clutter_content_invalidate (canvas);
 
@@ -632,7 +655,7 @@ load_controls (UserInterface * ui)
 
   // Controls title
   ui->control_title = clutter_text_new_full ("Sans 32px",
-      cut_long_filename (ui->filename, ui->title_length), &control_color2);
+      cut_long_filename (ui->filename, ui->title_length), &ui->text_color);
   if (strcmp (ui->filename, "") == 0) {
     clutter_text_set_text (CLUTTER_TEXT (ui->control_title),
         "Drag and drop a file here to play it");
@@ -739,7 +762,7 @@ load_controls (UserInterface * ui)
   ui->vol_int_canvas = clutter_canvas_new();
   clutter_canvas_set_size (CLUTTER_CANVAS (ui->vol_int_canvas),
       ui->media_width * CONTROLS_WIDTH_RATIO,
-      (ui->media_height * CONTROLS_HEIGHT_RATIO ) /  5);
+      (ui->media_height * CONTROLS_HEIGHT_RATIO) / 5);
   ui->vol_int = clutter_actor_new();
   clutter_actor_set_content (ui->vol_int, ui->vol_int_canvas);
   clutter_actor_add_constraint (ui->vol_int,
@@ -769,7 +792,7 @@ load_controls (UserInterface * ui)
   // Controls position text
   duration_str = g_strdup_printf ("   0:00:00 | %s", ui->duration_str);
   ui->control_pos = clutter_text_new_full ("Sans 22px", duration_str,
-      &control_color2);
+      &ui->text_color);
   clutter_actor_add_child (middle_box, ui->control_pos);
 
   // Add middle box (volume and text position) to Position and Volume Layout
@@ -1245,6 +1268,17 @@ interface_init (UserInterface * ui)
   ui->screensaver = NULL;
 
   ui->playback_position = 0.0;
+
+  ClutterColor stage_bg_color = { 0x21, 0x22, 0x28, 0xaa };
+  ui->stage_bg_color = stage_bg_color;
+  ClutterColor text_color = { 0xff, 0xff, 0xff, 0xff };
+  ui->text_color = text_color;
+  ClutterColor border_color = { 0x48, 0x4a, 0x52, 0xaa };
+  ui->border_color = border_color;
+  ClutterColor gradient_start = { 0x60, 0x82, 0x76, 0xff };
+  ui->gradient_start = gradient_start;
+  ClutterColor gradient_finish = { 0x3e, 0xb4, 0x8a, 0xff };
+  ui->gradient_finish = gradient_finish;
 }
 
 gboolean
@@ -1344,7 +1378,6 @@ interface_play_next_or_prev (UserInterface * ui, gboolean next)
 void
 interface_start (UserInterface * ui, gchar * uri)
 {
-  ClutterColor stage_color = { 0x00, 0x00, 0x00, 0x00 };
   GtkSettings *gtk_settings;
   GdkScreen *screen;
   gint screen_width, screen_height;
@@ -1420,7 +1453,8 @@ interface_start (UserInterface * ui, gchar * uri)
   /* Get the stage */
   ui->stage =
       gtk_clutter_embed_get_stage (GTK_CLUTTER_EMBED (ui->clutter_widget));
-  clutter_actor_set_background_color (CLUTTER_ACTOR (ui->stage), &stage_color);
+  clutter_actor_set_background_color (CLUTTER_ACTOR (ui->stage),
+      &ui->stage_bg_color);
   /* Set the size of the widget,
    * because we should not set the size of its stage when using GtkClutterEmbed.
    */
