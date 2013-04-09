@@ -662,7 +662,7 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
-  // Controls box
+  // Position, volume and streams box
   ui->pos_n_vol_layout = clutter_box_layout_new ();
   clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout),
       CLUTTER_ORIENTATION_VERTICAL);
@@ -694,6 +694,7 @@ load_controls (UserInterface * ui)
 
   clutter_actor_add_child (CLUTTER_ACTOR (seek_box), ui->control_seekbar);
 
+  // Add seek box to Position and Volume Layout
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), seek_box, TRUE,   /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
@@ -767,6 +768,7 @@ load_controls (UserInterface * ui)
       &control_color2);
   clutter_actor_add_child (middle_box, ui->control_pos);
 
+  // Add middle box (volume and text position) to Position and Volume Layout
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), middle_box, TRUE, /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
@@ -808,6 +810,7 @@ load_controls (UserInterface * ui)
     }
     clutter_actor_add_child (bottom_box, ui->audio_stream_toggle);
 
+    // Add bottom box (different streams) to Position and Volume Layout
     clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), bottom_box, TRUE,       /* expand */
         FALSE,                  /* x-fill */
         FALSE,                  /* y-fill */
