@@ -130,6 +130,7 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
 {
   double x, y, width, height, aspect, corner_radius, radius, degrees;
   double red, green, blue, alpha;
+  gfloat position;
   cairo_pattern_t *pattern;
 
   x = 1.0;
@@ -150,10 +151,18 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
   pattern = cairo_pattern_create_linear(0.0, 0.0, surface_width,
       0.0);
 
+  if (canvas == ui->seek_canvas) {
+    // if called for seek canvas, update playback position
+    position = ui->progress;
+  } else {
+    // if called for volume canvas, update volume level
+    position = ui->volume;
+  }
+
   cairo_pattern_add_color_stop_rgba(pattern, 0.0, 0.375, 0.508, 0.461, 0.75);
-  cairo_pattern_add_color_stop_rgba(pattern, ui->progress, 0.242, 0.703, 0.539,
+  cairo_pattern_add_color_stop_rgba(pattern, position, 0.242, 0.703, 0.539,
       0.75);
-  cairo_pattern_add_color_stop_rgba(pattern, ui->progress + 0.0001, 0, 0, 0,
+  cairo_pattern_add_color_stop_rgba(pattern, position + 0.0001, 0, 0, 0,
       0.75);
   cairo_pattern_add_color_stop_rgba(pattern, 1.0, 0, 0, 0, 0.75);
   cairo_set_source(cr, pattern);
@@ -449,17 +458,18 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           // Invalidate calls a redraw of the canvas
           clutter_content_invalidate (ui->seek_canvas);
 
-        } else if (actor == ui->vol_int || actor == ui->vol_int_bg) {
+        } else if (actor == ui->vol_int) {
           gfloat x, y, dist;
           gdouble volume;
 
-          clutter_actor_get_transformed_position (ui->vol_int_bg, &x, &y);
+          clutter_actor_get_transformed_position (ui->vol_int, &x, &y);
           dist = bev->x - x;
           dist = CLAMP (dist, 0, ui->volume_width);
 
           volume = dist / ui->volume_width;
           g_object_set (G_OBJECT (ui->engine->player), "volume", volume, NULL);
-          clutter_actor_set_size (ui->vol_int, dist, ui->volume_height);
+          ui->volume = (float)volume;
+          clutter_content_invalidate (ui->vol_int_canvas);
 
         } else if (actor == ui->control_bg || actor == ui->control_title
             || actor == ui->control_pos) {
@@ -738,16 +748,22 @@ load_controls (UserInterface * ui)
   vol_int_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (vol_int_box, vol_int_box_layout);
 
-  control_color1.alpha = 0xff;
-  ui->vol_int_bg = clutter_actor_new ();
-  clutter_actor_set_background_color (ui->vol_int_bg, &control_color1);
-  clutter_actor_add_child (CLUTTER_ACTOR (vol_int_box), ui->vol_int_bg);
-  clutter_actor_set_position (ui->vol_int_bg, 0, 0);
+  ui->vol_int_canvas = clutter_canvas_new();
+  clutter_canvas_set_size (CLUTTER_CANVAS (ui->vol_int_canvas),
+      ui->media_width * CONTROLS_WIDTH_RATIO,
+      (ui->media_height * CONTROLS_HEIGHT_RATIO ) /  5);
+  ui->vol_int = clutter_actor_new();
+  clutter_actor_set_content (ui->vol_int, ui->vol_int_canvas);
+  clutter_actor_add_constraint (ui->vol_int,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
+  clutter_actor_add_constraint (ui->vol_int,
+      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0));
 
-  ui->vol_int = clutter_actor_new ();
-  clutter_actor_set_background_color (ui->vol_int, &control_color2);
-  clutter_actor_insert_child_above (vol_int_box, ui->vol_int, ui->vol_int_bg);
+  g_signal_connect (ui->vol_int_canvas, "draw", G_CALLBACK (draw_progressbar),
+      ui);
+  clutter_content_invalidate (ui->vol_int_canvas);
 
+  clutter_actor_add_child (vol_int_box, ui->vol_int);
   clutter_actor_add_child (ui->volume_box, vol_int_box);
 
   // Controls volume high
@@ -1165,7 +1181,7 @@ update_controls_size (UserInterface * ui)
       clutter_actor_get_width (CLUTTER_ACTOR (ui->control_pos))) *
       VOLUME_WIDTH_RATIO;
   ui->volume_height = ctl_height * MAIN_BOX_H * VOLUME_HEIGHT_RATIO;
-  clutter_actor_set_size (ui->vol_int_bg, ui->volume_width, ui->volume_height);
+  clutter_actor_set_size (ui->vol_int, ui->volume_width, ui->volume_height);
 
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
@@ -1186,8 +1202,8 @@ update_volume (UserInterface * ui, gdouble volume)
   if (volume == -1)
     g_object_get (G_OBJECT (ui->engine->player), "volume", &volume, NULL);
 
-  clutter_actor_set_size (ui->vol_int, volume * ui->volume_width,
-      ui->volume_height);
+  ui->volume = (float)volume;
+  clutter_content_invalidate (ui->vol_int_canvas);
 
   return TRUE;
 }

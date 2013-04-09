@@ -88,7 +88,7 @@ struct _UserInterface
   guint media_width, media_height;
   guint stage_width, stage_height;
   gint64 media_duration;
-  gfloat progress;
+  gfloat progress, volume;
   gfloat seek_width, seek_height;
   gfloat volume_width, volume_height;
 
@@ -123,6 +123,7 @@ struct _UserInterface
   ClutterActor *main_box;
 
   ClutterContent *seek_canvas;
+  ClutterContent *vol_int_canvas;
 
   ClutterLayoutManager *main_box_layout;
   ClutterLayoutManager *info_box_layout;
