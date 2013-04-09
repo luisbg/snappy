@@ -536,7 +536,6 @@ load_controls (UserInterface * ui)
   gfloat pos;
   ClutterColor control_color1 = { 0x00, 0x00, 0x00, 0xaa };
   ClutterColor control_color2 = { 0xff, 0xff, 0xff, 0xff };
-  ClutterColor palette_color, palette_second_color;
   ClutterContent *canvas;
   ClutterLayoutManager *controls_layout = NULL;
   ClutterLayoutManager *middle_box_layout = NULL;
@@ -698,7 +697,6 @@ load_controls (UserInterface * ui)
   clutter_actor_add_constraint (ui->control_seekbar,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0));
 
-  pos = 0.0;
   g_signal_connect (ui->seek_canvas, "draw", G_CALLBACK (draw_progressbar), ui);
   clutter_content_invalidate (ui->seek_canvas);
 
