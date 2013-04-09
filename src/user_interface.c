@@ -153,7 +153,7 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
 
   if (canvas == ui->seek_canvas) {
     // if called for seek canvas, update playback position
-    position = ui->progress;
+    position = ui->playback_position;
   } else {
     // if called for volume canvas, update volume level
     position = ui->volume;
@@ -441,7 +441,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         } else if (actor == ui->control_seekbar) {
           gfloat x, y, dist;
-          gint64 progress;
+          gint64 pos;
 
           clutter_actor_get_transformed_position (ui->control_seekbar, &x, &y);
           dist = bev->x - x;
@@ -451,10 +451,10 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
             update_media_duration (ui->engine);
           }
 
-          progress = ui->engine->media_duration * (dist / ui->seek_width);
-          engine_seek (ui->engine, progress, FALSE);
+          pos = ui->engine->media_duration * (dist / ui->seek_width);
+          engine_seek (ui->engine, pos, FALSE);
 
-          ui->progress = (float)progress / ui->engine->media_duration;
+          ui->playback_position = (float)pos / ui->engine->media_duration;
           // Invalidate calls a redraw of the canvas
           clutter_content_invalidate (ui->seek_canvas);
 
@@ -950,12 +950,10 @@ progress_update_seekbar (gpointer data)
 
   if (ui->controls_showing && !engine->queries_blocked) {
     if (engine->media_duration != -1) {
-      gint64 pos;
-      gfloat progress = 0.0;
+      gfloat pos;
 
-      pos = query_position (engine);
-      progress = (float) pos / engine->media_duration;
-      ui->progress = progress;
+      pos = (float) query_position (engine) / engine->media_duration;
+      ui->playback_position = pos;
 
       // Invalidate calls a redraw of the canvas
       clutter_content_invalidate (ui->seek_canvas);
@@ -1256,7 +1254,7 @@ interface_init (UserInterface * ui)
   ui->engine = NULL;
   ui->screensaver = NULL;
 
-  ui->progress = 0;
+  ui->playback_position = 0.0;
 }
 
 gboolean

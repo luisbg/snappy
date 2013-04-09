@@ -88,7 +88,7 @@ struct _UserInterface
   guint media_width, media_height;
   guint stage_width, stage_height;
   gint64 media_duration;
-  gfloat progress, volume;
+  gfloat playback_position, volume;
   gfloat seek_width, seek_height;
   gfloat volume_width, volume_height;
 
