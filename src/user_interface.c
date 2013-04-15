@@ -1269,13 +1269,13 @@ interface_init (UserInterface * ui)
 
   ui->playback_position = 0.0;
 
-  ClutterColor stage_bg_color = { 0x21, 0x22, 0x28, 0xaa };
+  ClutterColor stage_bg_color = { 0x00, 0x00, 0x00, 0xda };
   ui->stage_bg_color = stage_bg_color;
   ClutterColor text_color = { 0xff, 0xff, 0xff, 0xff };
   ui->text_color = text_color;
-  ClutterColor border_color = { 0x48, 0x4a, 0x52, 0xaa };
+  ClutterColor border_color = { 0xff, 0xff, 0xff, 0x26 };
   ui->border_color = border_color;
-  ClutterColor gradient_start = { 0x60, 0x82, 0x76, 0xff };
+  ClutterColor gradient_start = { 0x3e, 0xb4, 0x8a, 0xff };
   ui->gradient_start = gradient_start;
   ClutterColor gradient_finish = { 0x3e, 0xb4, 0x8a, 0xff };
   ui->gradient_finish = gradient_finish;
