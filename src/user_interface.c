@@ -566,7 +566,6 @@ load_controls (UserInterface * ui)
 
   ClutterContent *canvas;
   ClutterLayoutManager *controls_layout = NULL;
-  ClutterLayoutManager *middle_box_layout = NULL;
   ClutterLayoutManager *bottom_box_layout = NULL;
   ClutterLayoutManager *volume_box_layout = NULL;
   ClutterActor *middle_box = NULL;
@@ -693,7 +692,7 @@ load_controls (UserInterface * ui)
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
-      CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
+      CLUTTER_BOX_ALIGNMENT_START);    /* y-align */
 
   // Position, volume and streams box
   ui->pos_n_vol_layout = clutter_box_layout_new ();
@@ -724,15 +723,15 @@ load_controls (UserInterface * ui)
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
-      CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
+      CLUTTER_BOX_ALIGNMENT_START);    /* y-align */
 
   // Controls middle box
-  middle_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (middle_box_layout),
+  ui->middle_box_layout = clutter_box_layout_new ();
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (ui->middle_box_layout),
       CLUTTER_ORIENTATION_HORIZONTAL);
 
   middle_box = clutter_actor_new ();
-  clutter_actor_set_layout_manager (middle_box, middle_box_layout);
+  clutter_actor_set_layout_manager (middle_box, ui->middle_box_layout);
 
   // Controls volume box
   volume_box_layout = clutter_box_layout_new ();
@@ -796,11 +795,12 @@ load_controls (UserInterface * ui)
   clutter_actor_add_child (middle_box, ui->control_pos);
 
   // Add middle box (volume and text position) to Position and Volume Layout
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), middle_box, TRUE, /* expand */
-      FALSE,                    /* x-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), middle_box,
+      TRUE, /* expand */
+      TRUE,                    /* x-fill */
       FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
-      CLUTTER_BOX_ALIGNMENT_END);       /* y-align */
+      CLUTTER_BOX_ALIGNMENT_START,        /* x-align */
+      CLUTTER_BOX_ALIGNMENT_START);       /* y-align */
 
   if (FALSE) {                  // hide this buttons (TODO: optional Flag)
     // Controls bottom box
@@ -848,7 +848,7 @@ load_controls (UserInterface * ui)
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->pos_n_vol_box, FALSE,  /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
+      CLUTTER_BOX_ALIGNMENT_START,        /* x-align */
       CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
   // Controls subtitle toggle
@@ -1148,13 +1148,13 @@ update_controls_size (UserInterface * ui)
 
   if (ui->subtitles_available) {
     control_box_width =
-        ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT) + (icon_size * 0.72f);
+        ctl_width + (icon_size * 0.72f);
   } else {
-    control_box_width = ctl_width + ((ctl_width / BG_W) * SHADOW_RIGHT);
+    control_box_width = ctl_width;
   }
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->control_box),
-      control_box_width, ctl_height + ((ctl_height / BG_H) * SHADOW_BOTTOM));
+      control_box_width, ctl_height);
 
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
 
@@ -1165,20 +1165,20 @@ update_controls_size (UserInterface * ui)
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->main_box_layout),
-      ctl_height * 0.12f);
+      ctl_height * 0.10f);
 
   ui->seek_width = 12 +         // accomodate volume_box spacing
       (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO -
-      2.0f * SEEK_BORDER;
+      4.0f;
   ui->seek_height =
-      ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 2.0f * SEEK_BORDER;
+      ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 4.0f;
 
   clutter_actor_set_size (ui->control_seekbar,
-      ui->seek_width + 2.0f * SEEK_BORDER,
-      ui->seek_height + 2.0f * SEEK_BORDER);
+      ui->seek_width + 4.0f,
+      ui->seek_height + 4.0f);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout),
-      ctl_height * 0.15f);
+      ctl_height * 0.10f);
 
   progress_update_seekbar (ui);
 
@@ -1194,8 +1194,11 @@ update_controls_size (UserInterface * ui)
 
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
-  clutter_actor_set_size (ui->volume_high, icon_size * 1.2f, icon_size);        /* originally 120x100 */
+  clutter_actor_set_size (ui->volume_high, icon_size * 1.2f, icon_size);        /* originally 24x24 */
   clutter_actor_set_size (ui->subtitle_toggle, icon_size * 1.4f, icon_size);
+
+  clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->middle_box_layout),
+      ctl_width * 0.04f);
 
   if (FALSE) {                  // hide this buttons (TODO: optional Flag)
     clutter_actor_set_size (ui->video_stream_toggle, icon_size, icon_size);
@@ -1263,6 +1266,7 @@ interface_init (UserInterface * ui)
   ui->main_box_layout = NULL;
   ui->info_box_layout = NULL;
   ui->pos_n_vol_layout = NULL;
+  ui->middle_box_layout = NULL;
 
   ui->engine = NULL;
   ui->screensaver = NULL;

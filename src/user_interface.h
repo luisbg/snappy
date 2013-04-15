@@ -31,31 +31,21 @@
 #define CTL_SHOW_SEC 3
 #define CTL_FADE_DURATION G_TIME_SPAN_MILLISECOND / 4
 
-#define CTL_BORDER 0
-#define SHADOW_CORRECT 15
-#define CTL_SPACING 0
-
 #define CONTROLS_WIDTH_RATIO 0.48f
-#define CONTROLS_HEIGHT_RATIO 0.28f
+#define CONTROLS_HEIGHT_RATIO 0.20f
 #define CONTROLS_ASPECT_RATIO 4.0f
-
-#define BG_W 986.0f
-#define BG_H 162.0f
-#define SHADOW_RIGHT 18.0f
-#define SHADOW_BOTTOM 11.0f
 
 #define MAIN_BOX_W 0.95f
 #define MAIN_BOX_H 0.8f
 
-#define PLAY_TOGGLE_RATIO 0.45f
+#define PLAY_TOGGLE_RATIO 0.38f
 #define TITLE_RATIO 0.033f
 #define SEEK_WIDTH_RATIO 0.9f
-#define SEEK_HEIGHT_RATIO 0.15f
-#define SEEK_BORDER 2.0f
+#define SEEK_HEIGHT_RATIO 0.10f
 #define POS_RATIO 0.1f
 #define VOLUME_ICON_RATIO 0.2f
 #define VOLUME_WIDTH_RATIO 0.65f
-#define VOLUME_HEIGHT_RATIO 0.08f
+#define VOLUME_HEIGHT_RATIO 0.05f
 
 #define TITLE_LENGTH 40
 
@@ -129,6 +119,7 @@ struct _UserInterface
   ClutterLayoutManager *main_box_layout;
   ClutterLayoutManager *info_box_layout;
   ClutterLayoutManager *pos_n_vol_layout;
+  ClutterLayoutManager *middle_box_layout;
 
   GstEngine *engine;
   ScreenSaver *screensaver;
