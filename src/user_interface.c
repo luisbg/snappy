@@ -111,20 +111,20 @@ draw_background (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
   cairo_arc (cr, x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
   cairo_close_path (cr);
 
-  red = (double)ui->stage_bg_color.red / 256.0;
-  green = (double)ui->stage_bg_color.green / 256.0;
-  blue = (double)ui->stage_bg_color.blue / 256.0;
-  alpha = (double)ui->stage_bg_color.alpha / 256.0;
+  red = (double) ui->stage_bg_color.red / 256.0;
+  green = (double) ui->stage_bg_color.green / 256.0;
+  blue = (double) ui->stage_bg_color.blue / 256.0;
+  alpha = (double) ui->stage_bg_color.alpha / 256.0;
 
   cairo_set_source_rgba (cr, red, green, blue, alpha);
   cairo_close_path (cr);
 
-  cairo_fill_preserve(cr);
+  cairo_fill_preserve (cr);
 
-  red = (double)ui->border_color.red / 256.0;
-  green = (double)ui->border_color.green / 256.0;
-  blue = (double)ui->border_color.blue / 256.0;
-  alpha = (double)ui->border_color.alpha / 256.0;
+  red = (double) ui->border_color.red / 256.0;
+  green = (double) ui->border_color.green / 256.0;
+  blue = (double) ui->border_color.blue / 256.0;
+  alpha = (double) ui->border_color.alpha / 256.0;
 
   cairo_set_source_rgba (cr, red, green, blue, alpha);
   cairo_stroke (cr);
@@ -149,7 +149,7 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
   width = surface_width - 2.0;
   height = surface_height - 2.0;
   aspect = 1.0;                 // aspect ratio
-  corner_radius = height / 4.0;        // and corner curvature radius
+  corner_radius = height / 4.0; // and corner curvature radius
 
   radius = corner_radius / aspect;
   degrees = M_PI / 180.0;
@@ -159,8 +159,7 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
   cairo_paint (cr);
   cairo_restore (cr);
 
-  pattern = cairo_pattern_create_linear(0.0, 0.0, surface_width,
-      0.0);
+  pattern = cairo_pattern_create_linear (0.0, 0.0, surface_width, 0.0);
 
   if (canvas == ui->seek_canvas) {
     // if called for seek canvas, update playback position
@@ -170,22 +169,22 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
     position = ui->volume;
   }
 
-  red = (double)ui->gradient_start.red / 256.0;
-  green = (double)ui->gradient_start.green / 256.0;
-  blue = (double)ui->gradient_start.blue / 256.0;
-  alpha = (double)ui->gradient_start.alpha / 256.0;
-  cairo_pattern_add_color_stop_rgba(pattern, 0.0, red, green, blue, alpha);
+  red = (double) ui->gradient_start.red / 256.0;
+  green = (double) ui->gradient_start.green / 256.0;
+  blue = (double) ui->gradient_start.blue / 256.0;
+  alpha = (double) ui->gradient_start.alpha / 256.0;
+  cairo_pattern_add_color_stop_rgba (pattern, 0.0, red, green, blue, alpha);
 
-  red = (double)ui->gradient_finish.red / 256.0;
-  green = (double)ui->gradient_finish.green / 256.0;
-  blue = (double)ui->gradient_finish.blue / 256.0;
-  alpha = (double)ui->gradient_finish.alpha / 256.0;
-  cairo_pattern_add_color_stop_rgba(pattern, position, red, green, blue, alpha);
+  red = (double) ui->gradient_finish.red / 256.0;
+  green = (double) ui->gradient_finish.green / 256.0;
+  blue = (double) ui->gradient_finish.blue / 256.0;
+  alpha = (double) ui->gradient_finish.alpha / 256.0;
+  cairo_pattern_add_color_stop_rgba (pattern, position, red, green, blue,
+      alpha);
 
-  cairo_pattern_add_color_stop_rgba(pattern, position + 0.0001, 0, 0, 0,
-      0.0);
-  cairo_pattern_add_color_stop_rgba(pattern, 1.0, 0, 0, 0, 0.0);
-  cairo_set_source(cr, pattern);
+  cairo_pattern_add_color_stop_rgba (pattern, position + 0.0001, 0, 0, 0, 0.0);
+  cairo_pattern_add_color_stop_rgba (pattern, 1.0, 0, 0, 0, 0.0);
+  cairo_set_source (cr, pattern);
 
   cairo_arc (cr, x + width - radius, y + radius, radius, -90 * degrees,
       0 * degrees);
@@ -196,12 +195,12 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
   cairo_arc (cr, x + radius, y + radius, radius, 180 * degrees, 270 * degrees);
   cairo_close_path (cr);
 
-  cairo_fill_preserve(cr);
+  cairo_fill_preserve (cr);
 
-  red = (double)ui->border_color.red / 256.0;
-  green = (double)ui->border_color.green / 256.0;
-  blue = (double)ui->border_color.blue / 256.0;
-  alpha = (double)ui->border_color.alpha / 256.0;
+  red = (double) ui->border_color.red / 256.0;
+  green = (double) ui->border_color.green / 256.0;
+  blue = (double) ui->border_color.blue / 256.0;
+  alpha = (double) ui->border_color.alpha / 256.0;
 
   cairo_set_source_rgba (cr, red, green, blue, alpha);
   cairo_stroke (cr);
@@ -347,7 +346,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           pos = CLAMP (pos, 0, ui->engine->media_duration);
           engine_seek (ui->engine, pos, FALSE);
 
-          ui->playback_position = (float)pos / ui->engine->media_duration;
+          ui->playback_position = (float) pos / ui->engine->media_duration;
           // Invalidate calls a redraw of the canvas
           clutter_content_invalidate (ui->seek_canvas);
 
@@ -483,7 +482,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           pos = ui->engine->media_duration * (dist / ui->seek_width);
           engine_seek (ui->engine, pos, FALSE);
 
-          ui->playback_position = (float)pos / ui->engine->media_duration;
+          ui->playback_position = (float) pos / ui->engine->media_duration;
           // Invalidate calls a redraw of the canvas
           clutter_content_invalidate (ui->seek_canvas);
 
@@ -497,7 +496,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
           volume = dist / ui->volume_width;
           g_object_set (G_OBJECT (ui->engine->player), "volume", volume, NULL);
-          ui->volume = (float)volume;
+          ui->volume = (float) volume;
           clutter_content_invalidate (ui->vol_int_canvas);
 
         } else if (actor == ui->control_bg || actor == ui->control_title
@@ -692,7 +691,7 @@ load_controls (UserInterface * ui)
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
-      CLUTTER_BOX_ALIGNMENT_START);    /* y-align */
+      CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
   // Position, volume and streams box
   ui->pos_n_vol_layout = clutter_box_layout_new ();
@@ -703,11 +702,11 @@ load_controls (UserInterface * ui)
   clutter_actor_set_layout_manager (ui->pos_n_vol_box, ui->pos_n_vol_layout);
 
   // Seek progress bar
-  ui->seek_canvas = clutter_canvas_new();
+  ui->seek_canvas = clutter_canvas_new ();
   clutter_canvas_set_size (CLUTTER_CANVAS (ui->seek_canvas),
       ui->media_width * CONTROLS_WIDTH_RATIO,
-      (ui->media_height * CONTROLS_HEIGHT_RATIO ) /  5);
-  ui->control_seekbar = clutter_actor_new();
+      (ui->media_height * CONTROLS_HEIGHT_RATIO) / 5);
+  ui->control_seekbar = clutter_actor_new ();
   clutter_actor_set_content (ui->control_seekbar, ui->seek_canvas);
   clutter_actor_add_constraint (ui->control_seekbar,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
@@ -718,17 +717,16 @@ load_controls (UserInterface * ui)
   clutter_content_invalidate (ui->seek_canvas);
 
   // Add seek box to Position and Volume Layout
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout),
-      ui->control_seekbar, TRUE,   /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), ui->control_seekbar, TRUE,        /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_END,        /* x-align */
-      CLUTTER_BOX_ALIGNMENT_START);    /* y-align */
+      CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
   // Controls middle box
   ui->middle_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (ui->middle_box_layout),
-      CLUTTER_ORIENTATION_HORIZONTAL);
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (ui->
+          middle_box_layout), CLUTTER_ORIENTATION_HORIZONTAL);
 
   middle_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (middle_box, ui->middle_box_layout);
@@ -758,11 +756,11 @@ load_controls (UserInterface * ui)
   // Controls volume intensity
   vol_int_box = clutter_actor_new ();
 
-  ui->vol_int_canvas = clutter_canvas_new();
+  ui->vol_int_canvas = clutter_canvas_new ();
   clutter_canvas_set_size (CLUTTER_CANVAS (ui->vol_int_canvas),
       ui->media_width * CONTROLS_WIDTH_RATIO,
       (ui->media_height * CONTROLS_HEIGHT_RATIO) / 5);
-  ui->vol_int = clutter_actor_new();
+  ui->vol_int = clutter_actor_new ();
   clutter_actor_set_content (ui->vol_int, ui->vol_int_canvas);
   clutter_actor_add_constraint (ui->vol_int,
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
@@ -795,12 +793,11 @@ load_controls (UserInterface * ui)
   clutter_actor_add_child (middle_box, ui->control_pos);
 
   // Add middle box (volume and text position) to Position and Volume Layout
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), middle_box,
-      TRUE, /* expand */
-      TRUE,                    /* x-fill */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout), middle_box, TRUE, /* expand */
+      TRUE,                     /* x-fill */
       FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_START,        /* x-align */
-      CLUTTER_BOX_ALIGNMENT_START);       /* y-align */
+      CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
+      CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
   if (FALSE) {                  // hide this buttons (TODO: optional Flag)
     // Controls bottom box
@@ -848,7 +845,7 @@ load_controls (UserInterface * ui)
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->pos_n_vol_box, FALSE,  /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_START,        /* x-align */
+      CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
       CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
   // Controls subtitle toggle
@@ -1147,8 +1144,7 @@ update_controls_size (UserInterface * ui)
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
 
   if (ui->subtitles_available) {
-    control_box_width =
-        ctl_width + (icon_size * 0.72f);
+    control_box_width = ctl_width + (icon_size * 0.72f);
   } else {
     control_box_width = ctl_width;
   }
@@ -1161,28 +1157,28 @@ update_controls_size (UserInterface * ui)
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->info_box_layout),
       ctl_width * 0.04f);
 
-  font_name = g_strdup_printf ("Clear Sans Bold %dpx", (gint) (ctl_width * TITLE_RATIO));
+  font_name =
+      g_strdup_printf ("Clear Sans Bold %dpx",
+      (gint) (ctl_width * TITLE_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->main_box_layout),
       ctl_height * 0.10f);
 
   ui->seek_width = 12 +         // accomodate volume_box spacing
-      (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO -
-      4.0f;
-  ui->seek_height =
-      ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 4.0f;
+      (ctl_width * MAIN_BOX_W - icon_size) * SEEK_WIDTH_RATIO - 4.0f;
+  ui->seek_height = ctl_height * MAIN_BOX_H * SEEK_HEIGHT_RATIO - 4.0f;
 
   clutter_actor_set_size (ui->control_seekbar,
-      ui->seek_width + 4.0f,
-      ui->seek_height + 4.0f);
+      ui->seek_width + 4.0f, ui->seek_height + 4.0f);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout),
       ctl_height * 0.10f);
 
   progress_update_seekbar (ui);
 
-  font_name = g_strdup_printf ("Clear Sans %dpx", (gint) (ctl_height * POS_RATIO));
+  font_name =
+      g_strdup_printf ("Clear Sans %dpx", (gint) (ctl_height * POS_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_pos), font_name);
 
   ui->volume_width =
@@ -1214,7 +1210,7 @@ update_volume (UserInterface * ui, gdouble volume)
   if (volume == -1)
     g_object_get (G_OBJECT (ui->engine->player), "volume", &volume, NULL);
 
-  ui->volume = (float)volume;
+  ui->volume = (float) volume;
   clutter_content_invalidate (ui->vol_int_canvas);
 
   return TRUE;
