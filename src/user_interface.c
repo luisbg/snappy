@@ -654,7 +654,7 @@ load_controls (UserInterface * ui)
       clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.03));
 
   // Controls title
-  ui->control_title = clutter_text_new_full ("Sans 32px",
+  ui->control_title = clutter_text_new_full ("Clear Sans Bold 32px",
       cut_long_filename (ui->filename, ui->title_length), &ui->text_color);
   if (strcmp (ui->filename, "") == 0) {
     clutter_text_set_text (CLUTTER_TEXT (ui->control_title),
@@ -791,7 +791,7 @@ load_controls (UserInterface * ui)
 
   // Controls position text
   duration_str = g_strdup_printf ("   0:00:00 | %s", ui->duration_str);
-  ui->control_pos = clutter_text_new_full ("Sans 22px", duration_str,
+  ui->control_pos = clutter_text_new_full ("Clear Sans 22px", duration_str,
       &ui->text_color);
   clutter_actor_add_child (middle_box, ui->control_pos);
 
@@ -1161,7 +1161,7 @@ update_controls_size (UserInterface * ui)
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->info_box_layout),
       ctl_width * 0.04f);
 
-  font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_width * TITLE_RATIO));
+  font_name = g_strdup_printf ("Clear Sans Bold %dpx", (gint) (ctl_width * TITLE_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_title), font_name);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->main_box_layout),
@@ -1182,7 +1182,7 @@ update_controls_size (UserInterface * ui)
 
   progress_update_seekbar (ui);
 
-  font_name = g_strdup_printf ("Sans %dpx", (gint) (ctl_height * POS_RATIO));
+  font_name = g_strdup_printf ("Clear Sans %dpx", (gint) (ctl_height * POS_RATIO));
   clutter_text_set_font_name (CLUTTER_TEXT (ui->control_pos), font_name);
 
   ui->volume_width =

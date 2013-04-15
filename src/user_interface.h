@@ -48,7 +48,7 @@
 #define MAIN_BOX_H 0.8f
 
 #define PLAY_TOGGLE_RATIO 0.45f
-#define TITLE_RATIO 0.04f
+#define TITLE_RATIO 0.033f
 #define SEEK_WIDTH_RATIO 0.9f
 #define SEEK_HEIGHT_RATIO 0.15f
 #define SEEK_BORDER 2.0f
