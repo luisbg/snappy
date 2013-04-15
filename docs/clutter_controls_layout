@@ -12,24 +12,14 @@ ui->control_box (fixed alignment bin)
 			ui->control_play_toggle
 			ui->pos_n_vol_box (vertical alignment box)
 			[
-				seek_box (fixed alignment bin)
-				[
-					ui->control_seek1
-					ui->control_seek2
-					ui->control_seekbar
-				]
+				ui->control_seekbar (clutter actor draw_progressbar())
 
 				middle_box (horizontal alignment box)
 				[
 					volume_box (horizontal alignment box)
 					[
 						ui->volume_low
-						volume_intensity (fixed alignment bin)
-						[
-							ui->vol_int
-							ui->vol_int_bg
-						]
-
+						ui->vol_int (clutter actor draw_progressbar())
 						ui->volume_high
 					]
 
