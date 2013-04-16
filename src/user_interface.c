@@ -1122,7 +1122,7 @@ update_controls_size (UserInterface * ui)
   gchar *font_name;
   gfloat ctl_width, ctl_height;
   gfloat icon_size;
-  gfloat control_box_width;
+  gfloat control_box_width, control_box_height;
   gfloat main_box_width, main_box_height;
   gfloat main_box_horiz_pos, main_box_vert_pos;
 
@@ -1151,8 +1151,9 @@ update_controls_size (UserInterface * ui)
     control_box_width = ctl_width;
   }
 
+  control_box_height = ctl_height * 0.85;
   clutter_actor_set_size (CLUTTER_ACTOR (ui->control_box),
-      control_box_width, ctl_height);
+      control_box_width, control_box_height);
 
   clutter_actor_set_size (ui->control_play_toggle, icon_size, icon_size);
 
@@ -1206,10 +1207,10 @@ update_controls_size (UserInterface * ui)
   clutter_actor_get_size (CLUTTER_ACTOR (ui->main_box),
       &main_box_width, &main_box_height);
   main_box_horiz_pos = (control_box_width - main_box_width) / 2;
-  main_box_vert_pos = (ctl_height - main_box_height) / 2;
+  main_box_vert_pos = (control_box_height - main_box_height) / 2;
 
   clutter_actor_set_position (CLUTTER_ACTOR (ui->main_box),
-      main_box_horiz_pos, main_box_vert_pos);
+      main_box_horiz_pos, main_box_vert_pos + 2.0);
 
   update_volume (ui, -1);
 }
