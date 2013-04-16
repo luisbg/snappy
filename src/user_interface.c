@@ -580,18 +580,18 @@ load_controls (UserInterface * ui)
   ClutterActor *vol_int_box = NULL;
   GError *error = NULL;
 
-  ui->play_png = g_build_filename (ui->data_dir, "media-actions-start.png",
+  ui->play_png = g_build_filename (ui->data_dir, "media-actions-start.svg",
       NULL);
-  ui->pause_png = g_build_filename (ui->data_dir, "media-actions-pause.png",
+  ui->pause_png = g_build_filename (ui->data_dir, "media-actions-pause.svg",
       NULL);
   ui->volume_low_png = g_build_filename (ui->data_dir,
-      "audio-volume-low.png", NULL);
+      "audio-volume-low.svg", NULL);
   ui->volume_high_png = g_build_filename (ui->data_dir,
-      "audio-volume-high.png", NULL);
+      "audio-volume-high.svg", NULL);
   ui->subtitle_active_png = g_build_filename (ui->data_dir,
-      "subtitles-active.png", NULL);
+      "subtitles-active.svg", NULL);
   ui->subtitle_inactive_png = g_build_filename (ui->data_dir,
-      "subtitles-inactive.png", NULL);
+      "subtitles-inactive.svg", NULL);
   ui->video_stream_toggle_png = g_build_filename (ui->data_dir,
       "video-stream-toggle.png", NULL);
   ui->audio_stream_toggle_png = g_build_filename (ui->data_dir,
