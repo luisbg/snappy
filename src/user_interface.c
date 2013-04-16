@@ -40,6 +40,7 @@ static gboolean draw_progressbar (ClutterCanvas * canvas, cairo_t * cr,
     int surface_width, int surface_height, UserInterface * ui);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
     UserInterface * ui);
+static void hide_cursor (UserInterface * ui);
 static void load_controls (UserInterface * ui);
 static gboolean penalty_box (gpointer data);
 static gchar *position_ns_to_str (gint64 nanoseconds);
@@ -65,7 +66,7 @@ controls_timeout_cb (gpointer data)
 
   ui->controls_timeout = -1;
 
-  clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
+  hide_cursor (ui);
   if (!ui->keep_showing_controls) {
     show_controls (ui, FALSE);
   }
@@ -542,6 +543,21 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
   return handled;
 }
 
+
+static void
+hide_cursor (UserInterface * ui)
+{
+    ClutterDeviceManager *manager = NULL;
+    ClutterInputDevice *device = NULL;
+    ClutterPoint point;
+
+    manager = clutter_device_manager_get_default ();
+    device = clutter_device_manager_get_core_device (manager, CLUTTER_POINTER_DEVICE);
+    clutter_input_device_get_coords(device, NULL, &point);
+
+    if (point.x < ui->stage_width && point.y < ui->stage_height)
+      clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
+}
 
 static void
 load_controls (UserInterface * ui)
@@ -1068,7 +1084,7 @@ show_controls (UserInterface * ui, gboolean vis)
   else if (vis == FALSE && ui->controls_showing == TRUE) {
     ui->controls_showing = FALSE;
 
-    clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
+    hide_cursor (ui);
     clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
         CLUTTER_EASE_OUT_QUINT, CTL_FADE_DURATION, "opacity", 0, NULL);
   }
@@ -1487,7 +1503,6 @@ interface_start (UserInterface * ui, gchar * uri)
 
   clutter_actor_set_pivot_point (ui->texture, 0.5, 0.5);
 
-  clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
   clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
       CLUTTER_EASE_OUT_QUINT, G_TIME_SPAN_MILLISECOND, "opacity", 0, NULL);
 
