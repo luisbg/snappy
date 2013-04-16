@@ -547,16 +547,19 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 static void
 hide_cursor (UserInterface * ui)
 {
-    ClutterDeviceManager *manager = NULL;
-    ClutterInputDevice *device = NULL;
-    ClutterPoint point;
+  ClutterDeviceManager *manager = NULL;
+  ClutterInputDevice *device = NULL;
+  ClutterPoint point;
 
-    manager = clutter_device_manager_get_default ();
-    device = clutter_device_manager_get_core_device (manager, CLUTTER_POINTER_DEVICE);
-    clutter_input_device_get_coords(device, NULL, &point);
+  manager = clutter_device_manager_get_default ();
+  device =
+      clutter_device_manager_get_core_device (manager, CLUTTER_POINTER_DEVICE);
+  clutter_input_device_get_coords (device, NULL, &point);
 
-    if (point.x < ui->stage_width && point.y < ui->stage_height)
-      clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
+  if (point.x > 0 && point.y > 0 &&
+      point.x < ui->stage_width && point.y < ui->stage_height) {
+    clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
+  }
 }
 
 static void
@@ -730,8 +733,8 @@ load_controls (UserInterface * ui)
 
   // Controls middle box
   ui->middle_box_layout = clutter_box_layout_new ();
-  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (ui->
-          middle_box_layout), CLUTTER_ORIENTATION_HORIZONTAL);
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT
+      (ui->middle_box_layout), CLUTTER_ORIENTATION_HORIZONTAL);
 
   middle_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (middle_box, ui->middle_box_layout);
