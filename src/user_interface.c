@@ -499,17 +499,6 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           ui->volume = (float) volume;
           clutter_content_invalidate (ui->vol_int_canvas);
 
-        } else if (actor == ui->control_bg || actor == ui->control_title
-            || actor == ui->control_pos) {
-          ui->keep_showing_controls = !ui->keep_showing_controls;
-
-          if (ui->keep_showing_controls) {
-            clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
-          } else {
-            penalty_box (ui);
-            show_controls (ui, FALSE);
-          }
-
         } else if (actor == ui->texture || actor == ui->stage) {
           if (!ui->penalty_box_active) {
             penalty_box (ui);
