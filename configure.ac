@@ -98,9 +98,9 @@ AC_SUBST(XTEST_CFLAGS)
 AC_SUBST(XTEST_LIBS)
 
 AC_ARG_ENABLE([dbus],
-    AS_HELP_STRING([--enable-dbus], [enable DBus support to disable the screensaver (default=no)]),
+    AS_HELP_STRING([--enable-dbus], [enable DBus support to disable the screensaver (default=yes)]),
       [],
-      [enable_dbus=no])
+      [enable_dbus=yes])
 
 if test "x$enable_dbus" = "xyes"; then
   PKG_CHECK_MODULES(GIO_2_26, gio-2.0 >= 2.26,
