@@ -1141,6 +1141,9 @@ update_controls_size (UserInterface * ui)
   if (ctl_width > CONTROLS_MAX_WIDTH) {
     ctl_width = CONTROLS_MAX_WIDTH;
     ctl_height = ctl_width / CONTROLS_ASPECT_RATIO;
+  } else if (ctl_width < CONTROLS_MIN_WIDTH) {
+    ctl_width = CONTROLS_MIN_WIDTH;
+    ctl_height = ctl_width / CONTROLS_ASPECT_RATIO;
   }
 
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
