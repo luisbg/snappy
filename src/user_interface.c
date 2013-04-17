@@ -654,10 +654,6 @@ load_controls (UserInterface * ui)
 
   clutter_actor_add_child (CLUTTER_ACTOR (ui->control_box),
       CLUTTER_ACTOR (ui->main_box));
-  clutter_actor_add_constraint (CLUTTER_ACTOR (ui->main_box),
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0.03));
-  clutter_actor_add_constraint (CLUTTER_ACTOR (ui->main_box),
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0.03));
 
   // Controls title
   ui->control_title = clutter_text_new_full ("Clear Sans Bold 32px",
@@ -716,10 +712,6 @@ load_controls (UserInterface * ui)
       (ui->media_height * CONTROLS_HEIGHT_RATIO) / 5);
   ui->control_seekbar = clutter_actor_new ();
   clutter_actor_set_content (ui->control_seekbar, ui->seek_canvas);
-  clutter_actor_add_constraint (ui->control_seekbar,
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
-  clutter_actor_add_constraint (ui->control_seekbar,
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0));
 
   g_signal_connect (ui->seek_canvas, "draw", G_CALLBACK (draw_progressbar), ui);
   clutter_content_invalidate (ui->seek_canvas);
@@ -770,10 +762,6 @@ load_controls (UserInterface * ui)
       (ui->media_height * CONTROLS_HEIGHT_RATIO) / 5);
   ui->vol_int = clutter_actor_new ();
   clutter_actor_set_content (ui->vol_int, ui->vol_int_canvas);
-  clutter_actor_add_constraint (ui->vol_int,
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_X_AXIS, 0));
-  clutter_actor_add_constraint (ui->vol_int,
-      clutter_align_constraint_new (ui->stage, CLUTTER_ALIGN_Y_AXIS, 0));
 
   g_signal_connect (ui->vol_int_canvas, "draw", G_CALLBACK (draw_progressbar),
       ui);
@@ -1015,11 +1003,7 @@ size_change (ClutterStage * stage,
   stage_width = clutter_actor_get_width (ui->stage);
   stage_height = clutter_actor_get_height (ui->stage);
 
-  ui->stage_width = stage_width;
-  ui->stage_height = stage_height;
-
   stage_ar = stage_width / stage_height;
-
   new_width = stage_width;
   new_height = stage_height;
 
@@ -1039,6 +1023,9 @@ size_change (ClutterStage * stage,
     g_debug ("Warning: not considering texture dimensions %fx%f", media_width,
         media_height);
   }
+
+  ui->stage_width = new_width;
+  ui->stage_height = new_height;
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), new_width, new_height);
 
@@ -1136,6 +1123,8 @@ update_controls_size (UserInterface * ui)
   gfloat ctl_width, ctl_height;
   gfloat icon_size;
   gfloat control_box_width;
+  gfloat main_box_width, main_box_height;
+  gfloat main_box_horiz_pos, main_box_vert_pos;
 
   // g_print ("Updating controls size for stage: %ux%u\n", ui->stage_width,
   //     ui->stage_height);
@@ -1146,6 +1135,11 @@ update_controls_size (UserInterface * ui)
   if (ctl_width / ctl_height > CONTROLS_ASPECT_RATIO) {
     ctl_width = ctl_height * CONTROLS_ASPECT_RATIO;
   } else {
+    ctl_height = ctl_width / CONTROLS_ASPECT_RATIO;
+  }
+
+  if (ctl_width > CONTROLS_MAX_WIDTH) {
+    ctl_width = CONTROLS_MAX_WIDTH;
     ctl_height = ctl_width / CONTROLS_ASPECT_RATIO;
   }
 
@@ -1208,6 +1202,14 @@ update_controls_size (UserInterface * ui)
     clutter_actor_set_size (ui->video_stream_toggle, icon_size, icon_size);
     clutter_actor_set_size (ui->audio_stream_toggle, icon_size, icon_size);
   }
+
+  clutter_actor_get_size (CLUTTER_ACTOR (ui->main_box),
+      &main_box_width, &main_box_height);
+  main_box_horiz_pos = (control_box_width - main_box_width) / 2;
+  main_box_vert_pos = (ctl_height - main_box_height) / 2;
+
+  clutter_actor_set_position (CLUTTER_ACTOR (ui->main_box),
+      main_box_horiz_pos, main_box_vert_pos);
 
   update_volume (ui, -1);
 }
