@@ -1213,7 +1213,7 @@ update_controls_size (UserInterface * ui)
   main_box_vert_pos = (control_box_height - main_box_height) / 2;
 
   clutter_actor_set_position (CLUTTER_ACTOR (ui->main_box),
-      main_box_horiz_pos, main_box_vert_pos + 2.0);
+      main_box_horiz_pos, main_box_vert_pos);
 
   update_volume (ui, -1);
 }
