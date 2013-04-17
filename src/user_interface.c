@@ -868,7 +868,7 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
-  clutter_actor_lower_bottom (ui->control_bg);
+  clutter_actor_set_child_below_sibling(ui->control_box, ui->control_bg, ui->main_box);
 
   size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 }
