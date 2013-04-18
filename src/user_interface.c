@@ -1211,7 +1211,7 @@ update_controls_size (UserInterface * ui)
       ui->seek_width + 4.0f, ui->seek_height + 4.0f);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->pos_n_vol_layout),
-      ctl_height * 0.10f);
+      ctl_height * 0.16f);
 
   progress_update_seekbar (ui);
 
@@ -1228,9 +1228,9 @@ update_controls_size (UserInterface * ui)
 
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
-  clutter_actor_set_size (ui->volume_high, icon_size * 1.2f, icon_size);
+  clutter_actor_set_size (ui->volume_high, icon_size, icon_size);
   clutter_actor_set_size (ui->fullscreen_button, icon_size, icon_size);
-  clutter_actor_set_size (ui->subtitle_toggle, icon_size * 1.4f, icon_size);
+  clutter_actor_set_size (ui->subtitle_toggle, icon_size, icon_size);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->middle_box_layout),
       ctl_width * 0.04f);
