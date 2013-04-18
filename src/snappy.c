@@ -20,7 +20,7 @@
  * USA
  */
 
-#define VERSION "0.3.6"
+#define VERSION "0.3.7"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
