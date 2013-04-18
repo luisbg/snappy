@@ -42,6 +42,8 @@ static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
     UserInterface * ui);
 static void hide_cursor (UserInterface * ui);
 static void load_controls (UserInterface * ui);
+static void new_video_size (UserInterface * ui, gfloat width, gfloat height,
+    gfloat * new_width, gfloat * new_height);
 static gboolean penalty_box (gpointer data);
 static gchar *position_ns_to_str (gint64 nanoseconds);
 static void progress_timing (UserInterface * ui);
@@ -905,6 +907,42 @@ load_controls (UserInterface * ui)
   size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 }
 
+static void
+new_video_size (UserInterface * ui, gfloat width, gfloat height,
+    gfloat * new_width, gfloat * new_height)
+{
+  gfloat tmp_width, tmp_height;
+  gfloat media_width, media_height;
+  gfloat stage_ar, media_ar;
+
+  media_width = clutter_actor_get_width (ui->texture);
+  media_height = clutter_actor_get_height (ui->texture);
+
+  stage_ar = width / height;
+  tmp_width = width;
+  tmp_height = height;
+
+  if (media_height > 0.0f && media_width > 0.0f) {
+    media_ar = media_width / media_height;
+
+    /* calculate new width and height
+     * note: when we're done, new_width/new_height should equal media_ar */
+    if (media_ar > stage_ar) {
+      /* media has wider aspect than stage so use new width as stage width and
+       * scale down height */
+      tmp_height = width / media_ar;
+    } else {
+      tmp_width = height * media_ar;
+    }
+  } else {
+    g_debug ("Warning: not considering texture dimensions %fx%f", media_width,
+        media_height);
+  }
+
+  *new_width = tmp_width;
+  *new_height = tmp_height;
+}
+
 static gboolean
 penalty_box (gpointer data)
 {
@@ -1025,41 +1063,15 @@ size_change (ClutterStage * stage,
     ClutterAllocationFlags flags, UserInterface * ui)
 {
   gfloat stage_width, stage_height;
-  gfloat new_width, new_height;
-  gfloat media_width, media_height;
-  gfloat stage_ar, media_ar;
+  gfloat video_width, video_height;
 
-  media_width = clutter_actor_get_width (ui->texture);
-  media_height = clutter_actor_get_height (ui->texture);
+  ui->stage_width = clutter_actor_get_width (ui->stage);
+  ui->stage_height = clutter_actor_get_height (ui->stage);
 
-  stage_width = clutter_actor_get_width (ui->stage);
-  stage_height = clutter_actor_get_height (ui->stage);
-
-  stage_ar = stage_width / stage_height;
-  new_width = stage_width;
-  new_height = stage_height;
-
-  if (media_height > 0.0f && media_width > 0.0f) {
-    media_ar = media_width / media_height;
-
-    /* calculate new width and height
-     * note: when we're done, new_width/new_height should equal media_ar */
-    if (media_ar > stage_ar) {
-      /* media has wider aspect than stage so use new width as stage width and
-       * scale down height */
-      new_height = stage_width / media_ar;
-    } else {
-      new_width = stage_height * media_ar;
-    }
-  } else {
-    g_debug ("Warning: not considering texture dimensions %fx%f", media_width,
-        media_height);
-  }
-
-  ui->stage_width = new_width;
-  ui->stage_height = new_height;
-
-  clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), new_width, new_height);
+  new_video_size (ui, ui->stage_width, ui->stage_height, &video_width,
+      &video_height);
+  clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), video_width,
+      video_height);
 
   update_controls_size (ui);
   progress_timing (ui);
@@ -1115,12 +1127,27 @@ show_controls (UserInterface * ui, gboolean vis)
 static void
 toggle_fullscreen (UserInterface * ui)
 {
-  if (ui->fullscreen) {
+  gfloat new_width, new_height;
+
+  if (!ui->fullscreen) {
+    ui->windowed_width = clutter_actor_get_width (ui->stage);
+    ui->windowed_height = clutter_actor_get_height (ui->stage);
+
+    new_video_size (ui, ui->screen_width, ui->screen_height, &new_width,
+        &new_height);
+    clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), new_width, new_height);
     gtk_window_fullscreen (GTK_WINDOW (ui->window));
-    ui->fullscreen = FALSE;
+
+    ui->fullscreen = TRUE;
+
   } else {
     gtk_window_unfullscreen (GTK_WINDOW (ui->window));
-    ui->fullscreen = TRUE;
+
+    new_video_size (ui, ui->windowed_width, ui->windowed_height, &new_width,
+        &new_height);
+    clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), new_width, new_height);
+
+    ui->fullscreen = FALSE;
   }
 }
 
@@ -1354,6 +1381,8 @@ interface_load_uri (UserInterface * ui, gchar * uri)
   ui->duration_str = position_ns_to_str (ui->engine->media_duration);
   ui->media_width = ui->engine->media_width;
   ui->media_height = ui->engine->media_height;
+  ui->windowed_width = ui->media_width;
+  ui->windowed_height = ui->media_height;
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->texture), ui->media_width,
       ui->media_height);
@@ -1427,7 +1456,6 @@ interface_start (UserInterface * ui, gchar * uri)
 {
   GtkSettings *gtk_settings;
   GdkScreen *screen;
-  gint screen_width, screen_height;
 
   g_print ("Loading ui!\n");
 
@@ -1442,10 +1470,11 @@ interface_start (UserInterface * ui, gchar * uri)
 
     // Get screen size
     screen = gdk_screen_get_default ();
-    screen_width = gdk_screen_get_width (screen);
-    screen_height = gdk_screen_get_height (screen);
+    ui->screen_width = gdk_screen_get_width (screen);
+    ui->screen_height = gdk_screen_get_height (screen);
 
-    if (ui->media_width < screen_width && ui->media_height < screen_height) {
+    if (ui->media_width < ui->screen_width &&
+        ui->media_height < ui->screen_height) {
       ui->stage_width = ui->media_width;
       ui->stage_height = ui->media_height;
 
@@ -1455,13 +1484,13 @@ interface_start (UserInterface * ui, gchar * uri)
 
       aspect_ratio = (float) ui->media_width / ui->media_height;
       // Scale down to screen width proportionally
-      ui->stage_width = screen_width;
-      ui->stage_height = screen_width / aspect_ratio;
+      ui->stage_width = ui->screen_width;
+      ui->stage_height = ui->screen_width / aspect_ratio;
 
-      if (ui->stage_height > screen_height) {
+      if (ui->stage_height > ui->screen_height) {
         // Stage height still too big, scale down to screen height
-        ui->stage_width = screen_height * aspect_ratio;
-        ui->stage_height = screen_height;
+        ui->stage_width = ui->screen_height * aspect_ratio;
+        ui->stage_height = ui->screen_height;
       }
     }
 
