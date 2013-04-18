@@ -237,7 +237,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_F:
         case CLUTTER_F11:
         {
-          // Fullscreen button
+          // Fullscreen keys
           toggle_fullscreen (ui);
 
           handled = TRUE;
@@ -506,6 +506,10 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
             show_controls (ui, FALSE);
           }
 
+        } else if (actor == ui->fullscreen_button) {
+          // Fullscreen button
+          toggle_fullscreen (ui);
+
         } else if (actor == ui->audio_stream_toggle) {
           cycle_streams (ui->engine, STREAM_AUDIO);
 
@@ -566,7 +570,7 @@ static void
 load_controls (UserInterface * ui)
 {
   // Check icon files exist
-  gchar *icon_files[8];
+  gchar *icon_files[9];
   gchar *duration_str = NULL;
   gint c;
   gfloat pos;
@@ -588,6 +592,7 @@ load_controls (UserInterface * ui)
       "audio-volume-low.svg", NULL);
   ui->volume_high_png = g_build_filename (ui->data_dir,
       "audio-volume-high.svg", NULL);
+  ui->fullscreen_svg = g_build_filename (ui->data_dir, "fullscreen.svg", NULL);
   ui->subtitle_active_png = g_build_filename (ui->data_dir,
       "subtitles-active.svg", NULL);
   ui->subtitle_inactive_png = g_build_filename (ui->data_dir,
@@ -601,12 +606,13 @@ load_controls (UserInterface * ui)
   icon_files[1] = ui->pause_png;
   icon_files[2] = ui->volume_low_png;
   icon_files[3] = ui->volume_high_png;
-  icon_files[4] = ui->subtitle_active_png;
-  icon_files[5] = ui->subtitle_inactive_png;
-  icon_files[6] = ui->video_stream_toggle_png;
-  icon_files[7] = ui->audio_stream_toggle_png;
+  icon_files[4] = ui->fullscreen_svg;
+  icon_files[5] = ui->subtitle_active_png;
+  icon_files[6] = ui->subtitle_inactive_png;
+  icon_files[7] = ui->video_stream_toggle_png;
+  icon_files[8] = ui->audio_stream_toggle_png;
 
-  for (c = 0; c < 8; c++) {
+  for (c = 0; c < 9; c++) {
     if (!g_file_test (icon_files[c], G_FILE_TEST_EXISTS)) {
       g_print ("Icon file doesn't exist, are you sure you have "
           " installed snappy correctly?\nThis file needed is: %s\n",
@@ -862,6 +868,24 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
+  // Controls fullscreen
+  ui->fullscreen_button = gtk_clutter_texture_new ();
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+      (ui->fullscreen_button),
+      gdk_pixbuf_new_from_file (ui->fullscreen_svg, NULL), &error);
+  if (!ui->fullscreen_button && error)
+    g_debug ("Clutter error: %s", error->message);
+  if (error) {
+    g_error_free (error);
+    error = NULL;
+  }
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->fullscreen_button, FALSE,        /* expand */
+      FALSE,                    /* x-fill */
+      FALSE,                    /* y-fill */
+      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
+      CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
+
+  // Add Info Box to Main Box Layout
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->info_box, FALSE,       /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
@@ -1149,9 +1173,9 @@ update_controls_size (UserInterface * ui)
   icon_size = ctl_height * PLAY_TOGGLE_RATIO;
 
   if (ui->subtitles_available) {
-    control_box_width = ctl_width + (icon_size * 0.72f);
+    control_box_width = ctl_width + (icon_size * 2.0f);
   } else {
-    control_box_width = ctl_width;
+    control_box_width = ctl_width + (icon_size);
   }
 
   control_box_height = ctl_height * 0.85;
@@ -1196,7 +1220,8 @@ update_controls_size (UserInterface * ui)
 
   icon_size = ctl_height * VOLUME_ICON_RATIO;
   clutter_actor_set_size (ui->volume_low, icon_size, icon_size);
-  clutter_actor_set_size (ui->volume_high, icon_size * 1.2f, icon_size);        /* originally 24x24 */
+  clutter_actor_set_size (ui->volume_high, icon_size * 1.2f, icon_size);
+  clutter_actor_set_size (ui->fullscreen_button, icon_size, icon_size);
   clutter_actor_set_size (ui->subtitle_toggle, icon_size * 1.4f, icon_size);
 
   clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (ui->middle_box_layout),

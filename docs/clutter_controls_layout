@@ -32,6 +32,7 @@ ui->control_box (fixed alignment bin)
 					ui->audio_stream_toggle
 				]
 			ui->subtitle_toggle
+			ui->fullscreen_button
 			]
 		]
 	]
