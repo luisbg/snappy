@@ -7,7 +7,7 @@ ui->control_box (fixed alignment bin)
 	main_box (vertical alignment box)
 	[
 		ui->control_title
-		info_box (vertical alignment box)
+		info_box (horizontal alignment box)
 		[
 			ui->control_play_toggle
 			ui->pos_n_vol_box (vertical alignment box)
@@ -31,8 +31,11 @@ ui->control_box (fixed alignment bin)
 					ui->video_stream_toggle
 					ui->audio_stream_toggle
 				]
-			ui->subtitle_toggle
-			ui->fullscreen_button
+			]
+			right_box (horizontal alignment box)
+			[
+				ui->subtitle_toggle
+				ui->fullscreen_button
 			]
 		]
 	]

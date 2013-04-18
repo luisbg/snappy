@@ -579,9 +579,11 @@ load_controls (UserInterface * ui)
   ClutterLayoutManager *controls_layout = NULL;
   ClutterLayoutManager *bottom_box_layout = NULL;
   ClutterLayoutManager *volume_box_layout = NULL;
+  ClutterLayoutManager *right_box_layout = NULL;
   ClutterActor *middle_box = NULL;
   ClutterActor *bottom_box = NULL;
   ClutterActor *vol_int_box = NULL;
+  ClutterActor *right_box = NULL;
   GError *error = NULL;
 
   ui->play_png = g_build_filename (ui->data_dir, "media-actions-start.svg",
@@ -850,6 +852,20 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_START,      /* x-align */
       CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
 
+  // Controls right box for subtitles and fullscreen
+  right_box_layout = clutter_box_layout_new ();
+  clutter_box_layout_set_orientation (CLUTTER_BOX_LAYOUT (right_box_layout),
+      CLUTTER_ORIENTATION_HORIZONTAL);
+  clutter_box_layout_set_spacing (CLUTTER_BOX_LAYOUT (right_box_layout), 10);
+  right_box = clutter_actor_new ();
+  clutter_actor_set_layout_manager (right_box, right_box_layout);
+
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), right_box, FALSE,        /* expand */
+      FALSE,                    /* x-fill */
+      FALSE,                    /* y-fill */
+      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
+      CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
+
   // Controls subtitle toggle
   ui->subtitle_toggle = gtk_clutter_texture_new ();
   gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
@@ -862,11 +878,7 @@ load_controls (UserInterface * ui)
     error = NULL;
   }
   clutter_actor_hide (ui->subtitle_toggle);
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->subtitle_toggle, FALSE,        /* expand */
-      FALSE,                    /* x-fill */
-      FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
-      CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
+  clutter_actor_add_child (right_box, ui->subtitle_toggle);
 
   // Controls fullscreen
   ui->fullscreen_button = gtk_clutter_texture_new ();
@@ -879,11 +891,7 @@ load_controls (UserInterface * ui)
     g_error_free (error);
     error = NULL;
   }
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), ui->fullscreen_button, FALSE,        /* expand */
-      FALSE,                    /* x-fill */
-      FALSE,                    /* y-fill */
-      CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
-      CLUTTER_BOX_ALIGNMENT_START);     /* y-align */
+  clutter_actor_add_child (right_box, ui->fullscreen_button);
 
   // Add Info Box to Main Box Layout
   clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->main_box_layout), ui->info_box, FALSE,       /* expand */
