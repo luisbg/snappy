@@ -164,7 +164,7 @@ draw_progressbar (ClutterCanvas * canvas, cairo_t * cr, int surface_width,
 
   pattern = cairo_pattern_create_linear (0.0, 0.0, surface_width, 0.0);
 
-  if (canvas == ui->seek_canvas) {
+  if (canvas == CLUTTER_CANVAS (ui->seek_canvas)) {
     // if called for seek canvas, update playback position
     position = ui->playback_position;
   } else {
