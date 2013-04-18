@@ -75,6 +75,7 @@ void engine_volume (GstEngine * engine, gdouble level);
 gboolean frame_stepping (GstEngine * engine, gboolean foward);
 gchar **get_recently_viewed ();
 GstState get_state (GstEngine * engine);
+gboolean has_subtitles (GstEngine * engine);
 gint64 query_position (GstEngine * engine);
 void set_subtitle_uri (GstEngine * engine, gchar *suburi);
 gboolean toggle_subtitles (GstEngine * engine);

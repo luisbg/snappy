@@ -496,12 +496,10 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
           else
             g_print ("Secret mode. Not saving uri in history.\n");
 
-          g_object_get (G_OBJECT (engine->player), "n-text", &streams, NULL);
-          if (streams > 0) {
+          if (has_subtitles (engine))
             ui->subtitles_available = TRUE;
-          } else {
+          else
             ui->subtitles_available = FALSE;
-          }
 
           interface_update_controls (ui);
           engine->has_started = TRUE;
@@ -819,7 +817,7 @@ engine_play (GstEngine * engine)
   GstStateChangeReturn change;
 
   change = gst_element_set_state (engine->player, GST_STATE_PLAYING);
-  engine->has_started = TRUE;
+
   engine->playing = TRUE;
   engine->queries_blocked = FALSE;
 
@@ -956,6 +954,23 @@ get_recently_viewed ()
       recent = g_key_file_get_keys (keyfile, "history", &length, NULL);
 
   return recent;
+}
+
+
+/*        Check if the uri has subtitles         */
+gboolean
+has_subtitles (GstEngine * engine)
+{
+  gint streams;
+  gboolean ret;
+
+  g_object_get (G_OBJECT (engine->player), "n-text", &streams, NULL);
+  if (streams > 0)
+    ret = TRUE;
+  else
+    ret = FALSE;
+
+  return ret;
 }
 
 

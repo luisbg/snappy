@@ -690,9 +690,15 @@ load_controls (UserInterface * ui)
 
   // Controls play toggle
   ui->control_play_toggle = gtk_clutter_texture_new ();
-  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
-      (ui->control_play_toggle), gdk_pixbuf_new_from_file (ui->pause_png, NULL),
-      &error);
+  if (strcmp (ui->filename, "") == 0) {
+    gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+        (ui->control_play_toggle), gdk_pixbuf_new_from_file (ui->play_png,
+            NULL), &error);
+  } else {
+    gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+        (ui->control_play_toggle), gdk_pixbuf_new_from_file (ui->pause_png,
+            NULL), &error);
+  }
   if (!ui->control_play_toggle && error)
     g_debug ("Clutter error: %s", error->message);
   if (error) {
@@ -862,7 +868,7 @@ load_controls (UserInterface * ui)
   right_box = clutter_actor_new ();
   clutter_actor_set_layout_manager (right_box, right_box_layout);
 
-  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), right_box, FALSE,        /* expand */
+  clutter_box_layout_pack (CLUTTER_BOX_LAYOUT (ui->info_box_layout), right_box, FALSE,  /* expand */
       FALSE,                    /* x-fill */
       FALSE,                    /* y-fill */
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
@@ -902,7 +908,8 @@ load_controls (UserInterface * ui)
       CLUTTER_BOX_ALIGNMENT_CENTER,     /* x-align */
       CLUTTER_BOX_ALIGNMENT_CENTER);    /* y-align */
 
-  clutter_actor_set_child_below_sibling(ui->control_box, ui->control_bg, ui->main_box);
+  clutter_actor_set_child_below_sibling (ui->control_box, ui->control_bg,
+      ui->main_box);
 
   size_change (CLUTTER_STAGE (ui->stage), NULL, 0, ui);
 }
@@ -1171,7 +1178,6 @@ toggle_playing (UserInterface * ui)
     gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
         (ui->control_play_toggle), gdk_pixbuf_new_from_file (ui->pause_png,
             NULL), NULL);
-
   }
 }
 
@@ -1403,6 +1409,10 @@ interface_load_uri (UserInterface * ui, gchar * uri)
 
   if (!ui->penalty_box_active)
     show_controls (ui, TRUE);
+
+  gtk_clutter_texture_set_from_pixbuf (GTK_CLUTTER_TEXTURE
+      (ui->control_play_toggle), gdk_pixbuf_new_from_file (ui->pause_png,
+          NULL), NULL);
 
   return TRUE;
 }
