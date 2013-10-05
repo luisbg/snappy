@@ -27,6 +27,8 @@ v          - toggle subtitles
 _          - cycle through available video streams
 j          - cycle through available subtitle streams
 
+o          - display playback time/display time left
+
 r          - rotate video
 
 .          - frame step foward

@@ -45,7 +45,7 @@ static void load_controls (UserInterface * ui);
 static void new_video_size (UserInterface * ui, gfloat width, gfloat height,
     gfloat * new_width, gfloat * new_height);
 static gboolean penalty_box (gpointer data);
-static gchar *position_ns_to_str (gint64 nanoseconds);
+static gchar *position_ns_to_str (UserInterface * ui, gint64 nanoseconds);
 static void progress_timing (UserInterface * ui);
 static gboolean progress_update_text (gpointer data);
 static gboolean progress_update_seekbar (gpointer data);
@@ -437,15 +437,28 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           break;
         }
 
+        case CLUTTER_o:
+	{
+	  // switch display to time left of the stream
+	  ui->duration_str_fwd_direction = !ui->duration_str_fwd_direction;
+
+          handled = TRUE;
+	  break;
+	}
+
         case CLUTTER_less:
         {
           interface_play_next_or_prev (ui, FALSE);
+
+          handled = TRUE;
           break;
         }
 
         case CLUTTER_greater:
         {
           interface_play_next_or_prev (ui, TRUE);
+
+          handled = TRUE;
           break;
         }
 
@@ -529,7 +542,10 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
         } else if (actor == ui->video_stream_toggle) {
           cycle_streams (ui->engine, STREAM_VIDEO);
-        }
+
+        } else if (actor == ui->control_pos) {
+	  ui->duration_str_fwd_direction = !ui->duration_str_fwd_direction;
+	}
       }
 
       handled = TRUE;
@@ -966,10 +982,13 @@ penalty_box (gpointer data)
 }
 
 static gchar *
-position_ns_to_str (gint64 nanoseconds)
+position_ns_to_str (UserInterface * ui, gint64 nanoseconds)
 {
   gint64 seconds;
   gint hours, minutes;
+
+  if (!ui->duration_str_fwd_direction)
+    nanoseconds = ui->engine->media_duration - nanoseconds;
 
   seconds = nanoseconds / GST_SECOND;
   hours = seconds / SEC_IN_HOUR;
@@ -1011,13 +1030,14 @@ progress_update_text (gpointer data)
       gint64 pos;
 
       if (ui->media_duration != engine->media_duration) {
-        ui->duration_str = position_ns_to_str (engine->media_duration);
         progress_timing (ui);
       }
 
       pos = query_position (engine);
-      duration_str = g_strdup_printf ("   %s | %s", position_ns_to_str (pos),
-          ui->duration_str);
+
+      duration_str = g_strdup_printf ("   %s | %s",
+          position_ns_to_str (ui, pos), ui->duration_str);
+      g_print("%s\n", duration_str);
       clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
     }
   }
@@ -1384,7 +1404,7 @@ interface_load_uri (UserInterface * ui, gchar * uri)
     clutter_text_set_text (CLUTTER_TEXT (ui->control_title), ui->filename);
   }
 
-  ui->duration_str = position_ns_to_str (ui->engine->media_duration);
+  ui->duration_str = position_ns_to_str (ui, ui->engine->media_duration);
   ui->media_width = ui->engine->media_width;
   ui->media_height = ui->engine->media_height;
   ui->windowed_width = ui->media_width;
@@ -1552,6 +1572,7 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->controls_showing = FALSE;
   ui->keep_showing_controls = FALSE;
   ui->penalty_box_active = FALSE;
+  ui->duration_str_fwd_direction = TRUE;
   ui->controls_timeout = -1;
 
   ui->seek_width = ui->stage_width / SEEK_WIDTH_RATIO;
@@ -1560,7 +1581,7 @@ interface_start (UserInterface * ui, gchar * uri)
   ui->progress_id = -1;
   ui->title_length = TITLE_LENGTH;
   ui->media_duration = -1;
-  ui->duration_str = position_ns_to_str (ui->engine->media_duration);
+  ui->duration_str = position_ns_to_str (ui, ui->engine->media_duration);
 
   clutter_actor_set_size (CLUTTER_ACTOR (ui->stage), ui->stage_width,
       ui->stage_height);
