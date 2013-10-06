@@ -438,13 +438,13 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         }
 
         case CLUTTER_o:
-	{
-	  // switch display to time left of the stream
-	  ui->duration_str_fwd_direction = !ui->duration_str_fwd_direction;
+        {
+          // switch display to time left of the stream
+          ui->duration_str_fwd_direction = !ui->duration_str_fwd_direction;
 
           handled = TRUE;
-	  break;
-	}
+          break;
+        }
 
         case CLUTTER_less:
         {
@@ -544,8 +544,8 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           cycle_streams (ui->engine, STREAM_VIDEO);
 
         } else if (actor == ui->control_pos) {
-	  ui->duration_str_fwd_direction = !ui->duration_str_fwd_direction;
-	}
+          ui->duration_str_fwd_direction = !ui->duration_str_fwd_direction;
+        }
       }
 
       handled = TRUE;
@@ -1037,7 +1037,7 @@ progress_update_text (gpointer data)
 
       duration_str = g_strdup_printf ("   %s | %s",
           position_ns_to_str (ui, pos), ui->duration_str);
-      g_print("%s\n", duration_str);
+      g_print ("%s\n", duration_str);
       clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
     }
   }
