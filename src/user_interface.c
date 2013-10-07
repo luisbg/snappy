@@ -1037,7 +1037,6 @@ progress_update_text (gpointer data)
 
       duration_str = g_strdup_printf ("   %s | %s",
           position_ns_to_str (ui, pos), ui->duration_str);
-      g_print ("%s\n", duration_str);
       clutter_text_set_text (CLUTTER_TEXT (ui->control_pos), duration_str);
     }
   }
