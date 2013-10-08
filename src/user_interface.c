@@ -446,6 +446,15 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           break;
         }
 
+        case CLUTTER_KEY_bracketright:
+	{
+	  // change playback speed
+	  engine_change_speed(ui->engine, 1.2);
+
+	  handled = TRUE;
+	  break;
+	}
+
         case CLUTTER_less:
         {
           interface_play_next_or_prev (ui, FALSE);

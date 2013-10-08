@@ -767,6 +767,27 @@ engine_init (GstEngine * engine, GstElement * sink)
   return TRUE;
 }
 
+/*              Change playback rate             */
+gboolean
+engine_change_speed (GstEngine *engine, gdouble rate)
+{
+  gint64 pos;
+  GstFormat fmt = GST_FORMAT_TIME;
+  GstSeekFlags flags;
+  GstEvent *seek_event;
+
+  /* Obtain the current position, needed for the seek event */
+  if (!gst_element_query_position (engine->player, fmt, &pos)) {
+      g_printerr ("Unable to retrieve current position.\n");
+      return FALSE;
+  }
+
+  seek_event = gst_event_new_seek (rate, fmt, GST_SEEK_FLAG_FLUSH | GST_SEEK_FLAG_ACCURATE,
+      GST_SEEK_TYPE_SET, pos, GST_SEEK_TYPE_NONE, 0);
+  gst_element_send_event (engine->player, seek_event);
+
+  return TRUE;
+}
 
 /*               Load URI to engine              */
 void
