@@ -446,14 +446,21 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           break;
         }
 
+        case CLUTTER_KEY_bracketleft:
         case CLUTTER_KEY_bracketright:
-	{
-	  // change playback speed
-	  engine_change_speed(ui->engine, 1.2);
+        {
+          // get current rate
+          gdouble rate = ui->engine->rate;
 
-	  handled = TRUE;
-	  break;
-	}
+          // change playback speed
+          if (keyval == CLUTTER_KEY_bracketleft)
+            engine_change_speed (ui->engine, rate - 0.1);
+          else
+            engine_change_speed (ui->engine, rate + 0.1);
+
+          handled = TRUE;
+          break;
+        }
 
         case CLUTTER_less:
         {

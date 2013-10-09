@@ -33,3 +33,6 @@ r          - rotate video
 
 .          - frame step foward
 ,          - frame step backwards
+
+[          - decrease speed of playback 10%
+]          - increase speed of playback 10%
