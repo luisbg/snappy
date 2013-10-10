@@ -1148,8 +1148,12 @@ show_controls (UserInterface * ui, gboolean vis)
     progress_update_seekbar (ui);
     progress_update_text (ui);
     clutter_stage_show_cursor (CLUTTER_STAGE (ui->stage));
-    clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
-        CLUTTER_EASE_OUT_QUINT, CTL_FADE_DURATION, "opacity", 0xff, NULL);
+
+    clutter_actor_set_easing_mode (CLUTTER_ACTOR (ui->control_box),
+        CLUTTER_EASE_OUT_QUINT);
+    clutter_actor_set_easing_duration (CLUTTER_ACTOR (ui->control_box),
+        CTL_FADE_DURATION);
+    clutter_actor_set_opacity (CLUTTER_ACTOR (ui->control_box), 0xff);
 
     if (ui->controls_timeout == -1) {
       ui->controls_timeout = g_timeout_add_seconds (CTL_SHOW_SEC,
@@ -1161,8 +1165,12 @@ show_controls (UserInterface * ui, gboolean vis)
     ui->controls_showing = FALSE;
 
     hide_cursor (ui);
-    clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
-        CLUTTER_EASE_OUT_QUINT, CTL_FADE_DURATION, "opacity", 0, NULL);
+
+    clutter_actor_set_easing_mode (CLUTTER_ACTOR (ui->control_box),
+        CLUTTER_EASE_OUT_QUINT);
+    clutter_actor_set_easing_duration (CLUTTER_ACTOR (ui->control_box),
+        CTL_FADE_DURATION);
+    clutter_actor_set_opacity (CLUTTER_ACTOR (ui->control_box), 0);
   }
 }
 
@@ -1620,8 +1628,11 @@ interface_start (UserInterface * ui, gchar * uri)
 
   clutter_actor_set_pivot_point (ui->texture, 0.5, 0.5);
 
-  clutter_actor_animate (CLUTTER_ACTOR (ui->control_box),
-      CLUTTER_EASE_OUT_QUINT, G_TIME_SPAN_MILLISECOND, "opacity", 0, NULL);
+  clutter_actor_set_easing_mode (CLUTTER_ACTOR (ui->control_box),
+      CLUTTER_EASE_OUT_QUINT);
+  clutter_actor_set_easing_duration (CLUTTER_ACTOR (ui->control_box),
+      G_TIME_SPAN_MILLISECOND);
+  clutter_actor_set_opacity (CLUTTER_ACTOR (ui->control_box), 0);
 
   /* Connect a signal handler to mouse clicks and key presses on the stage */
   g_signal_connect (CLUTTER_STAGE (ui->stage), "allocation-changed",
