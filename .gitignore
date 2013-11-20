@@ -10,6 +10,7 @@ data/icons/48x48/Makefile
 data/icons/Makefile
 libtool
 src/.deps/
+src/.libs/
 src/Makefile
 src/snappy
 src/snappy-dlna.o
