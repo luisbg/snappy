@@ -35,7 +35,7 @@ AC_CANONICAL_HOST
 # keep one single GST_REQ, core/base should be same versions anyway
 GST_REQ=1.0.0
 CLUTTER_REQS=1.12.0
-CLUTTER_GST_REQS=1.5.5
+CLUTTER_GST_REQS=2.0.0
 CLUTTER_GTK_REQS=1.0.2
 GTK_REQS=3.5.0
 GIO_REQ=2.32
@@ -43,6 +43,7 @@ GIO_REQ=2.32
 PKG_CHECK_MODULES([GST], \
     [gstreamer-1.0 >= $GST_REQ
     gstreamer-base-1.0 >= $GST_REQ
+    gstreamer-plugins-base-1.0 >= $GST_REQ
     gstreamer-pbutils-1.0 >= $GST_REQ
     gstreamer-video-1.0 >= $GST_REQ])
 

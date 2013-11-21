@@ -177,6 +177,8 @@ main (int argc, char *argv[])
 #endif
 
   gtk_clutter_init (&argc, &argv);
+  gst_init (&argc, &argv);
+  clutter_gst_init (NULL, NULL);
 
   /* Try to find the path for our resources in case snappy was relocated */
   data_dir = g_strdup (SNAPPY_DATA_DIR);
@@ -228,10 +230,10 @@ main (int argc, char *argv[])
 
   /* Gstreamer engine */
   engine = g_new (GstEngine, 1);
-  sink = gst_element_factory_make ("autocluttersink", "cluttersink");
+  sink = gst_element_factory_make ("cluttersink", "video-sink");
   if (sink == NULL) {
-    GST_DEBUG ("autocluttersink not found, falling back to cluttersink\n");
-    sink = gst_element_factory_make ("cluttersink", "cluttersink");
+    g_print ("ERROR: Failed to create clutter-gst sink element\n");
+    return FALSE;
   }
   g_object_set (G_OBJECT (sink), "texture", video_texture, NULL);
 
