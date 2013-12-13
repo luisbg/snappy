@@ -20,8 +20,7 @@
  * USA
  */
 
-#include <glib.h>
-#include <gio/gio.h>
+#include "utils.h"
 
 
 gchar *

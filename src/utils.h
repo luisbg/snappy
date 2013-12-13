@@ -23,6 +23,10 @@
 #ifndef __UTILS_H__
 #define __UTILS_H__
 
+#include <glib.h>
+#include <gio/gio.h>
+#include <gst/gst.h>
+
 G_BEGIN_DECLS
 
 gchar * cut_long_filename (gchar * filename, gint length);
