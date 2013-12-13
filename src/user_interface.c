@@ -268,7 +268,7 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_8:
         {
           // Mute button
-          gdouble volume;
+          gdouble volume = 0.0;
           gboolean muteval;
 
           g_object_get (G_OBJECT (ui->engine->player), "mute", &muteval, NULL);
@@ -315,7 +315,6 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
         case CLUTTER_Page_Down:
         {
           gint64 pos, second;
-          gfloat progress;
 
           pos = query_position (ui->engine);
           second = ui->engine->second;
@@ -576,6 +575,12 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
       handled = TRUE;
       break;
     }
+
+    default:
+    {
+      handled = FALSE;
+      break;
+    }
   }
 
   return handled;
@@ -607,7 +612,6 @@ load_controls (UserInterface * ui)
   gchar *icon_files[9];
   gchar *duration_str = NULL;
   gint c;
-  gfloat pos;
 
   ClutterContent *canvas;
   ClutterLayoutManager *controls_layout = NULL;
@@ -1084,8 +1088,6 @@ progress_update_seekbar (gpointer data)
 gboolean
 rotate_video (UserInterface * ui)
 {
-  gfloat vid_width, vid_height;
-  gfloat x_center, y_center;
   gdouble angle;
 
   angle = clutter_actor_get_rotation_angle (ui->texture, CLUTTER_Z_AXIS);
@@ -1104,7 +1106,6 @@ size_change (ClutterStage * stage,
     const ClutterActorBox * allocation,
     ClutterAllocationFlags flags, UserInterface * ui)
 {
-  gfloat stage_width, stage_height;
   gfloat video_width, video_height;
 
   ui->stage_width = clutter_actor_get_width (ui->stage);
@@ -1469,7 +1470,9 @@ interface_on_drop_cb (GtkWidget * widget,
 {
   char **list;
 
-  list = g_uri_list_extract_uris (gtk_selection_data_get_data (data));
+  list =
+      g_uri_list_extract_uris ((const gchar *)
+      gtk_selection_data_get_data (data));
 
   engine_open_uri (ui->engine, list[0]);
   interface_load_uri (ui, list[0]);
