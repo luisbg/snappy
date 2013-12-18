@@ -223,11 +223,6 @@ main (int argc, char *argv[])
   video_texture = g_object_new (CLUTTER_TYPE_TEXTURE, "disable-slicing", TRUE,
       NULL);
 
-  version_str = gst_version_string ();
-  GST_DEBUG_CATEGORY_INIT (_snappy_gst_debug, "snappy", 0,
-      "snappy media player");
-  GST_DEBUG ("Initialised %s", version_str);
-
   /* Gstreamer engine */
   engine = g_new (GstEngine, 1);
   sink = gst_element_factory_make ("cluttersink", "video-sink");

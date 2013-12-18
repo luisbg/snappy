@@ -33,6 +33,10 @@
 
 #define RECENTLY_VIEWED_MAX 50
 
+GST_DEBUG_CATEGORY_STATIC (_snappy_gst_debug);
+#define GST_CAT_DEFAULT _snappy_gst_debug
+
+
 // GstPlayFlags flags from playbin. It is the policy of GStreamer to
 // not publicly expose element-specific enums. That's why this
 // GstPlayFlags enum has been copied here.
@@ -746,8 +750,10 @@ engine_init (GstEngine * engine, GstElement * sink)
 
   gchar *version_str;
 
+  version_str = gst_version_string ();
   GST_DEBUG_CATEGORY_INIT (_snappy_gst_debug, "snappy", 0,
       "snappy media player");
+  GST_DEBUG ("Initialised %s", version_str);
 
   /* Make playbin element */
   engine->player = gst_element_factory_make ("playbin", "playbin");
