@@ -410,29 +410,6 @@ get_root_property (GDBusConnection * connection,
 }
 
 static void
-send_property_change (SnappyMP * myobj,
-    GParamSpec * pspec, GDBusConnection * connection)
-{
-  GVariantBuilder *builder;
-  GVariantBuilder *invalidated_builder;
-
-  builder = g_variant_builder_new (G_VARIANT_TYPE_ARRAY);
-  invalidated_builder = g_variant_builder_new (G_VARIANT_TYPE ("as"));
-
-  if (g_strcmp0 (pspec->name, "name") == 0)
-    g_variant_builder_add (builder,
-        "{sv}", "Name", g_variant_new_string (myobj->name ? myobj->name : ""));
-
-  g_dbus_connection_emit_signal (connection,
-      NULL,
-      "org/mpris/MediaPlayer2",
-      "org.freedesktop.DBus.Properties",
-      "PropertiesChanged",
-      g_variant_new ("(sa{sv}as)",
-          "org.mpris.MediaPlayer2", builder, invalidated_builder), NULL);
-}
-
-static void
 on_name_acquired (GDBusConnection * connection,
     const gchar * name, gpointer user_data)
 {
@@ -449,7 +426,6 @@ on_name_lost (GDBusConnection * connection,
 gboolean
 load_dlna (SnappyMP * mp)
 {
-  guint owner_id, player_id, root_id;
   GError *error = NULL;
   GDBusInterfaceInfo *ifaceinfo;
   GDBusConnection *connection;

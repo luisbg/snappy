@@ -77,8 +77,6 @@ enum
   LAST_SIGNAL
 };
 
-static guint mediaplayer_signals[LAST_SIGNAL] = { 0 };
-
 // Declaration of non-static functions
 gboolean load_dlna (SnappyMP * mp_obj);
 gboolean close_dlna (SnappyMP * mp_obj);
