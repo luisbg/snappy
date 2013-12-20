@@ -185,7 +185,6 @@ discover (GstEngine * engine, gchar * uri)
   gint timeout = 10;
   GstDiscoverer *dc;
   GstDiscovererInfo *info;
-  GstDiscovererStreamInfo *s_info;
   GstDiscovererVideoInfo *v_info;
   GError *error = NULL;
   GList *list;
@@ -483,8 +482,6 @@ bus_call (GstBus * bus, GstMessage * msg, gpointer data)
       GST_DEBUG ("State changed");
       gst_message_parse_state_changed (msg, &old, &new, &pending);
       if (new == GST_STATE_PLAYING) {
-        gint streams;
-
         /* If loading file */
         if (!engine->has_started) {
           gint64 position;
@@ -780,7 +777,6 @@ engine_change_speed (GstEngine * engine, gdouble rate)
 {
   gint64 pos;
   GstFormat fmt = GST_FORMAT_TIME;
-  GstSeekFlags flags;
   GstEvent *seek_event;
 
   /* Obtain the current position, needed for the seek event */
@@ -919,7 +915,7 @@ frame_stepping (GstEngine * engine, gboolean foward)
   gboolean ok;
   gint64 pos;
   gdouble rate;
-  GstFormat fmt;
+  GstFormat fmt = GST_FORMAT_TIME;
 
   /* Continue if previous frame step is done */
   if (engine->prev_done) {
@@ -1037,7 +1033,7 @@ query_position (GstEngine * engine)
 void
 set_subtitle_uri (GstEngine * engine, gchar * suburi)
 {
-  g_print ("Loading subtitles: %s\n");
+  g_print ("Loading subtitles: %s\n", suburi);
   g_object_set (G_OBJECT (engine->player), "suburi", suburi, NULL);
 
   return;
