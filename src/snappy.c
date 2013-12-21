@@ -31,6 +31,7 @@
 #include <string.h>
 #include <clutter/clutter.h>
 #include <clutter-gst/clutter-gst.h>
+#include <clutter-gtk/clutter-gtk.h>
 
 #include "user_interface.h"
 
@@ -164,19 +165,22 @@ main (int argc, char *argv[])
   gboolean ok, blind = FALSE, fullscreen = FALSE, hide = FALSE, loop = FALSE;
   gboolean secret = FALSE, tags = FALSE;
   gint ret = 0;
-  guint c, index, pos = 0;
   gchar *uri = NULL;
   gchar *suburi = NULL;
-  gchar *version_str;
   GList *uri_list;
   GOptionContext *context;
   gchar *data_dir;
+
+  ClutterInitError ci_err;
 
 #ifdef ENABLE_DBUS
   SnappyMP *mp_obj = NULL;
 #endif
 
-  gtk_clutter_init (&argc, &argv);
+  ci_err = gtk_clutter_init (&argc, &argv);
+  if (ci_err != CLUTTER_INIT_SUCCESS)
+    goto quit;
+
   gst_init (&argc, &argv);
   clutter_gst_init (NULL, NULL);
 
