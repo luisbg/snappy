@@ -430,8 +430,6 @@ load_dlna (SnappyMP * mp)
   GDBusInterfaceInfo *ifaceinfo;
   GDBusConnection *connection;
 
-  g_type_init ();
-
   connection = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
 
   /* Build the introspection data structures from the XML */
