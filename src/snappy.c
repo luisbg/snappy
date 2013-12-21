@@ -177,6 +177,12 @@ main (int argc, char *argv[])
   SnappyMP *mp_obj = NULL;
 #endif
 
+  context = g_option_context_new ("<media file> - Play movie files");
+
+  /* Process command arguments */
+  uri_list = process_args (argc, argv, &blind, &fullscreen, &hide,
+      &loop, &secret, &suburi, &tags, context);
+
   ci_err = gtk_clutter_init (&argc, &argv);
   if (ci_err != CLUTTER_INIT_SUCCESS)
     goto quit;
@@ -208,12 +214,6 @@ main (int argc, char *argv[])
       g_free (root_dir);
     }
   }
-
-  context = g_option_context_new ("<media file> - Play movie files");
-
-  /* Process command arguments */
-  uri_list = process_args (argc, argv, &blind, &fullscreen, &hide,
-      &loop, &secret, &suburi, &tags, context);
 
   /* User Interface */
   ui = g_new (UserInterface, 1);
