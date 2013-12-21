@@ -179,16 +179,9 @@ main (int argc, char *argv[])
 
   context = g_option_context_new ("<media file> - Play movie files");
 
-  /* Process command arguments */
-  uri_list = process_args (argc, argv, &blind, &fullscreen, &hide,
-      &loop, &secret, &suburi, &tags, context);
-
   ci_err = gtk_clutter_init (&argc, &argv);
   if (ci_err != CLUTTER_INIT_SUCCESS)
     goto quit;
-
-  gst_init (&argc, &argv);
-  clutter_gst_init (NULL, NULL);
 
   /* Try to find the path for our resources in case snappy was relocated */
   data_dir = g_strdup (SNAPPY_DATA_DIR);
@@ -214,6 +207,13 @@ main (int argc, char *argv[])
       g_free (root_dir);
     }
   }
+
+  /* Process command arguments */
+  uri_list = process_args (argc, argv, &blind, &fullscreen, &hide,
+      &loop, &secret, &suburi, &tags, context);
+
+  gst_init (&argc, &argv);
+  clutter_gst_init (NULL, NULL);
 
   /* User Interface */
   ui = g_new (UserInterface, 1);
