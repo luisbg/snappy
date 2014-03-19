@@ -741,6 +741,7 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->media_height = 400;
   engine->media_duration = -1;
   engine->second = GST_SECOND;
+  engine->av_offset = 0;
   engine->rate = 1.0;
 
   engine->uri = NULL;
@@ -767,6 +768,16 @@ engine_init (GstEngine * engine, GstElement * sink)
   engine->navigation =
       GST_NAVIGATION (gst_bin_get_by_interface (GST_BIN (engine->player),
           GST_TYPE_NAVIGATION));
+
+  return TRUE;
+}
+
+/*            Change audio/video offset          */
+gboolean
+engine_change_offset (GstEngine * engine, gint64 av_offset)
+{
+  engine->av_offset = av_offset;
+  g_object_set (G_OBJECT (engine->player), "av-offset", av_offset, NULL);
 
   return TRUE;
 }

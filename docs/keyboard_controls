@@ -34,6 +34,9 @@ r          - rotate video
 .          - frame step foward
 ,          - frame step backwards
 
+-          - delay audio 50 milliseconds with respect to the video
++          - advance the audio 50 milliseconds with respect to the video
+
 [          - decrease speed of playback 10%
 ]          - increase speed of playback 10%
 

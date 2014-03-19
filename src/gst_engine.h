@@ -44,6 +44,7 @@ struct _GstEngine
   guint media_width, media_height;
   gint64 media_duration;
   gint64 second;
+  gint64 av_offset;
   gdouble rate;
 
   gchar *uri;
@@ -64,6 +65,7 @@ gboolean change_state (GstEngine * engine, gchar * state);
 gboolean check_missing_plugins_error (GstEngine * engine, GstMessage * msg);
 gboolean cycle_streams (GstEngine * engine, guint streamid);
 gboolean engine_init (GstEngine * engine, GstElement * sink);
+gboolean engine_change_offset (GstEngine * engine, gint64 av_offest);
 gboolean engine_change_speed (GstEngine * engine, gdouble rate);
 void engine_load_uri (GstEngine * engine, gchar * uri);
 void engine_open_uri (GstEngine * engine, gchar * uri);

@@ -491,6 +491,23 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
           break;
         }
 
+        case CLUTTER_minus:
+        case CLUTTER_plus:
+        {
+          // get current av_offset
+          gint64 av_offset = ui->engine->av_offset;
+
+          // change a/v offset
+          if (keyval == CLUTTER_minus) {
+            engine_change_offset (ui->engine, av_offset - (GST_SECOND / 20));
+          } else {
+            engine_change_offset (ui->engine, av_offset + (GST_SECOND / 20));
+          }
+
+          handled = TRUE;
+          break;
+        }
+
         default:
         {
           handled = FALSE;
