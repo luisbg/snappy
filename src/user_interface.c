@@ -40,7 +40,7 @@ static gboolean draw_progressbar (ClutterCanvas * canvas, cairo_t * cr,
     int surface_width, int surface_height, UserInterface * ui);
 static gboolean event_cb (ClutterStage * stage, ClutterEvent * event,
     UserInterface * ui);
-static void hide_cursor (UserInterface * ui);
+static void hide_cursor (UserInterface * ui, float *x, float *y);
 static void load_controls (UserInterface * ui);
 static void new_video_size (UserInterface * ui, gfloat width, gfloat height,
     gfloat * new_width, gfloat * new_height);
@@ -65,12 +65,26 @@ static gboolean
 controls_timeout_cb (gpointer data)
 {
   UserInterface *ui = data;
+  ClutterActor *actor;
+  ClutterDeviceManager *manager = NULL;
+  ClutterInputDevice *device = NULL;
+  ClutterPoint point;
+
+  manager = clutter_device_manager_get_default ();
+  device =
+      clutter_device_manager_get_core_device (manager, CLUTTER_POINTER_DEVICE);
+  clutter_input_device_get_coords (device, NULL, &point);
 
   ui->controls_timeout = -1;
 
-  hide_cursor (ui);
-  if (!ui->keep_showing_controls) {
-    show_controls (ui, FALSE);
+  // Only hide controls and cursor if the cursor is outside the control box.
+  actor = clutter_stage_get_actor_at_pos (CLUTTER_STAGE (ui->stage),
+      CLUTTER_PICK_ALL, point.x, point.y);
+  if (actor == ui->texture) {
+    hide_cursor (ui, &point.x, &point.y);
+    if (!ui->keep_showing_controls) {
+      show_controls (ui, FALSE);
+    }
   }
 
   return FALSE;
@@ -588,19 +602,23 @@ event_cb (ClutterStage * stage, ClutterEvent * event, UserInterface * ui)
 
 
 static void
-hide_cursor (UserInterface * ui)
+hide_cursor (UserInterface * ui, float *x, float *y)
 {
   ClutterDeviceManager *manager = NULL;
   ClutterInputDevice *device = NULL;
   ClutterPoint point;
 
-  manager = clutter_device_manager_get_default ();
-  device =
-      clutter_device_manager_get_core_device (manager, CLUTTER_POINTER_DEVICE);
-  clutter_input_device_get_coords (device, NULL, &point);
-
-  if (point.x > 0 && point.y > 0 &&
-      point.x < ui->stage_width && point.y < ui->stage_height) {
+  if (!x && !y) {
+    manager = clutter_device_manager_get_default ();
+    device =
+        clutter_device_manager_get_core_device (manager,
+        CLUTTER_POINTER_DEVICE);
+    clutter_input_device_get_coords (device, NULL, &point);
+    x = &point.x;
+    y = &point.y;
+  }
+  // If cursor inside the snappy window, hide it.
+  if (*x > 0 && *y > 0 && *x < ui->stage_width && *y < ui->stage_height) {
     clutter_stage_hide_cursor (CLUTTER_STAGE (ui->stage));
   }
 }
@@ -1165,7 +1183,7 @@ show_controls (UserInterface * ui, gboolean vis)
   else if (vis == FALSE && ui->controls_showing == TRUE) {
     ui->controls_showing = FALSE;
 
-    hide_cursor (ui);
+    hide_cursor (ui, NULL, NULL);
 
     clutter_actor_set_easing_mode (CLUTTER_ACTOR (ui->control_box),
         CLUTTER_EASE_OUT_QUINT);
