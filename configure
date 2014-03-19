@@ -2274,7 +2274,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
 
-am__api_version='1.12'
+am__api_version='1.13'
 
 # Find a good install program.  We prefer a C program (faster),
 # so one script is as good as another.  But avoid the broken or
@@ -2458,8 +2458,8 @@ if test x"${MISSING+set}" != xset; then
   esac
 fi
 # Use eval to expand $SHELL
-if eval "$MISSING --run true"; then
-  am_missing_run="$MISSING --run "
+if eval "$MISSING --is-lightweight"; then
+  am_missing_run="$MISSING "
 else
   am_missing_run=
   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: 'missing' script is too old or missing" >&5
@@ -2699,6 +2699,45 @@ else
 fi
 rmdir .tst 2>/dev/null
 
+# Check whether --enable-silent-rules was given.
+if test "${enable_silent_rules+set}" = set; then :
+  enableval=$enable_silent_rules;
+fi
+
+case $enable_silent_rules in # (((
+  yes) AM_DEFAULT_VERBOSITY=0;;
+   no) AM_DEFAULT_VERBOSITY=1;;
+    *) AM_DEFAULT_VERBOSITY=1;;
+esac
+am_make=${MAKE-make}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether $am_make supports nested variables" >&5
+$as_echo_n "checking whether $am_make supports nested variables... " >&6; }
+if ${am_cv_make_support_nested_variables+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if $as_echo 'TRUE=$(BAR$(V))
+BAR0=false
+BAR1=true
+V=1
+am__doit:
+	@$(TRUE)
+.PHONY: am__doit' | $am_make -f - >/dev/null 2>&1; then
+  am_cv_make_support_nested_variables=yes
+else
+  am_cv_make_support_nested_variables=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_make_support_nested_variables" >&5
+$as_echo "$am_cv_make_support_nested_variables" >&6; }
+if test $am_cv_make_support_nested_variables = yes; then
+    AM_V='$(V)'
+  AM_DEFAULT_V='$(AM_DEFAULT_VERBOSITY)'
+else
+  AM_V=$AM_DEFAULT_VERBOSITY
+  AM_DEFAULT_V=$AM_DEFAULT_VERBOSITY
+fi
+AM_BACKSLASH='\'
+
 if test "`cd $srcdir && pwd`" != "`pwd`"; then
   # Use -I$(srcdir) only when $(srcdir) != ., so that make's output
   # is not polluted with repeated "-I."
@@ -2762,87 +2801,127 @@ mkdir_p='$(MKDIR_P)'
 AMTAR='$${TAR-tar}'
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how to create a ustar tar archive" >&5
-$as_echo_n "checking how to create a ustar tar archive... " >&6; }
-# Loop over all known methods to create a tar archive until one works.
+# We'll loop over all known methods to create a tar archive until one works.
 _am_tools='gnutar plaintar pax cpio none'
-_am_tools=${am_cv_prog_tar_ustar-$_am_tools}
-# Do not fold the above two line into one, because Tru64 sh and
-# Solaris sh will not grok spaces in the rhs of '-'.
-for _am_tool in $_am_tools
-do
-  case $_am_tool in
-  gnutar)
-    for _am_tar in tar gnutar gtar;
-    do
-      { echo "$as_me:$LINENO: $_am_tar --version" >&5
+
+# The POSIX 1988 'ustar' format is defined with fixed-size fields.
+      # There is notably a 21 bits limit for the UID and the GID.  In fact,
+      # the 'pax' utility can hang on bigger UID/GID (see automake bug#8343
+      # and bug#13588).
+      am_max_uid=2097151 # 2^21 - 1
+      am_max_gid=$am_max_uid
+      # The $UID and $GID variables are not portable, so we need to resort
+      # to the POSIX-mandated id(1) utility.  Errors in the 'id' calls
+      # below are definitely unexpected, so allow the users to see them
+      # (that is, avoid stderr redirection).
+      am_uid=`id -u || echo unknown`
+      am_gid=`id -g || echo unknown`
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether UID '$am_uid' is supported by ustar format" >&5
+$as_echo_n "checking whether UID '$am_uid' is supported by ustar format... " >&6; }
+      if test $am_uid -le $am_max_uid; then
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+      else
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+         _am_tools=none
+      fi
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether GID '$am_gid' is supported by ustar format" >&5
+$as_echo_n "checking whether GID '$am_gid' is supported by ustar format... " >&6; }
+      if test $am_gid -le $am_max_gid; then
+         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+      else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+        _am_tools=none
+      fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking how to create a ustar tar archive" >&5
+$as_echo_n "checking how to create a ustar tar archive... " >&6; }
+
+  # Go ahead even if we have the value already cached.  We do so because we
+  # need to set the values for the 'am__tar' and 'am__untar' variables.
+  _am_tools=${am_cv_prog_tar_ustar-$_am_tools}
+
+  for _am_tool in $_am_tools; do
+    case $_am_tool in
+    gnutar)
+      for _am_tar in tar gnutar gtar; do
+        { echo "$as_me:$LINENO: $_am_tar --version" >&5
    ($_am_tar --version) >&5 2>&5
    ac_status=$?
    echo "$as_me:$LINENO: \$? = $ac_status" >&5
    (exit $ac_status); } && break
-    done
-    am__tar="$_am_tar --format=ustar -chf - "'"$$tardir"'
-    am__tar_="$_am_tar --format=ustar -chf - "'"$tardir"'
-    am__untar="$_am_tar -xf -"
-    ;;
-  plaintar)
-    # Must skip GNU tar: if it does not support --format= it doesn't create
-    # ustar tarball either.
-    (tar --version) >/dev/null 2>&1 && continue
-    am__tar='tar chf - "$$tardir"'
-    am__tar_='tar chf - "$tardir"'
-    am__untar='tar xf -'
-    ;;
-  pax)
-    am__tar='pax -L -x ustar -w "$$tardir"'
-    am__tar_='pax -L -x ustar -w "$tardir"'
-    am__untar='pax -r'
-    ;;
-  cpio)
-    am__tar='find "$$tardir" -print | cpio -o -H ustar -L'
-    am__tar_='find "$tardir" -print | cpio -o -H ustar -L'
-    am__untar='cpio -i -H ustar -d'
-    ;;
-  none)
-    am__tar=false
-    am__tar_=false
-    am__untar=false
-    ;;
-  esac
+      done
+      am__tar="$_am_tar --format=ustar -chf - "'"$$tardir"'
+      am__tar_="$_am_tar --format=ustar -chf - "'"$tardir"'
+      am__untar="$_am_tar -xf -"
+      ;;
+    plaintar)
+      # Must skip GNU tar: if it does not support --format= it doesn't create
+      # ustar tarball either.
+      (tar --version) >/dev/null 2>&1 && continue
+      am__tar='tar chf - "$$tardir"'
+      am__tar_='tar chf - "$tardir"'
+      am__untar='tar xf -'
+      ;;
+    pax)
+      am__tar='pax -L -x ustar -w "$$tardir"'
+      am__tar_='pax -L -x ustar -w "$tardir"'
+      am__untar='pax -r'
+      ;;
+    cpio)
+      am__tar='find "$$tardir" -print | cpio -o -H ustar -L'
+      am__tar_='find "$tardir" -print | cpio -o -H ustar -L'
+      am__untar='cpio -i -H ustar -d'
+      ;;
+    none)
+      am__tar=false
+      am__tar_=false
+      am__untar=false
+      ;;
+    esac
 
-  # If the value was cached, stop now.  We just wanted to have am__tar
-  # and am__untar set.
-  test -n "${am_cv_prog_tar_ustar}" && break
+    # If the value was cached, stop now.  We just wanted to have am__tar
+    # and am__untar set.
+    test -n "${am_cv_prog_tar_ustar}" && break
 
-  # tar/untar a dummy directory, and stop if the command works
-  rm -rf conftest.dir
-  mkdir conftest.dir
-  echo GrepMe > conftest.dir/file
-  { echo "$as_me:$LINENO: tardir=conftest.dir && eval $am__tar_ >conftest.tar" >&5
+    # tar/untar a dummy directory, and stop if the command works.
+    rm -rf conftest.dir
+    mkdir conftest.dir
+    echo GrepMe > conftest.dir/file
+    { echo "$as_me:$LINENO: tardir=conftest.dir && eval $am__tar_ >conftest.tar" >&5
    (tardir=conftest.dir && eval $am__tar_ >conftest.tar) >&5 2>&5
    ac_status=$?
    echo "$as_me:$LINENO: \$? = $ac_status" >&5
    (exit $ac_status); }
-  rm -rf conftest.dir
-  if test -s conftest.tar; then
-    { echo "$as_me:$LINENO: $am__untar <conftest.tar" >&5
+    rm -rf conftest.dir
+    if test -s conftest.tar; then
+      { echo "$as_me:$LINENO: $am__untar <conftest.tar" >&5
    ($am__untar <conftest.tar) >&5 2>&5
    ac_status=$?
    echo "$as_me:$LINENO: \$? = $ac_status" >&5
    (exit $ac_status); }
-    grep GrepMe conftest.dir/file >/dev/null 2>&1 && break
-  fi
-done
-rm -rf conftest.dir
+      { echo "$as_me:$LINENO: cat conftest.dir/file" >&5
+   (cat conftest.dir/file) >&5 2>&5
+   ac_status=$?
+   echo "$as_me:$LINENO: \$? = $ac_status" >&5
+   (exit $ac_status); }
+      grep GrepMe conftest.dir/file >/dev/null 2>&1 && break
+    fi
+  done
+  rm -rf conftest.dir
 
-if ${am_cv_prog_tar_ustar+:} false; then :
+  if ${am_cv_prog_tar_ustar+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   am_cv_prog_tar_ustar=$_am_tool
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_prog_tar_ustar" >&5
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $am_cv_prog_tar_ustar" >&5
 $as_echo "$am_cv_prog_tar_ustar" >&6; }
+
 
 
 
@@ -6656,7 +6735,7 @@ ia64-*-hpux*)
   rm -rf conftest*
   ;;
 
-x86_64-*kfreebsd*-gnu|x86_64-*linux*|ppc*-*linux*|powerpc*-*linux*| \
+x86_64-*kfreebsd*-gnu|x86_64-*linux*|powerpc*-*linux*| \
 s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
   # Find out which ABI we are using.
   echo 'int i;' > conftest.$ac_ext
@@ -6674,7 +6753,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  x86_64-*linux*)
 	    LD="${LD-ld} -m elf_i386"
 	    ;;
-	  ppc64-*linux*|powerpc64-*linux*)
+	  powerpc64le-*linux*)
+	    LD="${LD-ld} -m elf32lppclinux"
+	    ;;
+	  powerpc64-*linux*)
 	    LD="${LD-ld} -m elf32ppclinux"
 	    ;;
 	  s390x-*linux*)
@@ -6693,7 +6775,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*)
 	  x86_64-*linux*)
 	    LD="${LD-ld} -m elf_x86_64"
 	    ;;
-	  ppc*-*linux*|powerpc*-*linux*)
+	  powerpcle-*linux*)
+	    LD="${LD-ld} -m elf64lppc"
+	    ;;
+	  powerpc-*linux*)
 	    LD="${LD-ld} -m elf64ppc"
 	    ;;
 	  s390*-*linux*|s390*-*tpf*)
@@ -8035,6 +8120,10 @@ _lt_linker_boilerplate=`cat conftest.err`
 $RM -r conftest*
 
 
+## CAVEAT EMPTOR:
+## There is no encapsulation within the following macros, do not change
+## the running order or otherwise move them around unless you know exactly
+## what you are doing...
 if test -n "$compiler"; then
 
 lt_prog_compiler_no_builtin_flag=
@@ -11882,7 +11971,7 @@ test -z "$OBJDUMP" && OBJDUMP=objdump
 # keep one single GST_REQ, core/base should be same versions anyway
 GST_REQ=1.0.0
 CLUTTER_REQS=1.12.0
-CLUTTER_GST_REQS=1.5.5
+CLUTTER_GST_REQS=2.0.0
 CLUTTER_GTK_REQS=1.0.2
 GTK_REQS=3.5.0
 GIO_REQ=2.32
@@ -12019,11 +12108,13 @@ if test -n "$GST_CFLAGS"; then
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"\\
     gstreamer-1.0 >= \$GST_REQ
     gstreamer-base-1.0 >= \$GST_REQ
+    gstreamer-plugins-base-1.0 >= \$GST_REQ
     gstreamer-pbutils-1.0 >= \$GST_REQ
     gstreamer-video-1.0 >= \$GST_REQ\""; } >&5
   ($PKG_CONFIG --exists --print-errors "\
     gstreamer-1.0 >= $GST_REQ
     gstreamer-base-1.0 >= $GST_REQ
+    gstreamer-plugins-base-1.0 >= $GST_REQ
     gstreamer-pbutils-1.0 >= $GST_REQ
     gstreamer-video-1.0 >= $GST_REQ") 2>&5
   ac_status=$?
@@ -12032,6 +12123,7 @@ if test -n "$GST_CFLAGS"; then
   pkg_cv_GST_CFLAGS=`$PKG_CONFIG --cflags "\
     gstreamer-1.0 >= $GST_REQ
     gstreamer-base-1.0 >= $GST_REQ
+    gstreamer-plugins-base-1.0 >= $GST_REQ
     gstreamer-pbutils-1.0 >= $GST_REQ
     gstreamer-video-1.0 >= $GST_REQ" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
@@ -12048,11 +12140,13 @@ if test -n "$GST_LIBS"; then
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"\\
     gstreamer-1.0 >= \$GST_REQ
     gstreamer-base-1.0 >= \$GST_REQ
+    gstreamer-plugins-base-1.0 >= \$GST_REQ
     gstreamer-pbutils-1.0 >= \$GST_REQ
     gstreamer-video-1.0 >= \$GST_REQ\""; } >&5
   ($PKG_CONFIG --exists --print-errors "\
     gstreamer-1.0 >= $GST_REQ
     gstreamer-base-1.0 >= $GST_REQ
+    gstreamer-plugins-base-1.0 >= $GST_REQ
     gstreamer-pbutils-1.0 >= $GST_REQ
     gstreamer-video-1.0 >= $GST_REQ") 2>&5
   ac_status=$?
@@ -12061,6 +12155,7 @@ if test -n "$GST_LIBS"; then
   pkg_cv_GST_LIBS=`$PKG_CONFIG --libs "\
     gstreamer-1.0 >= $GST_REQ
     gstreamer-base-1.0 >= $GST_REQ
+    gstreamer-plugins-base-1.0 >= $GST_REQ
     gstreamer-pbutils-1.0 >= $GST_REQ
     gstreamer-video-1.0 >= $GST_REQ" 2>/dev/null`
 		      test "x$?" != "x0" && pkg_failed=yes
@@ -12086,12 +12181,14 @@ fi
 	        GST_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "\
     gstreamer-1.0 >= $GST_REQ
     gstreamer-base-1.0 >= $GST_REQ
+    gstreamer-plugins-base-1.0 >= $GST_REQ
     gstreamer-pbutils-1.0 >= $GST_REQ
     gstreamer-video-1.0 >= $GST_REQ" 2>&1`
         else
 	        GST_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "\
     gstreamer-1.0 >= $GST_REQ
     gstreamer-base-1.0 >= $GST_REQ
+    gstreamer-plugins-base-1.0 >= $GST_REQ
     gstreamer-pbutils-1.0 >= $GST_REQ
     gstreamer-video-1.0 >= $GST_REQ" 2>&1`
         fi
@@ -12101,6 +12198,7 @@ fi
 	as_fn_error $? "Package requirements (\
     gstreamer-1.0 >= $GST_REQ
     gstreamer-base-1.0 >= $GST_REQ
+    gstreamer-plugins-base-1.0 >= $GST_REQ
     gstreamer-pbutils-1.0 >= $GST_REQ
     gstreamer-video-1.0 >= $GST_REQ) were not met:
 
@@ -13351,7 +13449,6 @@ DEFS=-DHAVE_CONFIG_H
 
 ac_libobjs=
 ac_ltlibobjs=
-U=
 for ac_i in : $LIBOBJS; do test "x$ac_i" = x: && continue
   # 1. Remove the extension, and $U if already installed.
   ac_script='s/\$U\././;s/\.o$//;s/\.obj$//'
@@ -14870,7 +14967,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
   case $ac_file$ac_mode in
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
-  # Autoconf 2.62 quotes --file arguments for eval, but not when files
+  # Older Autoconf quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval
   # if we detect the quoting.
   case $CONFIG_FILES in
@@ -14921,7 +15018,7 @@ $as_echo X"$mf" |
     DEPDIR=`sed -n 's/^DEPDIR = //p' < "$mf"`
     test -z "$DEPDIR" && continue
     am__include=`sed -n 's/^am__include = //p' < "$mf"`
-    test -z "am__include" && continue
+    test -z "$am__include" && continue
     am__quote=`sed -n 's/^am__quote = //p' < "$mf"`
     # Find all dependency output files, they are included files with
     # $(DEPDIR) in their names.  We invoke sed twice because it is the
