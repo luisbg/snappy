@@ -1488,8 +1488,7 @@ interface_on_drop_cb (GtkWidget * widget,
 {
   char **list;
 
-  list =
-      g_uri_list_extract_uris ((const gchar *)
+  list = g_uri_list_extract_uris ((const gchar *)
       gtk_selection_data_get_data (data));
 
   engine_open_uri (ui->engine, list[0]);
