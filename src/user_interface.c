@@ -1,7 +1,7 @@
 /*
- * snappy - 0.3
+ * snappy - 1.0
  *
- * Copyright (C) 2011-213 Collabora Ltd.
+ * Copyright (C) 2011-214 Collabora Ltd.
  * Luis de Bethencourt <luis.debethencourt@collabora.co.uk>
  *
  * This program is free software; you can redistribute it and/or modify
