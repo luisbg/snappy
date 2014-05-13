@@ -1052,9 +1052,9 @@ position_ns_to_str (UserInterface * ui, gint64 nanoseconds)
   seconds = seconds - (minutes * SEC_IN_MIN);
 
   if (hours >= 1)
-    return g_strdup_printf ("%d:%02d:%02ld", hours, minutes, seconds);
+    return g_strdup_printf ("%d:%02d:%02" G_GINT64_FORMAT, hours, minutes, seconds);
   else
-    return g_strdup_printf ("%02d:%02ld", minutes, seconds);
+    return g_strdup_printf ("%02d:%02" G_GINT64_FORMAT, minutes, seconds);
 }
 
 static void
