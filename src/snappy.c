@@ -179,6 +179,7 @@ main (int argc, char *argv[])
 
   context = g_option_context_new ("<media file> - Play movie files");
 
+  clutter_set_windowing_backend (CLUTTER_WINDOWING_X11);
   ci_err = gtk_clutter_init (&argc, &argv);
   if (ci_err != CLUTTER_INIT_SUCCESS)
     goto quit;
