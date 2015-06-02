@@ -33,7 +33,7 @@ AC_LIBTOOL_WIN32_DLL
 AC_CANONICAL_HOST
 
 # keep one single GST_REQ, core/base should be same versions anyway
-GST_REQ=1.0.0
+GST_REQ=1.4.0
 CLUTTER_REQS=1.12.0
 CLUTTER_GST_REQS=2.0.0
 CLUTTER_GTK_REQS=1.0.2
