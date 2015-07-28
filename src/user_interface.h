@@ -23,6 +23,10 @@
 #ifndef __USER_INTERFACE_H__
 #define __USER_INTERFACE_H__
 
+#include <clutter/clutter.h>
+#include <clutter-gst/clutter-gst.h>
+#include <clutter-gtk/clutter-gtk.h>
+
 #include <gtk/gtk.h>
 
 #include "gst_engine.h"

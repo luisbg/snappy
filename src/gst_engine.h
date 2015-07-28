@@ -24,6 +24,7 @@
 #define __GST_ENGINE_H__
 
 #include <gst/gst.h>
+#include <clutter-gst/clutter-gst.h>
 
 /* GStreamer Interfaces */
 #include <gst/video/navigation.h>
@@ -50,7 +51,7 @@ struct _GstEngine
   gchar *uri;
 
   GstElement *player;
-  GstElement *sink;
+  ClutterGstVideoSink *sink;
 
   GstBus *bus;
 
@@ -64,7 +65,7 @@ gboolean bus_call (GstBus * bus, GstMessage * msg, gpointer data);
 gboolean change_state (GstEngine * engine, gchar * state);
 gboolean check_missing_plugins_error (GstEngine * engine, GstMessage * msg);
 gboolean cycle_streams (GstEngine * engine, guint streamid);
-gboolean engine_init (GstEngine * engine, GstElement * sink);
+gboolean engine_init (GstEngine * engine, ClutterGstVideoSink * sink);
 gboolean engine_change_offset (GstEngine * engine, gint64 av_offest);
 gboolean engine_change_speed (GstEngine * engine, gdouble rate);
 void engine_load_uri (GstEngine * engine, gchar * uri);

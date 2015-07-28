@@ -29,9 +29,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <clutter/clutter.h>
-#include <clutter-gst/clutter-gst.h>
-#include <clutter-gtk/clutter-gtk.h>
 
 #include "user_interface.h"
 
@@ -160,7 +157,7 @@ main (int argc, char *argv[])
   UserInterface *ui = NULL;
   GstEngine *engine = NULL;
   ClutterActor *video_texture;
-  GstElement *sink;
+  ClutterGstVideoSink *sink;
 
   gboolean ok, blind = FALSE, fullscreen = FALSE, hide = FALSE, loop = FALSE;
   gboolean secret = FALSE, tags = FALSE;
@@ -230,7 +227,7 @@ main (int argc, char *argv[])
 
   /* Gstreamer engine */
   engine = g_new (GstEngine, 1);
-  sink = gst_element_factory_make ("cluttersink", "video-sink");
+  sink = clutter_gst_video_sink_new ();
   if (sink == NULL) {
     g_print ("ERROR: Failed to create clutter-gst sink element\n");
     return FALSE;

@@ -724,7 +724,7 @@ cycle_streams (GstEngine * engine, guint streamid)
 
 /*            Init GstEngine variables           */
 gboolean
-engine_init (GstEngine * engine, GstElement * sink)
+engine_init (GstEngine * engine, ClutterGstVideoSink * sink)
 {
   engine->playing = FALSE;
   engine->direction_foward = TRUE;
