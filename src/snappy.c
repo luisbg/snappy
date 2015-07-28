@@ -222,8 +222,6 @@ main (int argc, char *argv[])
   ui->tags = tags;
   ui->data_dir = data_dir;
   interface_init (ui);
-  video_texture = g_object_new (CLUTTER_TYPE_TEXTURE, "disable-slicing", TRUE,
-      NULL);
 
   /* Gstreamer engine */
   engine = g_new (GstEngine, 1);
@@ -232,7 +230,9 @@ main (int argc, char *argv[])
     g_print ("ERROR: Failed to create clutter-gst sink element\n");
     return FALSE;
   }
-  g_object_set (G_OBJECT (sink), "texture", video_texture, NULL);
+  video_texture = g_object_new (CLUTTER_TYPE_ACTOR, "content",
+      g_object_new (CLUTTER_GST_TYPE_CONTENT, "sink", sink, NULL),
+      "name", "texture", NULL);
 
   ok = engine_init (engine, sink);
   if (!ok)
