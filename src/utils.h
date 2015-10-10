@@ -26,12 +26,14 @@
 #include <glib.h>
 #include <gio/gio.h>
 #include <gst/gst.h>
+#include <string.h>
 
 G_BEGIN_DECLS
 
 gchar * cut_long_filename (gchar * filename, gint length);
 gchar * clean_uri (gchar * input_arg);
 gchar * clean_brackets_in_uri (gchar * uri);
+gchar * strip_filename_extension (gchar * filename);
 
 G_END_DECLS
 #endif /* __UTILS_H__ */

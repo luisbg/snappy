@@ -248,8 +248,20 @@ main (int argc, char *argv[])
   gst_object_unref (engine->bus);
 
   /* Get uri to load */
-  if (uri_list)
+  if (uri_list) {
     uri = g_list_first (uri_list)->data;
+    /* based on video filename we can guess subtitle file (.srt files only) */
+    if (NULL == suburi) {
+      gchar suburi_path_guessing[1024]; //buffer
+      gchar *uri_no_extension = strip_filename_extension (uri);
+
+      sprintf (suburi_path_guessing, "%s.srt", uri_no_extension);
+      /* subtitle file exists, defaults for it */
+      if (g_file_test (g_filename_from_uri (suburi_path_guessing, NULL, NULL),
+              G_FILE_TEST_EXISTS))
+        suburi = suburi_path_guessing;
+    }
+  }
 
   /* Load engine and start interface */
   engine_load_uri (engine, uri);

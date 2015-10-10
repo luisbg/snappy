@@ -89,3 +89,24 @@ clean_brackets_in_uri (gchar * uri)
 
   return clean_uri;
 }
+
+gchar *
+strip_filename_extension (gchar * filename)
+{
+  gchar *retstr;
+  gchar *lastdot;
+
+  if (NULL == filename)
+    return NULL;
+
+  if (NULL == (retstr = malloc (strlen (filename) + 1)))
+    return NULL;
+
+  strcpy (retstr, filename);
+  lastdot = strrchr (retstr, '.');
+
+  if (NULL != lastdot)
+    *lastdot = '\0';
+
+  return retstr;
+}
